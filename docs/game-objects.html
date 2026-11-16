@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Game Objects · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-game-objects">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li class="current"><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 2 of 11</p>
+<h1 id="game-objects">Game Objects</h1>
+<p class="lead">A <strong>GameObject</strong> is one thing in your game: the player, a coin, a wall, a bullet, a crate. Each one has a shape the physics engine uses, a look, and properties you can change while the game runs.</p>
+<h2 id="making-a-game-object">Making a game object</h2>
+<p>There are a few ways to write it. Use whichever reads best:</p>
+<pre><code class="language-js">new GameObject(x, y);                          // a 40×40 box
+new GameObject(x, y, size);                    // a square
+new GameObject(x, y, width, height);           // a rectangle
+new GameObject(x, y, width, height, options);  // with options
+new GameObject(x, y, size, options);           // square with options
+</code></pre>
+<p>Usually you'll want to keep the object in a variable so you can use it later:</p>
+<pre><code class="language-js">let player;
+
+function setup() {
+  createCanvas(640, 360);
+  player = new GameObject(100, 100, 40, 60, { color: 'tomato' });
+}
+</code></pre>
+<p><strong>Options</strong> is an object with any settings you want, in any order. Anything you leave out gets a sensible default. You can also change every option later, for example <code>player.color = 'gold'</code>.</p>
+<blockquote>
+<p><strong>Tip:</strong> Remember that <code>x</code> and <code>y</code> are the <strong>centre</strong> of the object, not its top-left corner.</p>
+</blockquote>
+<h2 id="shapes">Shapes</h2>
+<p>Set the <code>shape</code> option to choose the physics shape:</p>
+<table>
+<thead>
+<tr>
+<th><code>shape</code></th>
+<th>What you get</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'box'</code></td>
+<td>A rectangle (the default). Add <code>cornerRadius: 8</code> for rounded corners.</td>
+</tr>
+<tr>
+<td><code>'circle'</code></td>
+<td>A circle. The width is the <strong>diameter</strong>.</td>
+</tr>
+<tr>
+<td><code>'triangle'</code></td>
+<td>An equal-sided triangle with a point facing right.</td>
+</tr>
+<tr>
+<td><code>'polygon'</code></td>
+<td>A regular polygon. Set <code>sides</code> (default 6). The width is the diameter.</td>
+</tr>
+<tr>
+<td>your own</td>
+<td>Leave out <code>shape</code> and give <code>vertices</code>, a list of points around the centre.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">new GameObject(80, 50, 60, 40);                                // box
+new GameObject(180, 50, 50, { shape: 'circle' });
+new GameObject(280, 50, 50, { shape: 'triangle' });
+new GameObject(380, 50, 50, { shape: 'polygon', sides: 5 });
+new GameObject(480, 50, {
+  vertices: [[0, -30], [25, 20], [-25, 20]],                   // points around the centre
+});
+</code></pre>
+<div class="demo" data-sketch="shapes" data-width="640" data-height="300"></div>
+<blockquote>
+<p><strong>Watch out:</strong> custom shapes made from <code>vertices</code> should be <strong>convex</strong>, meaning no dents or inward corners, like a star has. Dented shapes need an extra library, so build them from several simple objects instead.</p>
+</blockquote>
+<h2 id="how-it-looks">How it looks</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it does</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color</code></td>
+<td>The inside colour, like p5's <code>fill()</code>. Any p5 colour: <code>'red'</code>, <code>'#ff8800'</code>, <code>[255, 0, 0]</code>. <code>null</code> for none.</td>
+<td>random pastel</td>
+</tr>
+<tr>
+<td><code>stroke</code></td>
+<td>The outline colour, like p5's <code>stroke()</code>. <code>null</code> for no outline.</td>
+<td>black</td>
+</tr>
+<tr>
+<td><code>strokeWeight</code></td>
+<td>Outline thickness</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>opacity</code></td>
+<td><code>0</code> (invisible) to <code>255</code> (solid)</td>
+<td><code>255</code></td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>Text drawn in the middle of the object</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>labelColor</code>, <code>labelSize</code></td>
+<td>Colour and size of the label</td>
+<td>black, <code>14</code></td>
+</tr>
+<tr>
+<td><code>visible</code></td>
+<td><code>false</code> hides it (it still collides!)</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>depth</code></td>
+<td>Drawing order. Higher numbers are drawn on top.</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>flipX</code>, <code>flipY</code></td>
+<td>Mirror the object (handy for images facing left/right)</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>showRotation</code></td>
+<td>Circles draw a line so you can see them roll</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>You can change the colours at any time. <code>fill()</code> works just like p5's <code>fill()</code>, so any colour p5 understands works here too:</p>
+<pre><code class="language-js">player.color = 'gold';       // set the colour directly...
+player.fill(255, 200, 0);    // ...or the p5 way
+player.fill(0, 0, 255, 128); // with transparency
+player.stroke = 'navy';      // outline colour
+player.stroke = null;        // no outline
+player.strokeWeight = 4;
+</code></pre>
+<div class="demo" data-sketch="appearance" data-width="640" data-height="300"></div>
+<h2 id="images">Images</h2>
+<p>To make an object look like a picture, load an image and pass it as the <code>image</code> option. In p5.js 2.x, load images in an <strong><code>async setup()</code></strong> with <strong><code>await</code></strong>:</p>
+<pre><code class="language-js">let crateImg;
+
+async function setup() {
+  createCanvas(640, 320);
+  crateImg = await loadImage('crate.png');
+
+  new GameObject(320, 100, 48, 48, { image: crateImg });
+}
+</code></pre>
+<p>The picture is stretched to the object's width and height. The physics shape is still a box underneath, so for round pictures add <code>shape: 'circle'</code> to make the object roll properly:</p>
+<pre><code class="language-js">new GameObject(200, 100, 48, { image: ballImg, shape: 'circle', bounce: 0.8 });
+</code></pre>
+<p>To use the image at its own size, give the object the image's size:</p>
+<pre><code class="language-js">new GameObject(200, 100, crateImg.width, crateImg.height, { image: crateImg });
+</code></pre>
+<div class="demo" data-sketch="images" data-width="640" data-height="320"></div>
+<p>You can swap the picture any time with <code>obj.image = otherImage</code>. To nudge the picture inside its shape (for art that isn't centred in its file), use <code>imageOffsetX</code> and <code>imageOffsetY</code>. Animated pictures have their own section: <a href="animation.html">Spritesheets and Animations</a>.</p>
+<blockquote>
+<p><strong>Tip:</strong> with <code>world.debug = true</code> you can see whether the physics shape matches your picture.</p>
+</blockquote>
+<h2 id="changing-size">Changing size</h2>
+<pre><code class="language-js">box.width = 120;         // physics shape changes too
+box.height = 20;
+box.setSize(80, 80);
+</code></pre>
+<p>For circles, triangles and polygons, setting <code>width</code> or <code>height</code> changes both.</p>
+<h2 id="remembering-things-name-and-data">Remembering things: <code>name</code> and <code>data</code></h2>
+<p>Every object has a <code>name</code> and a <code>data</code> object for your own information, like health or points:</p>
+<pre><code class="language-js">let enemy = new GameObject(300, 100, 40, { name: 'slime' });
+enemy.data.health = 3;
+enemy.data.points = 50;
+
+// later…
+enemy.data.health--;
+if (enemy.data.health &lt;= 0) enemy.destroy();
+</code></pre>
+<h2 id="removing-objects">Removing objects</h2>
+<ul>
+<li><strong><code>obj.destroy()</code></strong> removes the object from the world and from every group.</li>
+<li><strong><code>obj.destroyed</code></strong> is <code>true</code> once it's gone.</li>
+<li><strong><code>lifespan</code></strong> is a number of frames after which the object destroys itself. It's perfect for bullets, sparks and explosions.</li>
+<li><strong><code>obj.isOffscreen()</code></strong> is <code>true</code> when the object is completely off the screen.</li>
+</ul>
+<pre><code class="language-js">// a spark that disappears after one second (60 frames)
+new GameObject(x, y, 6, { shape: 'circle', lifespan: 60 });
+
+// clean up things that fell off the bottom
+if (rock.isOffscreen(100)) rock.destroy();
+</code></pre>
+<div class="demo" data-sketch="lifespan" data-width="640" data-height="320"></div>
+<h2 id="making-your-own-kind-of-object">Making your own kind of object</h2>
+<p>When several objects behave the same way, make a <strong>class</strong> that <code>extends GameObject</code>. You get everything a GameObject has, plus your own code.</p>
+<ul>
+<li><strong><code>update()</code></strong> runs every frame, just before the physics step. Put behaviour here.</li>
+<li><strong><code>drawShape(p)</code></strong> draws the object. <code>(0, 0)</code> is the object's centre and the drawing is already rotated. Override it to give your object a custom look. Use <code>p.</code> in front of p5 functions.</li>
+</ul>
+<pre><code class="language-js">class Robot extends GameObject {
+  constructor(x, y) {
+    super(x, y, 60, 70, { fixedRotation: true, cornerRadius: 10 });
+    this.data.blink = 0;
+  }
+
+  update() {
+    // blink every now and then
+    if (random() &lt; 0.01) this.data.blink = 8;
+    if (this.data.blink &gt; 0) this.data.blink--;
+  }
+
+  drawShape(p) {
+    p.fill(140, 160, 190);
+    p.stroke(60);
+    p.rect(0, 0, this.width, this.height, 10);   // rectMode is CENTER in here
+    p.fill(255);
+    let eyeH = this.data.blink &gt; 0 ? 2 : 16;
+    p.ellipse(-12, -10, 16, eyeH);
+    p.ellipse(12, -10, 16, eyeH);
+  }
+}
+</code></pre>
+<div class="demo" data-sketch="custom-class" data-width="640" data-height="320"></div>
+<blockquote>
+<p><strong>Tip:</strong> inside <code>drawShape</code>, the drawing is already moved to the centre of the object and rotated, and <code>rectMode</code> and <code>ellipseMode</code> are <code>CENTER</code>.</p>
+</blockquote>
+<h2 id="quick-reference">Quick reference</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code>, <code>y</code></td>
+<td>Centre position</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code>, <code>setSize(w, h)</code></td>
+<td>Size</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td>Angle in degrees</td>
+</tr>
+<tr>
+<td><code>shape</code></td>
+<td><code>'box'</code>, <code>'circle'</code>, <code>'triangle'</code>, <code>'polygon'</code> or <code>'custom'</code> (read only)</td>
+</tr>
+<tr>
+<td><code>color</code>, <code>fill(...)</code>, <code>stroke</code>, <code>strokeWeight</code>, <code>opacity</code></td>
+<td>Colours</td>
+</tr>
+<tr>
+<td><code>image</code>, <code>imageOffsetX</code>, <code>imageOffsetY</code></td>
+<td>Picture</td>
+</tr>
+<tr>
+<td><code>label</code>, <code>labelColor</code>, <code>labelSize</code></td>
+<td>Text on the object</td>
+</tr>
+<tr>
+<td><code>visible</code>, <code>depth</code>, <code>flipX</code>, <code>flipY</code></td>
+<td>Drawing</td>
+</tr>
+<tr>
+<td><code>name</code>, <code>data</code></td>
+<td>Your own information</td>
+</tr>
+<tr>
+<td><code>lifespan</code>, <code>destroy()</code>, <code>destroyed</code>, <code>isOffscreen()</code></td>
+<td>Removing</td>
+</tr>
+<tr>
+<td><code>update()</code>, <code>drawShape(p)</code></td>
+<td>Override these in your own class</td>
+</tr>
+</tbody>
+</table>
+    <nav class="pager">
+      <a class="prev" href="getting-started.html"><small>Previous</small>Getting Started</a>
+      <a class="next" href="movement.html"><small>Next</small>Movement</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

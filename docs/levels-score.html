@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Managing your Game with Levels and Score · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-levels-score">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li class="current"><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 10 of 11</p>
+<h1 id="managing-your-game-with-levels-and-score">Managing your Game with Levels and Score</h1>
+<p class="lead">You have objects that move, collide, animate and make noise. This section turns them into a <strong>game</strong>: something with a score, lives, a start and an end, and more than one level.</p>
+<h2 id="keeping-score">Keeping score</h2>
+<p>The score is just a variable. Change it when something happens, and draw it every frame:</p>
+<pre><code class="language-js">let score = 0;
+
+function setup() {
+  // ...
+  player.onCollide(coins, (me, coin) =&gt; {
+    coin.destroy();
+    score += 10;
+  });
+}
+</code></pre>
+<h3 id="drawing-the-score-on-top">Drawing the score on top</h3>
+<p>GameObjects normally draws your objects <strong>after</strong> <code>draw()</code> finishes, which would put them on top of your score. To draw text over the game, call <strong><code>world.draw()</code></strong> yourself, then draw your text afterwards:</p>
+<pre><code class="language-js">function draw() {
+  background(220);
+
+  world.draw();                   // 1. draw the game objects now
+
+  fill(0);                        // 2. then the score, on top
+  textSize(20);
+  text('Score: ' + score, 10, 30);
+}
+</code></pre>
+<p>GameObjects notices you drew the world yourself and won't draw it again that frame. Anything you draw before <code>world.draw()</code>, like a background picture, ends up <strong>behind</strong> the objects.</p>
+<h2 id="lives-and-losing">Lives and losing</h2>
+<p>Lives work the same way: a variable, and a check for when they run out.</p>
+<pre><code class="language-js">let lives = 3;
+
+function loseLife() {
+  lives--;
+  if (lives &lt;= 0) {
+    gameOver();
+  } else {
+    player.setPosition(startX, startY);   // back to the start
+    player.stop();
+  }
+}
+
+// falling off the bottom of the level
+if (player.y &gt; height + 100) loseLife();
+</code></pre>
+<h2 id="game-states-title-playing-game-over">Game states: title, playing, game over</h2>
+<p>Most games have <strong>screens</strong>: a title screen, the game itself, a game-over screen. Keep track of which one you're on with a <strong>state</strong> variable, and draw something different for each:</p>
+<pre><code class="language-js">let state = 'title';
+
+function draw() {
+  background(30);
+
+  if (state === 'title') {
+    text('SUPER CATCH — press any key', 200, 180);
+  } else if (state === 'playing') {
+    playGame();       // move things, check rules
+    world.draw();
+    drawScore();
+  } else if (state === 'gameover') {
+    world.draw();
+    text('GAME OVER — press R', 200, 180);
+  }
+}
+</code></pre>
+<p>Freeze the physics while you're not playing with <strong><code>world.paused</code></strong>:</p>
+<pre><code class="language-js">function gameOver() {
+  state = 'gameover';
+  world.paused = true;
+}
+</code></pre>
+<h2 id="starting-again">Starting again</h2>
+<p>To restart, you need to <strong>remove everything</strong> and <strong>build it again</strong>. Put all the building code in one function, so you can call it at the start and again later:</p>
+<pre><code class="language-js">function startGame() {
+  world.clear();          // destroy every object and joint
+  score = 0;
+  lives = 3;
+  player = new GameObject(320, 300, 40);
+  // ... make the rest of the game
+  world.paused = false;
+  state = 'playing';
+}
+</code></pre>
+<blockquote>
+<p><strong>Watch out:</strong> <code>world.clear()</code> destroys <strong>everything</strong>, including walls from <code>world.addWalls()</code>. Make them again inside <code>startGame()</code>. Also make your groups <strong>once</strong> in <code>setup()</code>. <code>clear()</code> empties them, but they keep their settings and collision rules.</p>
+</blockquote>
+<h2 id="saving-a-high-score">Saving a high score</h2>
+<p>p5.js can remember things in the browser even after the page is closed, using <code>storeItem</code> and <code>getItem</code>:</p>
+<pre><code class="language-js">let best = getItem('bestScore') || 0;     // 0 the first time
+
+function gameOver() {
+  if (score &gt; best) {
+    best = score;
+    storeItem('bestScore', best);
+  }
+}
+</code></pre>
+<div class="demo" data-sketch="catch-game" data-width="640" data-height="360" data-keys="1"></div>
+<h2 id="levels">Levels</h2>
+<p>A <strong>level</strong> is a particular arrangement of platforms, enemies and collectibles. The easiest way to design levels is to <strong>draw them as text</strong>. Each character stands for one tile of the map:</p>
+<pre><code class="language-js">let levels = [
+  [
+    '                    ',
+    '                    ',
+    '      o o o         ',
+    '     #######     E  ',
+    '  P            #####',
+    '#######    #########',
+  ],
+  [
+    '  o                E',
+    ' ###     o o   #####',
+    '       #####        ',
+    '  o o              o',
+    ' #####   P    ##### ',
+    '####################',
+  ],
+];
+</code></pre>
+<p>Here <code>#</code> is ground, <code>o</code> is a coin, <code>P</code> is where the player starts, <code>E</code> is the exit and a space is empty. Changing a level is as easy as typing.</p>
+<h3 id="building-a-level-from-the-map">Building a level from the map</h3>
+<p>Loop through every row and every character, and make the right object for each one:</p>
+<pre><code class="language-js">let TILE = 32;
+
+function buildLevel(n) {
+  world.clear();
+  let map = levels[n];
+  for (let row = 0; row &lt; map.length; row++) {
+    for (let col = 0; col &lt; map[row].length; col++) {
+      let ch = map[row][col];
+      let x = col * TILE + TILE / 2;    // centre of this tile
+      let y = row * TILE + TILE / 2;
+      if (ch === '#') ground.create(x, y, TILE, TILE);
+      if (ch === 'o') coins.create(x, y, TILE / 2);
+      if (ch === 'E') exit = new GameObject(x, y, TILE, TILE, { isStatic: true, isSensor: true });
+      if (ch === 'P') player = makePlayer(x, y);
+    }
+  }
+}
+</code></pre>
+<h3 id="moving-to-the-next-level">Moving to the next level</h3>
+<p>Keep the current level number in a variable. When the player reaches the exit, add one and build the next level:</p>
+<pre><code class="language-js">let level = 0;
+
+function nextLevel() {
+  level++;
+  if (level &gt;= levels.length) {
+    state = 'won';            // no more levels!
+  } else {
+    buildLevel(level);
+  }
+}
+
+// in draw():
+if (player.isTouching(exit) &amp;&amp; coins.length === 0) nextLevel();
+</code></pre>
+<blockquote>
+<p><strong>Tip:</strong> change levels <strong>in <code>draw()</code></strong>, not inside an <code>onCollide</code> callback. Building a whole level in the middle of the physics step can cause strange results. Checking <code>isTouching</code> in <code>draw()</code> avoids the problem.</p>
+</blockquote>
+<div class="demo" data-sketch="tile-levels" data-width="640" data-height="360" data-keys="1"></div>
+<h2 id="putting-it-all-together">Putting it all together</h2>
+<p>A complete game usually has these parts:</p>
+<ol>
+<li><strong><code>setup()</code></strong> loads images and sounds, makes the world and groups (with their collision rules), then shows the title screen.</li>
+<li><strong><code>startGame()</code></strong> resets the score and lives, and builds the first level.</li>
+<li><strong><code>buildLevel(n)</code></strong> clears the world and makes everything for level <code>n</code>.</li>
+<li><strong><code>draw()</code></strong> checks the <strong>state</strong>, reads the keys, checks the rules (won? lost? next level?), then draws the world and the score.</li>
+<li><strong><code>keyPressed()</code></strong> handles jumping, starting and restarting.</li>
+</ol>
+<p>The <a href="examples.html">example games</a> that come with GameObjects follow this pattern. Open them up, change things and see what happens.</p>
+<p><strong>Have fun making games!</strong></p>
+    <nav class="pager">
+      <a class="prev" href="input-camera.html"><small>Previous</small>Player Input and Camera</a>
+      <a class="next" href="examples.html"><small>Next</small>Example Games</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

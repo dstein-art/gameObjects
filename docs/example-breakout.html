@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Breakout · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-example-breakout">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html" class="current" aria-current="page">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li class=current><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num"><a href="examples.html">Example Games</a> › Breakout</p>
+<h1 id="breakout">Breakout</h1>
+<p class="lead">The classic: a paddle, a bouncing ball and a wall of bricks. Along the way you'll write your first class that <strong>extends GameObject</strong>.</p>
+<p><strong>You'll learn:</strong> zero gravity · perfectly bouncy objects · controlling a static object with the mouse · making your own class with <code>update()</code> · group collisions · lives and winning</p>
+<h2 id="play-the-finished-game">Play the finished game</h2>
+<p>Move the mouse to steer the paddle and click to launch the ball. Break all the bricks!</p>
+<div class="demo" data-sketch="examples/breakout" data-width="600" data-height="600"></div>
+<h2 id="step-1-no-gravity-walls-and-a-paddle">Step 1: No gravity, walls and a paddle</h2>
+<p>Breakout has no gravity: the ball should fly in straight lines. Every sketch has a ready-made <code>world</code>, and we turn its gravity off with <code>world.gravityY = 0</code>.</p>
+<p>The walls make the ball bounce, so they're perfectly bouncy (<code>bounce: 1</code>) with no friction. The bottom wall is removed: that's where you lose the ball.</p>
+<pre><code class="language-js">world.gravityY = 0; // no gravity in breakout
+
+let walls = world.addWalls({ bounce: 1, friction: 0 });
+walls.bottom.destroy();
+</code></pre>
+<p>The paddle is <strong>static</strong>, so the ball can't push it around, but we can move it ourselves. <code>constrain()</code> keeps it on the screen:</p>
+<pre><code class="language-js">paddle.x = constrain(mouseX, paddle.width / 2, width - paddle.width / 2);
+</code></pre>
+<div class="demo" data-sketch="examples/breakout-step-1" data-width="600" data-height="600"></div>
+<h2 id="step-2-a-bouncing-ball">Step 2: A bouncing ball</h2>
+<p>The ball needs three settings to bounce forever without losing speed:</p>
+<ul>
+<li><code>bounce: 1</code> keeps all its speed when it hits something.</li>
+<li><code>friction: 0</code> stops it gripping and spinning when it hits a wall at an angle.</li>
+<li><code>airFriction: 0</code> stops it slowing down as it moves.</li>
+</ul>
+<pre><code class="language-js">ball = new GameObject(width / 2, height - 60, 16, {
+  shape: 'circle',
+  color: 'white',
+  stroke: null,
+  bounce: 1,
+  friction: 0,
+  airFriction: 0,
+  fixedRotation: true,
+});
+</code></pre>
+<p>Clicking launches it, up and a little to one side:</p>
+<pre><code class="language-js">function mousePressed() {
+  ball.setVelocity(random(-3, 3), -6);
+}
+</code></pre>
+<div class="demo" data-sketch="examples/breakout-step-2" data-width="600" data-height="600"></div>
+<p>Two problems: the ball sits in the middle of nowhere before it's launched, and once it's gone, it's gone. Over time it can also speed up or slow down a little, or get stuck bouncing almost flat.</p>
+<h2 id="step-3-a-ball-class">Step 3: A Ball class</h2>
+<p>When an object needs its own <strong>behaviour</strong>, make a class that <code>extends GameObject</code>. The class gets everything a GameObject has, and its <code>update()</code> method runs every frame, just before the physics step.</p>
+<p>Our <code>Ball</code>:</p>
+<ul>
+<li><strong>before launch</strong>, sits on top of the paddle (<code>setPosition</code>) and doesn't move (<code>stop()</code>);</li>
+<li><strong>after launch</strong>, never travels too flat and always moves at <code>speed</code> 7.</li>
+</ul>
+<pre><code class="language-js">class Ball extends GameObject {
+  constructor(x, y) {
+    super(x, y, 16, { shape: 'circle', color: 'white', /* ... */ });
+  }
+
+  update() {
+    if (!launched) {
+      this.setPosition(paddle.x, paddle.y - 20);
+      this.stop();
+      return;
+    }
+    if (abs(this.velocityY) &lt; 2) this.velocityY = this.velocityY &lt; 0 ? -2 : 2;
+    this.speed = 7;
+  }
+}
+</code></pre>
+<p>A <code>launched</code> variable tracks whether the ball is in play. When the ball falls off the bottom, it goes back to <code>false</code>, and the ball returns to the paddle.</p>
+<div class="demo" data-sketch="examples/breakout-step-3" data-width="600" data-height="600"></div>
+<h2 id="step-4-a-wall-of-bricks">Step 4: A wall of bricks</h2>
+<p>Two nested loops make 5 rows of 10 bricks, with one colour per row. The bricks share their settings through the group's defaults.</p>
+<pre><code class="language-js">bricks = new GameGroup({ isStatic: true, bounce: 1, friction: 0, stroke: '#222', strokeWeight: 2 });
+let colors = ['#ff6b6b', '#ffa94d', '#ffd43b', '#69db7c', '#4dabf7'];
+for (let row = 0; row &lt; 5; row++) {
+  for (let col = 0; col &lt; 10; col++) {
+    bricks.create(35 + col * 59, 70 + row * 26, 56, 22, { color: colors[row] });
+  }
+}
+</code></pre>
+<p>Now the most important line in the game. <strong>One rule for the whole group</strong>: any brick the ball hits is destroyed. The callback is given the brick that was hit.</p>
+<pre><code class="language-js">bricks.onCollide(ball, (brick) =&gt; brick.destroy());
+</code></pre>
+<p>The ball still bounces off the brick before it disappears, because destroying happens safely after the collision.</p>
+<div class="demo" data-sketch="examples/breakout-step-4" data-width="600" data-height="600"></div>
+<h2 id="step-5-steering-with-the-paddle">Step 5: Steering with the paddle</h2>
+<p>In real Breakout, where the ball hits the paddle decides where it goes: the left end sends it left, the right end sends it right. When the ball hits the paddle, we work out how far from the centre it landed, as a number from -1 to 1, and set a new velocity:</p>
+<pre><code class="language-js">ball.onCollide(paddle, (b) =&gt; {
+  let offset = (b.x - paddle.x) / (paddle.width / 2); // -1 .. 1
+  b.setVelocity(offset * 6, -6);
+});
+</code></pre>
+<div class="demo" data-sketch="examples/breakout-step-5" data-width="600" data-height="600"></div>
+<h2 id="step-6-lives-winning-and-losing-the-finished-game">Step 6: Lives, winning and losing (the finished game)</h2>
+<p>The finishing touches:</p>
+<ul>
+<li>A <code>lives</code> counter that goes down each time the ball falls off the bottom.</li>
+<li><strong>Game over</strong> when lives run out, and <strong>You win!</strong> when <code>bricks.length</code> is <code>0</code>. Either way, <code>world.paused = true</code> freezes everything.</li>
+<li>Clicking only launches while you still have lives.</li>
+</ul>
+<pre><code class="language-js">if (ball.y &gt; height + 30) {
+  lives--;
+  launched = false;
+}
+...
+if (lives &lt;= 0) {
+  text('Game over — reload to play again', width / 2, height / 2);
+  world.paused = true;
+} else if (bricks.length === 0) {
+  text('You win!', width / 2, height / 2);
+  world.paused = true;
+}
+</code></pre>
+<div class="demo" data-sketch="examples/breakout" data-width="600" data-height="600"></div>
+<h2 id="make-it-your-own">Make it your own</h2>
+<ul>
+<li><strong>Tough bricks:</strong> give the top row <code>data.hits = 2</code>, and only destroy a brick when its hits run out (change its colour each hit).</li>
+<li><strong>Power-ups:</strong> sometimes drop a sensor from a destroyed brick. Catching it with the paddle makes the paddle wider with <code>paddle.width = 150</code>.</li>
+<li><strong>Sound:</strong> a blip for the paddle and a crunch for bricks (see <a href="sounds.html">Sounds</a>).</li>
+<li><strong>Restart:</strong> press <strong>R</strong> to rebuild the bricks and reset lives, instead of reloading (see <a href="levels-score.html#starting-again">Levels and Score</a>).</li>
+</ul>
+    <nav class="pager">
+      <a class="prev" href="example-joints.html"><small>Previous</small>Joints Playground</a>
+      <a class="next" href="example-platformer.html"><small>Next</small>Platformer</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

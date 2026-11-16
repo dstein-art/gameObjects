@@ -1,0 +1,54 @@
+# GameObjects.js — only the library, its docs and the examples go to GitHub.
+#
+# This file works as an ALLOWLIST: everything in the top folder is ignored,
+# then the files and folders below are let back in. If you add a new
+# top-level file or folder that should be on GitHub, add a "!/name" line.
+
+/*
+
+# ---- the library ----
+!/gameObjects.js
+!/lib/
+
+# ---- docs and examples (the help site; examples live in docs/examples) ----
+!/index.html
+!/docs/
+!/API.md
+!/README.md
+
+# ---- project files ----
+!/LICENSE
+!/package.json
+!/.gitignore
+
+
+# ---- never commit these, wherever they are ----
+
+# Claude / AI assistant settings and notes
+.claude/
+.claude.json
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
+
+# operating system and editor files
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# build leftovers and archives
+__pycache__/
+*.pyc
+node_modules/
+*.tgz
+*.zip
+*.log
+
+# local secrets
+.env
+.env.*

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Getting Started · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-getting-started">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li class="current"><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 1 of 11</p>
+<h1 id="getting-started">Getting Started</h1>
+<p class="lead">GameObjects.js adds <strong>game objects with real physics</strong> to p5.js. You make a box, a ball or a picture, and it falls, bounces, slides, stacks and bumps into other things by itself. You decide what happens when things touch, how the player moves and how the game is scored.</p>
+<p>GameObjects is built on <a href="https://brm.io/matter-js/">Matter.js</a>, a popular physics engine. You don't need to know anything about Matter.js to use it.</p>
+<div class="demo" data-sketch="hello" data-width="640" data-height="320"></div>
+<p>Click the demo above to drop more boxes. That whole sketch is about 20 lines of code.</p>
+<blockquote>
+<p><strong>Tip:</strong> you can <strong>edit the code under every demo</strong> on this site. Change a number or a colour, then press the <strong>▶</strong> button (or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd>) to see what happens. If something goes wrong, the error and its line are shown in red. The other icons under each demo reset the code to the original (<strong>↺</strong>), hide or show the code, copy it, and open the demo in its own tab.</p>
+</blockquote>
+<h2 id="what-you-need">What you need</h2>
+<ul>
+<li>A p5.js sketch. GameObjects works with <strong>p5.js 2.x</strong> (recommended) and 1.x.</li>
+<li>Three extra <code>&lt;script&gt;</code> lines in your <code>index.html</code>.</li>
+<li>The file <code>gameObjects.js</code>.</li>
+</ul>
+<h2 id="setting-up-in-the-p5js-web-editor">Setting up in the p5.js Web Editor</h2>
+<ol>
+<li><strong>Download <code>gameObjects.js</code></strong> from the GameObjects repository.</li>
+<li>In the Web Editor, open the sketch files panel (the <strong>›</strong> arrow on the left), click <strong>+</strong>, choose <strong>Upload file</strong> and upload <code>gameObjects.js</code>.</li>
+<li>Open <code>index.html</code> and make the <code>&lt;head&gt;</code> load the scripts <strong>in this order</strong>:</li>
+</ol>
+<pre><code class="language-html">&lt;!-- 1. p5.js and p5.sound --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js&quot;&gt;&lt;/script&gt;
+&lt;!-- 2. the physics engine --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js&quot;&gt;&lt;/script&gt;
+&lt;!-- 3. GameObjects --&gt;
+&lt;script src=&quot;gameObjects.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>Your <code>sketch.js</code> is loaded after these, in the <code>&lt;body&gt;</code>, as usual.</p>
+<blockquote>
+<p><strong>Watch out:</strong> the order matters. p5.js first, then Matter.js, then <code>gameObjects.js</code>. If you see <em>"GameObjects.js needs Matter.js"</em> in the console, the Matter.js line is missing or comes too late.</p>
+</blockquote>
+<h2 id="setting-up-on-your-own-computer">Setting up on your own computer</h2>
+<p>Make a folder like this:</p>
+<pre><code class="language-text">my-game/
+  index.html
+  sketch.js
+  gameObjects.js
+</code></pre>
+<p>Use the same <code>&lt;script&gt;</code> lines as above. Open the folder with a local web server, for example the <strong>Live Server</strong> extension in VS Code. Opening <code>index.html</code> by double-clicking it won't load images or sounds.</p>
+<h2 id="your-first-sketch">Your first sketch</h2>
+<pre><code class="language-js">function setup() {
+  createCanvas(640, 320);
+
+  // 1. A floor. Static objects never move.
+  new GameObject(320, 300, 640, 40, { isStatic: true, color: 'seagreen' });
+
+  // 2. A box. It falls!
+  new GameObject(320, 50, 50);
+}
+
+function draw() {
+  background(230);
+}
+</code></pre>
+<p>Things to notice:</p>
+<ul>
+<li><strong>There's no world to set up.</strong> GameObjects gives every sketch a ready-made physics world called <strong><code>world</code></strong>, with gravity pulling down. Your objects go into it automatically.</li>
+<li><strong><code>new GameObject(x, y, width, height)</code></strong> makes an object. If you leave out the height, you get a square.</li>
+<li><strong>You don't draw the objects.</strong> GameObjects moves and draws them for you, right after your <code>draw()</code> function runs.</li>
+<li><strong><code>x</code> and <code>y</code> are the centre</strong> of the object, not its top-left corner.</li>
+</ul>
+<h2 id="what-happens-every-frame">What happens every frame</h2>
+<p>Each time p5.js runs a frame, GameObjects does three things:</p>
+<ol>
+<li><strong>Before your <code>draw()</code>:</strong> every object moves one step. Gravity pulls, things bounce, and collision code runs.</li>
+<li><strong>Your <code>draw()</code> runs.</strong> Draw the background, read the keyboard, update the score.</li>
+<li><strong>After your <code>draw()</code>:</strong> GameObjects draws every object on top of what you drew.</li>
+</ol>
+<p>That's why <code>background()</code> in your <code>draw()</code> doesn't wipe out your objects. They're drawn afterwards.</p>
+<blockquote>
+<p><strong>Tip:</strong> Want text (like a score) drawn <em>on top</em> of your objects? Call <code>world.draw()</code> yourself in the middle of <code>draw()</code>, then draw the text. GameObjects notices and won't draw them a second time. There's more on this in <a href="levels-score.html">Levels and Score</a>.</p>
+</blockquote>
+<h2 id="units">Units</h2>
+<table>
+<thead>
+<tr>
+<th>Thing</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Position, width, height</td>
+<td>pixels</td>
+</tr>
+<tr>
+<td>Velocity, speed</td>
+<td>pixels per frame</td>
+</tr>
+<tr>
+<td>Rotation</td>
+<td>degrees (0 = pointing right, increasing clockwise)</td>
+</tr>
+<tr>
+<td>Time (like <code>lifespan</code>)</td>
+<td>frames</td>
+</tr>
+</tbody>
+</table>
+<p>Rotation is always in degrees, even if you used <code>angleMode(RADIANS)</code>.</p>
+<h2 id="seeing-the-physics-shapes">Seeing the physics shapes</h2>
+<p>Turn on <strong>debug view</strong> to see the shape the physics engine is using for each object:</p>
+<pre><code class="language-js">world.debug = true;
+</code></pre>
+<p>Outlines are <strong>green</strong>, turn <strong>red</strong> while touching something, and are <strong>orange</strong> for sensors (more on those in <a href="collisions.html">Collisions and Overlaps</a>). This is very useful when something isn't colliding the way you expect.</p>
+<div class="demo" data-sketch="debug-view" data-width="640" data-height="320" data-keys="1"></div>
+<h2 id="where-next">Where next?</h2>
+<p>Work through the sections in order, or jump to what you need:</p>
+<ul>
+<li><strong><a href="game-objects.html">Game Objects</a>:</strong> shapes, colours, images and your own kinds of object</li>
+<li><strong><a href="movement.html">Movement</a>:</strong> making things move</li>
+<li><strong><a href="groups.html">Groups</a>:</strong> handling lots of objects at once</li>
+<li><strong><a href="physics.html">Physics</a>:</strong> gravity, bounce, friction, weight and joints</li>
+<li><strong><a href="collisions.html">Collisions and Overlaps</a>:</strong> reacting when things touch</li>
+<li><strong><a href="animation.html">Spritesheets and Animations</a>:</strong> animated characters</li>
+<li><strong><a href="sounds.html">Sounds</a>:</strong> sound effects and music</li>
+<li><strong><a href="input-camera.html">Player Input and Camera</a>:</strong> keyboard, mouse and scrolling worlds</li>
+<li><strong><a href="levels-score.html">Levels and Score</a>:</strong> turning it all into a real game</li>
+<li><strong><a href="examples.html">Example Games</a>:</strong> five complete games to play with and change</li>
+</ul>
+    <nav class="pager">
+      <span></span>
+      <a class="next" href="game-objects.html"><small>Next</small>Game Objects</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

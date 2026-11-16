@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Movement · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-movement">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li class="current"><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 3 of 11</p>
+<h1 id="movement">Movement</h1>
+<p class="lead">There are several ways to make a game object move. Some are like teleporting, some like steering, and some like pushing. Picking the right one makes your game feel right.</p>
+<h2 id="teleporting-x-y-and-setposition">Teleporting: <code>x</code>, <code>y</code> and <code>setPosition</code></h2>
+<p>Setting the position moves an object <strong>instantly</strong>, without passing through the space in between:</p>
+<pre><code class="language-js">player.x = 100;
+player.y = 50;
+player.setPosition(100, 50);   // same thing, in one line
+</code></pre>
+<p>Use it for respawning, wrapping around the screen, and placing things at the start of a level. Don't use it every frame to move the player around: the physics engine can't stop you going through walls when you teleport.</p>
+<h2 id="velocity-steady-movement">Velocity: steady movement</h2>
+<p><strong>Velocity</strong> is how many pixels an object moves each frame. Setting velocity is the easiest way to control a player, because physics still works: you'll stop at walls and push things.</p>
+<pre><code class="language-js">player.velocityX = 5;          // 5 pixels per frame to the right
+player.velocityY = -10;        // upward (y goes down the screen!)
+player.setVelocity(3, -2);     // both at once
+player.stop();                 // velocity and spin back to 0
+</code></pre>
+<p>A typical top-down control scheme:</p>
+<pre><code class="language-js">function draw() {
+  background(220);
+  let vx = 0;
+  let vy = 0;
+  if (keyIsDown(LEFT_ARROW))  vx = -4;
+  if (keyIsDown(RIGHT_ARROW)) vx = 4;
+  if (keyIsDown(UP_ARROW))    vy = -4;
+  if (keyIsDown(DOWN_ARROW))  vy = 4;
+  player.setVelocity(vx, vy);
+}
+</code></pre>
+<div class="demo" data-sketch="velocity-topdown" data-width="640" data-height="320" data-keys="1"></div>
+<blockquote>
+<p><strong>Tip:</strong> in a platformer, only set <strong><code>velocityX</code></strong> from the keys and leave <code>velocityY</code> alone, so gravity keeps working. See <a href="input-camera.html">Player Input</a>.</p>
+</blockquote>
+<h2 id="speed-and-direction">Speed and direction</h2>
+<p>Sometimes it's easier to think in <em>how fast</em> and <em>which way</em>:</p>
+<pre><code class="language-js">ball.speed;            // how fast it's going, in pixels per frame
+ball.direction;        // which way it's going, in degrees (0 = right, 90 = down)
+
+ball.speed = 8;        // same direction, new speed
+ball.direction = -90;  // same speed, now going straight up
+</code></pre>
+<p><code>speed</code> is great for keeping a ball at a constant speed in a Breakout game.</p>
+<h2 id="pushing-push-and-applyforce">Pushing: <code>push</code> and <code>applyForce</code></h2>
+<p>Both of these <strong>add</strong> to the current movement instead of replacing it.</p>
+<ul>
+<li><strong><code>push(x, y)</code></strong> adds straight to the velocity: an instant kick that ignores weight. Good for jumps, dashes and explosions.</li>
+<li><strong><code>applyForce(x, y)</code></strong> is a real physical push: <strong>heavy objects move less</strong>. Call it every frame for things like rocket thrust or wind.</li>
+</ul>
+<pre><code class="language-js">player.push(0, -12);           // a jump
+rocket.applyForce(0, -0.5);    // a rocket engine, every frame
+</code></pre>
+<div class="demo" data-sketch="push-vs-force" data-width="640" data-height="300" data-keys="1"></div>
+<h2 id="heading-toward-something">Heading toward something</h2>
+<p><strong><code>moveToward(x, y, speed)</code></strong> points an object's velocity at a spot. It's perfect for enemies chasing the player, or homing missiles. You can pass another object instead of a point:</p>
+<pre><code class="language-js">enemy.moveToward(player, 2);          // chase the player at speed 2
+ghost.moveToward(mouseX, mouseY, 4);  // chase the mouse
+</code></pre>
+<div class="demo" data-sketch="move-toward" data-width="640" data-height="320"></div>
+<h2 id="facing-and-moving-forward">Facing and moving forward</h2>
+<p><strong><code>rotation</code></strong> turns an object (in degrees). <strong><code>lookAt()</code></strong> turns it to face something, and <strong><code>moveForward(speed)</code></strong> moves it the way it's facing. Together they make tanks, cars and spaceships:</p>
+<pre><code class="language-js">tank.rotation += 3;          // turn right
+tank.lookAt(mouseX, mouseY); // or: face the mouse
+tank.moveForward(3);         // drive the way it's pointing
+tank.rotationSpeed = 2;      // keep spinning, 2 degrees per frame
+</code></pre>
+<div class="demo" data-sketch="tank" data-width="640" data-height="320" data-keys="1"></div>
+<blockquote>
+<p><strong>Tip:</strong> objects that shouldn't tip over or spin when they bump into things, like most players, need <code>fixedRotation: true</code>.</p>
+</blockquote>
+<h2 id="moving-platforms">Moving platforms</h2>
+<p>A <strong>static</strong> object (<code>isStatic: true</code>) is never moved by physics, but <strong>you</strong> can move it by setting its position. When you move it a little each frame, GameObjects treats it as sliding, so things standing on it ride along:</p>
+<pre><code class="language-js">platform.x = 320 + sin(frameCount * 0.02) * 150;
+</code></pre>
+<div class="demo" data-sketch="moving-platform" data-width="640" data-height="320"></div>
+<h2 id="how-far-away">How far away?</h2>
+<pre><code class="language-js">player.distanceTo(enemy);        // distance to another object
+player.distanceTo(mouseX, mouseY);
+
+if (enemy.distanceTo(player) &lt; 200) {
+  enemy.moveToward(player, 3);   // only chase when close
+}
+</code></pre>
+<h2 id="quick-reference">Quick reference</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code>, <code>y</code>, <code>setPosition(x, y)</code></td>
+<td>Teleport</td>
+</tr>
+<tr>
+<td><code>velocityX</code>, <code>velocityY</code>, <code>setVelocity(x, y)</code></td>
+<td>Pixels per frame</td>
+</tr>
+<tr>
+<td><code>speed</code>, <code>direction</code></td>
+<td>How fast, which way (degrees)</td>
+</tr>
+<tr>
+<td><code>push(x, y)</code></td>
+<td>Add to velocity (ignores weight)</td>
+</tr>
+<tr>
+<td><code>applyForce(x, y)</code></td>
+<td>Physical push (heavier moves less)</td>
+</tr>
+<tr>
+<td><code>moveToward(x, y, speed)</code>, <code>moveToward(obj, speed)</code></td>
+<td>Head toward something</td>
+</tr>
+<tr>
+<td><code>rotation</code>, <code>rotationSpeed</code></td>
+<td>Angle and spin, in degrees</td>
+</tr>
+<tr>
+<td><code>lookAt(x, y)</code>, <code>lookAt(obj)</code></td>
+<td>Turn to face something</td>
+</tr>
+<tr>
+<td><code>moveForward(speed)</code></td>
+<td>Move the way it's facing</td>
+</tr>
+<tr>
+<td><code>stop()</code></td>
+<td>Stop moving and spinning</td>
+</tr>
+<tr>
+<td><code>distanceTo(x, y)</code>, <code>distanceTo(obj)</code></td>
+<td>Distance in pixels</td>
+</tr>
+</tbody>
+</table>
+    <nav class="pager">
+      <a class="prev" href="game-objects.html"><small>Previous</small>Game Objects</a>
+      <a class="next" href="groups.html"><small>Next</small>Groups of Game Objects</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

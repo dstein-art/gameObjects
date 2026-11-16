@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Collisions and Overlaps · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-collisions">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li class="current"><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 6 of 11</p>
+<h1 id="collisions-and-overlaps">Collisions and Overlaps</h1>
+<p class="lead">Games are mostly about what happens when things touch: the player grabs a coin, a bullet hits an enemy, a ball breaks a brick. GameObjects gives you two kinds of touching, and several ways to react to them.</p>
+<h2 id="collisions-vs-overlaps">Collisions vs. overlaps</h2>
+<ul>
+<li>A <strong>collision</strong> is when two solid objects bump into each other and <strong>bounce off or block</strong> each other. A ball hitting a wall is a collision.</li>
+<li>An <strong>overlap</strong> is when objects <strong>pass through</strong> each other, but you still want to know about it. The player walking through a coin, or into a "finish line" zone, is an overlap.</li>
+</ul>
+<p>You make an object that overlaps instead of collides with <strong><code>isSensor: true</code></strong>. Everything else on this page works the same for both kinds.</p>
+<pre><code class="language-js">let wall = new GameObject(300, 200, 20, 200, { isStatic: true });                // solid
+let coin = new GameObject(400, 200, 20, { shape: 'circle', isSensor: true });     // overlap only
+</code></pre>
+<h2 id="reacting-once-oncollide">Reacting once: <code>onCollide</code></h2>
+<p><strong><code>onCollide(target, callback)</code></strong> runs your code <strong>once</strong>, at the moment two things start touching. Set it up once, in <code>setup()</code>:</p>
+<pre><code class="language-js">function setup() {
+  // ...
+  player.onCollide(coin, () =&gt; {
+    coin.destroy();
+    score++;
+  });
+}
+</code></pre>
+<p>The <strong>target</strong> can be:</p>
+<ul>
+<li><strong>one GameObject:</strong> <code>player.onCollide(door, ...)</code></li>
+<li><strong>a GameGroup:</strong> <code>player.onCollide(coins, ...)</code> runs for <strong>any</strong> coin</li>
+<li><strong>nothing:</strong> <code>ball.onCollide(() =&gt; ...)</code> runs when it touches <strong>anything</strong></li>
+</ul>
+<p>The callback is given <strong>both</strong> objects: first the one you set it up on, then the one it touched. This is how you know <em>which</em> coin was collected:</p>
+<pre><code class="language-js">player.onCollide(coins, (me, coin) =&gt; {
+  coin.destroy();    // destroy the coin we actually touched
+  score += 10;
+});
+</code></pre>
+<p>Groups have <code>onCollide</code> too. Then the first object is the member of the group:</p>
+<pre><code class="language-js">bullets.onCollide(enemies, (bullet, enemy) =&gt; {
+  bullet.destroy();
+  enemy.destroy();
+});
+</code></pre>
+<blockquote>
+<p><strong>Tip:</strong> it's completely safe to <code>destroy()</code> objects inside these callbacks.</p>
+</blockquote>
+<h2 id="when-touching-stops-oncollideend">When touching stops: <code>onCollideEnd</code></h2>
+<p><strong><code>onCollideEnd(target, callback)</code></strong> runs once, when two things <strong>stop</strong> touching:</p>
+<pre><code class="language-js">player.onCollideEnd(water, () =&gt; {
+  player.airFriction = 0.01;    // back to normal after leaving the water
+});
+</code></pre>
+<h2 id="every-frame-while-touching-whiletouching">Every frame while touching: <code>whileTouching</code></h2>
+<p><strong><code>whileTouching(target, callback)</code></strong> runs <strong>every frame</strong> for as long as they touch. It's good for damage from lava, or for charging up on a pad:</p>
+<pre><code class="language-js">player.whileTouching(lava, (me) =&gt; {
+  me.data.health -= 1;
+});
+</code></pre>
+<div class="demo" data-sketch="collide-events" data-width="640" data-height="320"></div>
+<h2 id="checking-right-now-istouching">Checking right now: <code>isTouching</code></h2>
+<p>Sometimes it's easier to <strong>ask</strong> whether something is touching, inside <code>draw()</code>. <strong><code>isTouching(target)</code></strong> is <code>true</code> or <code>false</code>, and takes the same kinds of target:</p>
+<pre><code class="language-js">if (player.isTouching(platforms)) {
+  // standing on (or next to) a platform, so we're allowed to jump
+}
+
+if (player.isTouching(exitDoor) &amp;&amp; keys === 3) {
+  nextLevel();
+}
+
+if (ball.isTouching()) { /* touching anything at all */ }
+</code></pre>
+<p><code>getTouching()</code> gives you an array of everything an object is touching right now.</p>
+<h2 id="overlaps-with-sensors">Overlaps with sensors</h2>
+<p>Sensors are perfect for:</p>
+<ul>
+<li><strong>things to collect:</strong> coins, stars, power-ups</li>
+<li><strong>trigger zones:</strong> the finish line, a checkpoint, a trap that springs when you walk in</li>
+<li><strong>areas with effects:</strong> water that slows you down, wind that pushes you up</li>
+</ul>
+<div class="demo" data-sketch="overlaps" data-width="640" data-height="340" data-keys="1"></div>
+
+<pre><code class="language-js">coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, color: 'gold' });
+water = new GameObject(450, 250, 200, 140, { isSensor: true, isStatic: true, color: '#74c0fc80' });
+
+player.onCollide(coins, (me, coin) =&gt; coin.destroy());
+
+function draw() {
+  // ...
+  player.airFriction = player.isTouching(water) ? 0.2 : 0.01;   // slow in water
+}
+</code></pre>
+<blockquote>
+<p><strong>Watch out:</strong> a sensor that is <strong>not</strong> static will fall straight through the floor, because it doesn't collide with anything. Most sensors should also be <code>isStatic: true</code>.</p>
+</blockquote>
+<h2 id="not-colliding-at-all-ignore">Not colliding at all: <code>ignore</code></h2>
+<p>Sometimes two things should pass through each other <strong>without</strong> noticing at all. Your own bullets shouldn't hit your ship, and ghosts float through walls. Use <strong><code>ignore</code></strong>:</p>
+<pre><code class="language-js">ship.ignore(bullets);          // ship and bullets pass through each other
+ghosts.ignore(walls);          // a whole group ignores another group
+sparks.ignore(sparks);         // members of a group ignore each other
+ship.unignore(bullets);        // collide again
+</code></pre>
+<p>Ignored objects don't trigger <code>onCollide</code> or <code>isTouching</code> with each other either.</p>
+<div class="demo" data-sketch="ignore" data-width="640" data-height="320"></div>
+<h2 id="recipes">Recipes</h2>
+<p><strong>Take damage only once in a while.</strong> Without a pause, a player standing on spikes loses all their health in one second:</p>
+<pre><code class="language-js">player.onCollide(spikes, (me) =&gt; {
+  if (me.data.hurtTimer &gt; 0) return;   // still recovering
+  me.data.health--;
+  me.data.hurtTimer = 60;              // safe for 60 frames
+  me.push(0, -8);                      // knock back
+});
+
+function draw() {
+  if (player.data.hurtTimer &gt; 0) player.data.hurtTimer--;
+  player.visible = player.data.hurtTimer % 10 &lt; 5;   // blink while hurt
+}
+</code></pre>
+<p><strong>Only jump when standing on something.</strong> See <a href="input-camera.html#platformer-controls">Player Input</a>.</p>
+<p><strong>Stomp on enemies from above:</strong></p>
+<pre><code class="language-js">player.onCollide(enemies, (me, enemy) =&gt; {
+  if (me.y &lt; enemy.y - enemy.height / 2) {   // we were above it
+    enemy.destroy();
+    me.velocityY = -8;                       // bounce off
+  } else {
+    loseLife();
+  }
+});
+</code></pre>
+<h2 id="seeing-collisions">Seeing collisions</h2>
+<p>Turn on <code>world.debug = true</code>. Outlines are <strong>green</strong>, turn <strong>red</strong> while touching something, and are <strong>orange</strong> for sensors.</p>
+<h2 id="quick-reference">Quick reference</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isSensor: true</code></td>
+<td>Overlaps instead of colliding</td>
+</tr>
+<tr>
+<td><code>onCollide(target, fn)</code></td>
+<td>Once, when touching starts. <code>fn(self, other)</code></td>
+</tr>
+<tr>
+<td><code>onCollideEnd(target, fn)</code></td>
+<td>Once, when touching stops</td>
+</tr>
+<tr>
+<td><code>whileTouching(target, fn)</code></td>
+<td>Every frame while touching</td>
+</tr>
+<tr>
+<td><code>isTouching(target)</code></td>
+<td><code>true</code>/<code>false</code> right now</td>
+</tr>
+<tr>
+<td><code>getTouching()</code></td>
+<td>Array of everything touching it</td>
+</tr>
+<tr>
+<td><code>ignore(target)</code>, <code>unignore(target)</code></td>
+<td>Pass through without noticing</td>
+</tr>
+</tbody>
+</table>
+<p><code>target</code> is a GameObject, a GameGroup, or left out for "anything". All of these work on groups too.</p>
+    <nav class="pager">
+      <a class="prev" href="physics.html"><small>Previous</small>Physics</a>
+      <a class="next" href="animation.html"><small>Next</small>Spritesheets and Animations</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

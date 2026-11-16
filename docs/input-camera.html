@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Player Input and Camera · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-input-camera">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li class="current"><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 9 of 11</p>
+<h1 id="player-input-and-camera">Player Input and Camera</h1>
+<p class="lead">This section is about letting the player take control with the keyboard and mouse, and about using the <strong>camera</strong> so your game world can be bigger than the screen.</p>
+<h2 id="keyboard-holding-vs-pressing">Keyboard: holding vs. pressing</h2>
+<p>p5.js gives you two ways to read keys, and games need both:</p>
+<ul>
+<li><strong><code>keyIsDown(code)</code></strong> in <code>draw()</code> is <code>true</code> for <strong>every frame</strong> a key is held. Use it for continuous things like walking, steering and thrust.</li>
+<li><strong><code>keyPressed()</code></strong> runs <strong>once</strong> each time a key goes down. Use it for single actions like jumping, shooting and pausing.</li>
+</ul>
+<pre><code class="language-js">function draw() {
+  background(220);
+  if (keyIsDown(LEFT_ARROW))  player.velocityX = -5;   // walk while held
+}
+
+function keyPressed() {
+  if (key === ' ') shoot();                            // once per press
+}
+</code></pre>
+<h3 id="key-codes">Key codes</h3>
+<p><code>keyIsDown()</code> needs a <strong>key code</strong>. The arrow keys have names. For letters, use the capital letter's code. A handy trick is <code>'W'.charCodeAt(0)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>← → ↑ ↓</td>
+<td><code>LEFT_ARROW</code>, <code>RIGHT_ARROW</code>, <code>UP_ARROW</code>, <code>DOWN_ARROW</code></td>
+</tr>
+<tr>
+<td>W A S D</td>
+<td><code>87</code>, <code>65</code>, <code>83</code>, <code>68</code></td>
+</tr>
+<tr>
+<td>Space</td>
+<td><code>32</code></td>
+</tr>
+<tr>
+<td>Shift, Enter</td>
+<td><code>SHIFT</code>, <code>ENTER</code></td>
+</tr>
+</tbody>
+</table>
+<p>In <code>keyPressed()</code>, check <strong><code>key</code></strong> (the character, like <code>'a'</code> or <code>' '</code>) or <strong><code>keyCode</code></strong> (the number).</p>
+<h2 id="top-down-controls">Top-down controls</h2>
+<p>For games seen from above, set both parts of the velocity from the keys. Supporting both arrows <strong>and</strong> WASD is friendly:</p>
+<pre><code class="language-js">let W = 87, A = 65, S = 83, D = 68;
+
+function draw() {
+  let vx = 0, vy = 0;
+  if (keyIsDown(LEFT_ARROW)  || keyIsDown(A)) vx -= 1;
+  if (keyIsDown(RIGHT_ARROW) || keyIsDown(D)) vx += 1;
+  if (keyIsDown(UP_ARROW)    || keyIsDown(W)) vy -= 1;
+  if (keyIsDown(DOWN_ARROW)  || keyIsDown(S)) vy += 1;
+  // the same speed diagonally as straight
+  let len = max(1, sqrt(vx * vx + vy * vy));
+  player.setVelocity(vx / len * 4, vy / len * 4);
+}
+</code></pre>
+<div class="demo" data-sketch="topdown-controls" data-width="640" data-height="320" data-keys="1"></div>
+<h2 id="platformer-controls">Platformer controls</h2>
+<p>In a platformer, the keys only set the <strong>sideways</strong> speed. Gravity handles up and down. You can only jump when you're standing on something:</p>
+<pre><code class="language-js">function draw() {
+  player.velocityX = 0;
+  if (keyIsDown(LEFT_ARROW))  player.velocityX = -5;
+  if (keyIsDown(RIGHT_ARROW)) player.velocityX = 5;
+}
+
+function keyPressed() {
+  if (key === ' ' &amp;&amp; player.isTouching(platforms)) {
+    player.velocityY = -15;   // jump!
+  }
+}
+</code></pre>
+<blockquote>
+<p><strong>Tip:</strong> give the player <code>fixedRotation: true</code> so it doesn't tip over, and <code>friction: 0</code> so it doesn't stick to the sides of walls.</p>
+</blockquote>
+<h2 id="mouse">Mouse</h2>
+<p>Use p5's <code>mouseX</code> and <code>mouseY</code>, and <code>mousePressed()</code> for clicks. A few GameObjects extras help:</p>
+<pre><code class="language-js">if (button.isMouseOver()) { /* hovering */ }
+
+function mousePressed() {
+  for (let enemy of enemies) {
+    if (enemy.isMouseOver()) enemy.destroy();   // click to zap
+  }
+}
+
+turret.lookAt(world.mouseX, world.mouseY);       // aim at the mouse
+crate.draggable = true;                         // grab and throw
+</code></pre>
+<blockquote>
+<p><strong>Watch out:</strong> once the camera moves, <code>mouseX</code> and <code>mouseY</code> are <strong>screen</strong> positions. Use <strong><code>world.mouseX</code></strong> and <strong><code>world.mouseY</code></strong> for positions <strong>in the game world</strong>. <code>isMouseOver()</code> and dragging already do this for you.</p>
+</blockquote>
+<div class="demo" data-sketch="mouse-aim" data-width="640" data-height="320"></div>
+<h2 id="the-camera">The camera</h2>
+<p>The camera chooses which part of the world you see. By default it looks at the canvas area, so world positions and screen positions are the same. Move the camera and the world scrolls.</p>
+<h3 id="following-the-player">Following the player</h3>
+<pre><code class="language-js">world.camera.follow(player);              // smooth follow
+world.camera.follow(player, 1);           // locked tightly on
+world.camera.follow(player, 0.05);        // lazy, floaty camera
+world.camera.follow(player, 0.1, 0, -80); // look a bit above the player
+world.camera.stopFollowing();
+</code></pre>
+<p>The second number is the <strong>ease</strong>: how much of the way to the player the camera moves each frame.</p>
+<h3 id="zoom">Zoom</h3>
+<pre><code class="language-js">world.camera.zoom = 2;      // close up
+world.camera.zoom = 0.5;    // zoomed out
+</code></pre>
+<h3 id="keeping-the-camera-inside-your-level">Keeping the camera inside your level</h3>
+<p>Stop the camera showing empty space past the edges of your level by using <code>constrain</code> after it follows:</p>
+<pre><code class="language-js">world.camera.x = constrain(world.camera.x, width / 2, LEVEL_WIDTH - width / 2);
+world.camera.y = constrain(world.camera.y, height / 2, LEVEL_HEIGHT - height / 2);
+</code></pre>
+<h3 id="moving-it-yourself">Moving it yourself</h3>
+<pre><code class="language-js">world.camera.x = 1000;    // look at this spot in the world
+world.camera.y = 300;
+world.camera.reset();     // back to normal
+</code></pre>
+<div class="demo" data-sketch="camera" data-width="640" data-height="360" data-keys="1"></div>
+<h2 id="drawing-with-the-camera-world-vs-screen">Drawing with the camera: world vs. screen</h2>
+<p>When the camera moves, there are two kinds of drawing:</p>
+<ul>
+<li><strong>Screen drawing</strong> stays put on the screen: the score, lives and a "Paused" message. This is anything you draw normally in <code>draw()</code>.</li>
+<li><strong>World drawing</strong> scrolls with the world: backgrounds, grids, decorations. Put it between <strong><code>world.camera.begin()</code></strong> and <strong><code>world.camera.end()</code></strong>.</li>
+</ul>
+<pre><code class="language-js">function draw() {
+  background(200);
+
+  world.camera.begin();
+  image(mountains, 0, 0);       // scrolls with the world
+  world.camera.end();
+
+  world.draw();                 // the game objects
+
+  text('Score: ' + score, 10, 20);   // stays on screen
+}
+</code></pre>
+<p>Converting between the two:</p>
+<pre><code class="language-js">world.camera.screenToWorld(mouseX, mouseY);   // { x, y } in the world
+world.camera.worldToScreen(player.x, player.y);
+player.isOffscreen();                         // completely out of view?
+</code></pre>
+<h2 id="quick-reference">Quick reference</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>keyIsDown(code)</code></td>
+<td>Held down (check in <code>draw()</code>)</td>
+</tr>
+<tr>
+<td><code>keyPressed()</code>, <code>key</code>, <code>keyCode</code></td>
+<td>Pressed once</td>
+</tr>
+<tr>
+<td><code>obj.isMouseOver()</code></td>
+<td>Mouse over this object</td>
+</tr>
+<tr>
+<td><code>world.mouseX</code>, <code>world.mouseY</code></td>
+<td>Mouse position in the world</td>
+</tr>
+<tr>
+<td><code>draggable</code>, <code>world.dragging</code></td>
+<td>Drag with the mouse</td>
+</tr>
+<tr>
+<td><code>world.camera.follow(obj, ease, offsetX, offsetY)</code></td>
+<td>Follow an object</td>
+</tr>
+<tr>
+<td><code>world.camera.x</code>, <code>.y</code>, <code>.zoom</code></td>
+<td>Position and zoom</td>
+</tr>
+<tr>
+<td><code>world.camera.begin()</code> / <code>.end()</code></td>
+<td>Draw in world space</td>
+</tr>
+<tr>
+<td><code>world.camera.screenToWorld()</code>, <code>.worldToScreen()</code></td>
+<td>Convert positions</td>
+</tr>
+</tbody>
+</table>
+    <nav class="pager">
+      <a class="prev" href="sounds.html"><small>Previous</small>Sounds</a>
+      <a class="next" href="levels-score.html"><small>Next</small>Managing your Game with Levels and Score</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

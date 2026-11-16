@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GameObjects demo</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; background: #fff; }
+      canvas { display: block; }
+      body > *:not(canvas) { font: 13px system-ui, sans-serif; }
+      #demo-error {
+        position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 10;
+        padding: 10px 12px; border-radius: 8px; background: #fff0f0; color: #a61e1e;
+        border: 1px solid #ffa8a8; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace;
+        white-space: pre-wrap; box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      }
+    </style>
+    <!--
+      Runs one demo sketch.
+        run.html?s=sketch-name            loads sketch-name.js
+        run.html?s=examples/platformer    loads ../examples/platformer.js
+        run.html?s=sketch-name&id=demo-3  runs edited code from the docs page, if there is any
+    -->
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var id = params.get('id');
+        var shown = false;
+
+        // Show errors inside the demo, and tell the docs page which line it was
+        function report(message, line) {
+          if (shown) return; // one at a time is enough
+          shown = true;
+          function show() {
+            var box = document.createElement('div');
+            box.id = 'demo-error';
+            box.textContent = '⚠ ' + message + (line ? '  (line ' + line + ')' : '');
+            document.body.appendChild(box);
+          }
+          document.body ? show() : addEventListener('DOMContentLoaded', show);
+          try {
+            if (id && parent.GODemos) parent.GODemos.reportError(id, message, line);
+          } catch (e) {}
+        }
+
+        addEventListener('error', function (e) {
+          var fromSketch = !e.filename || /^blob:|\/(demos|examples)\/[\w-]+\.js/.test(e.filename);
+          report(e.message || 'Error', fromSketch ? e.lineno : null);
+        });
+        addEventListener('unhandledrejection', function (e) {
+          var r = e.reason || {};
+          var m = /(?:blob:\S+?|\/(?:demos|examples)\/[\w-]+\.js):(\d+):\d+/.exec(r.stack || '');
+          report((r.name ? r.name + ': ' : '') + (r.message || String(r)), m ? +m[1] : null);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js"></script>
+    <script src="../../lib/matter.min.js"></script>
+    <script src="../../gameObjects.js"></script>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var s = params.get('s') || '';
+        var id = params.get('id');
+        var edited = null;
+        try {
+          if (id && parent.GODemos) edited = parent.GODemos.getCode(id);
+        } catch (e) {}
+
+        if (typeof edited === 'string') {
+          // run the code from the editor on the docs page, loaded as its own
+          // script file so syntax errors are reported with the right line
+          var url = URL.createObjectURL(new Blob([edited], { type: 'text/javascript' }));
+          document.write('<script src="' + url + '"><\/script>');
+        } else if (/^[\w-]+$/.test(s)) {
+          document.write('<script src="' + s + '.js"><\/script>');
+        } else if (/^examples\/[\w-]+$/.test(s)) {
+          document.write('<script src="../' + s + '.js"><\/script>');
+        }
+        document.title = s + ' · GameObjects demo';
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Physics Sandbox · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-example-basics">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html" class="current" aria-current="page">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li class=current><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num"><a href="examples.html">Example Games</a> › Physics Sandbox</p>
+<h1 id="physics-sandbox">Physics Sandbox</h1>
+<p class="lead">Drop shapes, drag them, throw them and watch them stack. It isn't quite a game, but it's the best way to get a feel for physics, and it's the simplest tutorial here.</p>
+<p><strong>You'll learn:</strong> static objects · making objects with the mouse · random shapes · groups with defaults · walls · dragging · debug view</p>
+<h2 id="play-the-finished-sketch">Play the finished sketch</h2>
+<p>Click empty space to drop a shape, drag shapes to throw them, press <strong>D</strong> for the debug view and <strong>C</strong> to clear.</p>
+<div class="demo" data-sketch="examples/basics" data-width="800" data-height="500" data-keys="1"></div>
+<h2 id="step-1-a-floor-and-a-falling-box">Step 1: A floor and a falling box</h2>
+<p>Every sketch gets a ready-made physics world called <code>world</code>, so all we need is a <strong>floor</strong> and something to fall on it.</p>
+<p>The floor is a long, thin box. Making it <strong>static</strong> means gravity and collisions never move it. Notice that <code>x</code> and <code>y</code> are the <strong>centre</strong> of the object, so the floor's centre is 20 pixels above the bottom of the canvas.</p>
+<pre><code class="language-js">ground = new GameObject(width / 2, height - 20, width, 40, {
+  isStatic: true,
+  color: 80,
+});
+
+new GameObject(width / 2, 50, 50);   // a 50 × 50 box, high up
+</code></pre>
+<p>We don't draw anything ourselves. GameObjects moves and draws every object after our <code>draw()</code> runs.</p>
+<div class="demo" data-sketch="examples/basics-step-1" data-width="800" data-height="500"></div>
+<h2 id="step-2-click-to-drop-a-box">Step 2: Click to drop a box</h2>
+<p>p5 calls <code>mousePressed()</code> whenever the mouse is clicked. Making a new GameObject at the mouse position is all it takes:</p>
+<pre><code class="language-js">function mousePressed() {
+  new GameObject(mouseX, mouseY, 40);
+}
+</code></pre>
+<p>We don't need to keep each box in a variable: the world keeps track of it.</p>
+<div class="demo" data-sketch="examples/basics-step-2" data-width="800" data-height="500"></div>
+<h2 id="step-3-random-shapes-and-a-ramp">Step 3: Random shapes and a ramp</h2>
+<p>Let's make it more interesting. <code>random()</code> can pick from an array, so each click picks a different <strong>shape</strong>, <strong>size</strong> and starting <strong>rotation</strong>:</p>
+<pre><code class="language-js">let kind = random(['box', 'circle', 'triangle', 'polygon']);
+let size = random(25, 60);
+
+new GameObject(mouseX, mouseY, size, size, {
+  shape: kind,
+  sides: floor(random(5, 9)), // only used by polygons
+  rotation: random(360),
+});
+</code></pre>
+<p>We also add a <strong>ramp</strong>: another static box, rotated 15 degrees. Circles roll down it, boxes slide.</p>
+<pre><code class="language-js">new GameObject(250, 300, 300, 20, { isStatic: true, rotation: 15, color: 120 });
+</code></pre>
+<div class="demo" data-sketch="examples/basics-step-3" data-width="800" data-height="500"></div>
+<blockquote>
+<p><strong>Try it:</strong> change the ramp's <code>rotation</code> to <code>-30</code>, or give the shapes <code>bounce: 0.9</code>.</p>
+</blockquote>
+<h2 id="step-4-a-group-walls-and-dragging">Step 4: A group, walls and dragging</h2>
+<p>Three improvements:</p>
+<ol>
+<li><strong>Walls.</strong> Shapes can roll off the edge of the canvas and fall forever. <code>world.addWalls()</code> puts invisible walls around the canvas.</li>
+<li><strong>A group.</strong> We put every shape in a <code>GameGroup</code>, which lets us count them with <code>shapes.length</code>. The group also has <strong>defaults</strong>: every shape made with <code>shapes.create()</code> is <code>draggable</code> and a little bouncy.</li>
+<li><strong>Dragging.</strong> Draggable objects can be grabbed with the mouse. But a click now does two things: grab a shape <em>and</em> make a new one. <code>world.objectsAt()</code> lists the objects under the mouse, so we only make a new shape when the click lands on empty space.</li>
+</ol>
+<pre><code class="language-js">world.addWalls();
+
+shapes = new GameGroup({ draggable: true, bounce: 0.4 });
+</code></pre>
+<pre><code class="language-js">function mousePressed() {
+  // Don't spawn if we clicked on something (we're dragging it instead)
+  if (world.objectsAt(mouseX, mouseY).length &gt; 0) return;
+  ...
+  shapes.create(mouseX, mouseY, size, size, { ... });
+}
+</code></pre>
+<div class="demo" data-sketch="examples/basics-step-4" data-width="800" data-height="500"></div>
+<h2 id="step-5-keyboard-shortcuts-the-finished-sketch">Step 5: Keyboard shortcuts (the finished sketch)</h2>
+<p>Finally, two keys:</p>
+<ul>
+<li><strong>D</strong> toggles <code>world.debug</code>, which draws the physics outline of every object. They turn red while touching something.</li>
+<li><strong>C</strong> destroys every shape in the group with <code>shapes.destroyAll()</code>.</li>
+</ul>
+<pre><code class="language-js">function keyPressed() {
+  if (key === 'd' || key === 'D') world.debug = !world.debug;
+  if (key === 'c' || key === 'C') shapes.destroyAll();
+}
+</code></pre>
+<div class="demo" data-sketch="examples/basics" data-width="800" data-height="500" data-keys="1"></div>
+<h2 id="make-it-your-own">Make it your own</h2>
+<ul>
+<li><strong>Gravity switch:</strong> make the arrow keys change <code>world.gravityX</code> and <code>world.gravityY</code> (see <a href="physics.html#the-world-and-gravity">Physics</a>).</li>
+<li><strong>Explode:</strong> press <strong>E</strong> to give every shape a random <code>push()</code> (see <a href="movement.html#pushing-push-and-applyforce">Movement</a>).</li>
+<li><strong>Pictures:</strong> load an image and use it as the <code>image</code> option in the group's defaults (see <a href="game-objects.html#images">Game Objects</a>).</li>
+<li><strong>Sound:</strong> play a thud when shapes land, louder for faster shapes (see <a href="sounds.html#sounds-when-things-happen">Sounds</a>).</li>
+</ul>
+    <nav class="pager">
+      <a class="prev" href="examples.html"><small>Previous</small>Example Games</a>
+      <a class="next" href="example-joints.html"><small>Next</small>Joints Playground</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Space Shooter · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-example-space-shooter">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html" class="current" aria-current="page">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li class=current><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num"><a href="examples.html">Example Games</a> › Space Shooter</p>
+<h1 id="space-shooter">Space Shooter</h1>
+<p class="lead">Steer a spaceship with the mouse, fire the engine and blast asteroids that split into smaller ones. This is the biggest tutorial, and it brings together groups, forces, lifespans, collisions and animation.</p>
+<p><strong>You'll learn:</strong> zero gravity · <code>lookAt()</code> · <code>applyForce()</code> and drifting · wrapping around the screen · bullets with a <code>lifespan</code> · <code>ignore()</code> · group-against-group collisions · an animation drawn in code</p>
+<h2 id="play-the-finished-game">Play the finished game</h2>
+<p>The ship points at the mouse. Hold <strong>W</strong> or <strong>↑</strong> to thrust, and click or press <strong>Space</strong> to shoot. Click the game first so it can hear the keyboard.</p>
+<div class="demo" data-sketch="examples/space-shooter" data-width="800" data-height="600" data-keys="1"></div>
+<h2 id="step-1-a-ship-that-faces-the-mouse">Step 1: A ship that faces the mouse</h2>
+<p>In space there's no gravity, so we set <code>world.gravityY = 0</code>. The ship is a <strong>triangle</strong>, which points right when its rotation is 0. That's the direction it will fly and shoot.</p>
+<p>Every frame, <code>lookAt()</code> turns the ship to face the mouse:</p>
+<pre><code class="language-js">world.gravityY = 0; // space: no gravity
+
+ship = new GameObject(width / 2, height / 2, 30, {
+  shape: 'triangle',
+  color: '#e9ecef',
+  stroke: '#4dabf7',
+  strokeWeight: 2,
+  airFriction: 0.02, // drifts, but slowly comes to a stop
+});
+</code></pre>
+<pre><code class="language-js">ship.lookAt(mouseX, mouseY);
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter-step-1" data-width="800" data-height="600"></div>
+<h2 id="step-2-thrust-and-wrapping-around-the-screen">Step 2: Thrust and wrapping around the screen</h2>
+<p>Spaceships don't stop instantly: they <strong>drift</strong>. Instead of setting the velocity, we <strong>push</strong> the ship with <code>applyForce()</code> while the thrust key is held. The push points the way the ship is facing. <code>ship.angle</code> is its rotation in radians, so <code>cos</code> and <code>sin</code> turn it into an x and y direction:</p>
+<pre><code class="language-js">let thrusting = keyIsDown(87) || keyIsDown(UP_ARROW); // 87 = W
+if (thrusting) {
+  ship.applyForce(Math.cos(ship.angle) * 0.5, Math.sin(ship.angle) * 0.5);
+}
+</code></pre>
+<p>When the ship flies off one edge, it should come back on the other. A <code>wrap()</code> function checks each edge and <strong>teleports</strong> the object to the opposite side:</p>
+<pre><code class="language-js">function wrap(obj) {
+  let m = obj.width / 2;
+  if (obj.x &lt; -m) obj.x = width + m;
+  if (obj.x &gt; width + m) obj.x = -m;
+  if (obj.y &lt; -m) obj.y = height + m;
+  if (obj.y &gt; height + m) obj.y = -m;
+}
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter-step-2" data-width="800" data-height="600" data-keys="1"></div>
+<blockquote>
+<p><strong>Try it:</strong> change the ship's <code>airFriction</code> to <code>0</code> for real outer-space drifting, or <code>0.1</code> for flying through syrup.</p>
+</blockquote>
+<h2 id="step-3-shooting">Step 3: Shooting</h2>
+<p>Bullets are a group. Two defaults matter here:</p>
+<ul>
+<li><code>lifespan: 60</code> makes each bullet destroy itself after 60 frames (one second), so old bullets don't pile up.</li>
+<li><code>airFriction: 0</code> stops bullets slowing down.</li>
+</ul>
+<p>Bullets start just in front of the ship's nose and fly the way it faces, <strong>plus</strong> the ship's own velocity, so they don't lag behind a fast-moving ship. We also make the ship and its bullets ignore each other, or you'd shoot yourself!</p>
+<pre><code class="language-js">bullets = new GameGroup({
+  shape: 'circle', color: '#ffe066', stroke: null,
+  airFriction: 0,
+  lifespan: 60,
+});
+ship.ignore(bullets);
+</code></pre>
+<pre><code class="language-js">function shoot() {
+  let a = ship.angle;
+  let b = bullets.create(ship.x + Math.cos(a) * 20, ship.y + Math.sin(a) * 20, 8);
+  b.setVelocity(ship.velocityX + Math.cos(a) * 12, ship.velocityY + Math.sin(a) * 12);
+}
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter-step-3" data-width="800" data-height="600" data-keys="1"></div>
+<h2 id="step-4-rocks">Step 4: Rocks</h2>
+<p>Rocks are a group of <strong>polygons</strong>. A <code>spawnRock()</code> function makes one rock with a random number of sides, a random drift and a random spin. Having a function means we can make rocks anywhere, at any size, which we'll need when they split.</p>
+<pre><code class="language-js">function spawnRock(x, y, size) {
+  let r = rocks.create(x, y, size, size, { sides: floor(random(5, 9)), rotation: random(360) });
+  r.setVelocity(random(-2, 2), random(-2, 2));
+  r.rotationSpeed = random(-2, 2);
+}
+</code></pre>
+<p>Rocks wrap around the screen too. Spreading the group into an array with the ship lets one loop handle everything:</p>
+<pre><code class="language-js">for (let obj of [ship, ...rocks]) wrap(obj);
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter-step-4" data-width="800" data-height="600" data-keys="1"></div>
+<h2 id="step-5-blasting-rocks">Step 5: Blasting rocks</h2>
+<p>This is where groups really pay off. <strong>One rule</strong> covers every bullet hitting every rock. The callback gets the bullet and the rock involved. Both are destroyed, you score points, and <strong>big</strong> rocks split into two smaller ones, at 60% of the size, where the old rock was. When the last rock is gone, a new wave arrives.</p>
+<pre><code class="language-js">bullets.onCollide(rocks, (bullet, rock) =&gt; {
+  bullet.destroy();
+  rock.destroy();
+  score += 10;
+  if (rock.width &gt; 30) {
+    spawnRock(rock.x, rock.y, rock.width * 0.6);
+    spawnRock(rock.x, rock.y, rock.width * 0.6);
+  }
+  if (rocks.length === 0) for (let i = 0; i &lt; 6; i++) spawnRock(random(width), 0, 60);
+});
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter-step-5" data-width="800" data-height="600" data-keys="1"></div>
+<h2 id="step-6-getting-hit">Step 6: Getting hit</h2>
+<p>When a rock hits the ship, you lose points and the ship turns red. <code>onCollideEnd</code> turns it back once they stop touching:</p>
+<pre><code class="language-js">ship.onCollide(rocks, () =&gt; {
+  score = max(0, score - 25);
+  ship.color = '#ff6b6b';
+});
+ship.onCollideEnd(rocks, () =&gt; (ship.color = '#e9ecef'));
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter-step-6" data-width="800" data-height="600" data-keys="1"></div>
+<h2 id="step-7-a-rocket-flame-the-finished-game">Step 7: A rocket flame (the finished game)</h2>
+<p>The finishing touch is a flickering flame behind the ship while thrusting. It's an <strong>animation</strong> whose three frames are drawn in code with <code>createGraphics()</code>, so no image files are needed:</p>
+<pre><code class="language-js">for (let i = 0; i &lt; 3; i++) {
+  let g = createGraphics(40, 30);
+  g.noStroke();
+  g.fill(255, 120 + i * 40, 0);
+  g.triangle(40, 15, 0, 15 - 8, 0, 15 + 8);
+  g.fill(255, 240, 120);
+  g.triangle(30, 15, 0, 15 - 3 - i * 2, 0, 15 + 3 + i * 2);
+  flameFrames.push(g);
+}
+</code></pre>
+<p>The flame is its own object, a sensor drawn behind the ship (<code>depth: -1</code>) that ignores everything. Every frame we glue it behind the ship and only show it while thrusting:</p>
+<pre><code class="language-js">ship.flame = new GameObject(0, 0, 40, 30, { isSensor: true, depth: -1 });
+ship.flame.addAnimation('burn', flameFrames, 4);
+</code></pre>
+<pre><code class="language-js">ship.flame.setPosition(ship.x - Math.cos(ship.angle) * 30, ship.y - Math.sin(ship.angle) * 30);
+ship.flame.rotation = ship.rotation + 180;
+ship.flame.visible = thrusting;
+</code></pre>
+<div class="demo" data-sketch="examples/space-shooter" data-width="800" data-height="600" data-keys="1"></div>
+<h2 id="make-it-your-own">Make it your own</h2>
+<ul>
+<li><strong>Lives:</strong> lose a life when a rock hits you, and end the game when they're gone (see <a href="levels-score.html#lives-and-losing">Levels and Score</a>).</li>
+<li><strong>A bigger universe:</strong> remove the wrapping, make the world larger and follow the ship with the camera (see <a href="input-camera.html#the-camera">Player Input and Camera</a>).</li>
+<li><strong>Sounds:</strong> a laser for shooting, an explosion for rocks (see <a href="sounds.html">Sounds</a>).</li>
+<li><strong>Power-ups:</strong> a rare sensor star that gives you triple shot for ten seconds.</li>
+<li><strong>Explosions:</strong> a burst of short-lived sparks when a rock breaks (see the fireworks demo in <a href="game-objects.html#removing-objects">Game Objects</a>).</li>
+</ul>
+    <nav class="pager">
+      <a class="prev" href="example-platformer.html"><small>Previous</small>Platformer</a>
+      <span></span>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

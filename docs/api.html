@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>API Reference · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-api">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html" class="current" aria-current="page">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <p class="sidebar-title"><span class="ref-icon">{ }</span> API Reference</p>
+    <ul class="api-toc">
+      <li><a href="#loading-the-library">Loading the library</a></li>
+      <li><a href="#units-and-conventions">Units and conventions</a></li>
+      <li><a href="#the-frame-loop">The frame loop</a></li>
+      <li><a href="#gameworld">GameWorld</a><ul class="sub"><li><a href="#world-options">World options</a></li><li><a href="#world-properties">World properties</a></li><li><a href="#world-methods">World methods</a></li><li><a href="#more-than-one-world">More than one world</a></li><li><a href="#walls">Walls</a></li><li><a href="#joints">Joints</a></li></ul></li>
+      <li><a href="#gameobject">GameObject</a><ul class="sub"><li><a href="#creating-a-game-object">Creating a game object</a></li><li><a href="#shapes">Shapes</a></li><li><a href="#object-options">Object options</a></li><li><a href="#position-and-size">Position and size</a></li><li><a href="#movement">Movement</a></li><li><a href="#physical-properties">Physical properties</a></li><li><a href="#appearance">Appearance</a></li><li><a href="#collisions">Collisions</a></li><li><a href="#mouse">Mouse</a></li><li><a href="#animation">Animation</a></li><li><a href="#groups-and-removal">Groups and removal</a></li><li><a href="#extending-gameobject">Extending GameObject</a></li></ul></li>
+      <li><a href="#gamegroup">GameGroup</a><ul class="sub"><li><a href="#creating-a-group">Creating a group</a></li><li><a href="#group-members">Group members</a></li><li><a href="#looping-and-searching">Looping and searching</a></li><li><a href="#changing-and-removing">Changing and removing</a></li><li><a href="#group-collisions">Group collisions</a></li></ul></li>
+      <li><a href="#gamecamera">GameCamera</a></li>
+      <li><a href="#gamelink">GameLink</a></li>
+      <li><a href="#the-gameobjects-namespace">The GameObjects namespace</a></li>
+      <li><a href="#collision-targets-and-callbacks">Collision targets and callbacks</a></li>
+    </ul>
+    <div class="sidebar-ref">
+      <a href="getting-started.html"><span class="ref-icon learn">?</span> Learn GameObjects</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Reference</p>
+<h1 id="gameobjectsjs-api-reference">GameObjects.js API Reference</h1>
+<p>Every class, property and method in GameObjects.js. For a step-by-step introduction with live demos, see the <a href="getting-started.html">guide</a>.</p>
+<p><strong>Version 0.1.0</strong> · Requires p5.js (1.x or 2.x) and Matter.js 0.20+</p>
+<h2 id="loading-the-library">Loading the library</h2>
+<p>Load the scripts in this order in <code>index.html</code>:</p>
+<pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;gameObjects.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;sketch.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>GameObjects adds these globals: <strong><code>world</code></strong> (a ready-made <a href="#gameworld">GameWorld</a>), <code>GameWorld</code>, <code>GameObject</code>, <code>GameGroup</code> and the <code>GameObjects</code> namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.</p>
+<h2 id="units-and-conventions">Units and conventions</h2>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Position, width, height</td>
+<td>pixels; <code>x</code> and <code>y</code> are the <strong>centre</strong> of an object</td>
+</tr>
+<tr>
+<td>Velocity, speed</td>
+<td>pixels per frame</td>
+</tr>
+<tr>
+<td><code>rotation</code>, <code>direction</code>, <code>rotationSpeed</code></td>
+<td>degrees (0 = pointing right, positive = clockwise)</td>
+</tr>
+<tr>
+<td><code>angle</code></td>
+<td>radians</td>
+</tr>
+<tr>
+<td><code>lifespan</code>, <code>frameDelay</code></td>
+<td>frames</td>
+</tr>
+<tr>
+<td>Colours</td>
+<td>anything p5's <code>fill()</code> accepts: <code>'red'</code>, <code>'#ff8800'</code>, <code>[255, 0, 0]</code>, <code>[255, 0, 0, 128]</code>, a <code>p5.Color</code>, or <code>null</code> for none</td>
+</tr>
+</tbody>
+</table>
+<p>Rotation is always in degrees, whatever <code>angleMode()</code> is set to. Most methods that change an object return the object, so calls can be chained: <code>ball.setPosition(100, 50).setVelocity(3, 0)</code>.</p>
+<h2 id="the-frame-loop">The frame loop</h2>
+<p>Each frame, while a world is current:</p>
+<ol>
+<li><strong>Before <code>draw()</code></strong>, the world's <code>update()</code> runs: mouse dragging, each object's <code>update()</code>, one physics step (collision callbacks run here), then animations, lifespans and the camera.</li>
+<li><strong>Your <code>draw()</code></strong> runs.</li>
+<li><strong>After <code>draw()</code></strong>, the world's <code>draw()</code> draws every link and object (sorted by <code>depth</code>) through the camera.</li>
+</ol>
+<p>If your sketch calls <code>world.update()</code> or <code>world.draw()</code> itself, the automatic step is skipped for that frame. Calling <code>update()</code> yourself switches <code>autoUpdate</code> off. Physics runs at a fixed step of 1/60 s per frame, so the game runs in slow motion if the frame rate drops.</p>
+<hr />
+<h2 id="gameworld">GameWorld</h2>
+<p>The physics world: gravity, every object, the camera, joints and drawing.</p>
+<p><strong>You don't need to make one.</strong> GameObjects creates a world when it loads and makes it available as the global <strong><code>world</code></strong>. Change its settings in <code>setup()</code>:</p>
+<pre><code class="language-js">function setup() {
+  createCanvas(640, 360);
+  world.gravityY = 0;      // a top-down game
+  world.debug = true;
+  new GameObject(100, 100, 40);
+}
+</code></pre>
+<p>You can still make a world yourself, for example to pass options all at once. Making a world makes it the <strong>current</strong> world, the one new objects go into and the one <code>world</code> refers to:</p>
+<pre><code class="language-js">world = new GameWorld({ gravityY: 0, debug: true });
+</code></pre>
+<p>If your sketch declares its own <code>let world</code>, your variable is used instead of the built-in one, and the old style keeps working: <code>let world;</code> then <code>world = new GameWorld();</code> in <code>setup()</code>.</p>
+<h3 id="world-options">World options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gravityX</code></td>
+<td><code>0</code></td>
+<td>Sideways gravity</td>
+</tr>
+<tr>
+<td><code>gravityY</code></td>
+<td><code>1</code></td>
+<td>Downward gravity. Use <code>0</code> for space or top-down games.</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td><code>false</code></td>
+<td>Draw physics outlines (see <code>debug</code> below)</td>
+</tr>
+<tr>
+<td><code>autoUpdate</code></td>
+<td><code>true</code></td>
+<td>Update automatically before <code>draw()</code></td>
+</tr>
+<tr>
+<td><code>autoDraw</code></td>
+<td><code>true</code></td>
+<td>Draw automatically after <code>draw()</code></td>
+</tr>
+<tr>
+<td><code>timeScale</code></td>
+<td><code>1</code></td>
+<td>Speed of time: <code>0.5</code> is slow motion</td>
+</tr>
+<tr>
+<td><code>background</code></td>
+<td><code>null</code></td>
+<td>If set, the world clears the canvas with this colour before drawing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="world-properties">World properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gravityX</code>, <code>gravityY</code></td>
+<td>number</td>
+<td>Gravity. Read or change any time.</td>
+</tr>
+<tr>
+<td><code>objects</code></td>
+<td>GameGroup</td>
+<td>Every object in the world</td>
+</tr>
+<tr>
+<td><code>camera</code></td>
+<td>GameCamera</td>
+<td>The camera (see <a href="#gamecamera">GameCamera</a>)</td>
+</tr>
+<tr>
+<td><code>paused</code></td>
+<td>boolean</td>
+<td><code>true</code> freezes physics, animations and lifespans. Objects are still drawn.</td>
+</tr>
+<tr>
+<td><code>timeScale</code></td>
+<td>number</td>
+<td><code>1</code> is normal, <code>0.3</code> slow motion, <code>2</code> fast</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td>boolean</td>
+<td>Draws every physics outline: green normally, red while touching, orange for sensors, with a magenta cross at each centre</td>
+</tr>
+<tr>
+<td><code>background</code></td>
+<td>colour or <code>null</code></td>
+<td>Clears the canvas before the world draws</td>
+</tr>
+<tr>
+<td><code>autoUpdate</code>, <code>autoDraw</code></td>
+<td>boolean</td>
+<td>Automatic update and draw (see <a href="#the-frame-loop">The frame loop</a>)</td>
+</tr>
+<tr>
+<td><code>mouseX</code>, <code>mouseY</code></td>
+<td>number</td>
+<td>Mouse position in <strong>world</strong> coordinates (read only). Differs from p5's <code>mouseX</code> once the camera moves.</td>
+</tr>
+<tr>
+<td><code>mouse</code></td>
+<td><code>{ x, y }</code></td>
+<td>Both of the above at once (read only)</td>
+</tr>
+<tr>
+<td><code>dragging</code></td>
+<td>GameObject or <code>null</code></td>
+<td>The object being dragged with the mouse (read only)</td>
+</tr>
+<tr>
+<td><code>links</code></td>
+<td>array of GameLink</td>
+<td>Every joint in the world (read only)</td>
+</tr>
+<tr>
+<td><code>frame</code></td>
+<td>number</td>
+<td>How many physics steps have run (read only)</td>
+</tr>
+<tr>
+<td><code>engine</code></td>
+<td>Matter.Engine</td>
+<td>The Matter.js engine, for advanced use</td>
+</tr>
+</tbody>
+</table>
+<h3 id="world-methods">World methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>setGravity(x, y)</code></td>
+<td>world</td>
+<td>Set both parts of gravity</td>
+</tr>
+<tr>
+<td><code>update()</code></td>
+<td>world</td>
+<td>Run one frame: dragging, <code>update()</code> on each object, physics, collisions, animations, lifespans, camera. Called automatically.</td>
+</tr>
+<tr>
+<td><code>draw()</code></td>
+<td>world</td>
+<td>Draw all links and objects through the camera. Called automatically.</td>
+</tr>
+<tr>
+<td><code>addWalls(options)</code></td>
+<td>GameGroup</td>
+<td>Static walls around the canvas. See <a href="#walls">Walls</a>.</td>
+</tr>
+<tr>
+<td><code>connect(a, b, options)</code></td>
+<td>GameLink</td>
+<td>Join two objects. See <a href="#joints">Joints</a>.</td>
+</tr>
+<tr>
+<td><code>pin(obj, x, y, options)</code></td>
+<td>GameLink</td>
+<td>Pin an object to a point in the world. See <a href="#joints">Joints</a>.</td>
+</tr>
+<tr>
+<td><code>objectsAt(x, y)</code></td>
+<td>array</td>
+<td>Objects under a point (world coordinates)</td>
+</tr>
+<tr>
+<td><code>raycast(x1, y1, x2, y2, width)</code></td>
+<td>array</td>
+<td>Objects crossed by a line, nearest to <code>(x1, y1)</code> first. <code>width</code> defaults to <code>1</code>.</td>
+</tr>
+<tr>
+<td><code>clear()</code></td>
+<td>world</td>
+<td>Destroy every object and link. Groups keep their settings and collision rules.</td>
+</tr>
+<tr>
+<td><code>makeCurrent()</code></td>
+<td>world</td>
+<td>Make this the current world: new objects go into it, it runs automatically, and the global <code>world</code> refers to it</td>
+</tr>
+</tbody>
+</table>
+<h3 id="more-than-one-world">More than one world</h3>
+<p>Most games need only one world. Use <code>world.clear()</code> to restart or change levels. A second world is useful when you want two separate physics scenes, such as a title screen with its own falling letters while a paused game waits underneath.</p>
+<ul>
+<li>Only the <strong>current</strong> world (the newest, or the one you called <code>makeCurrent()</code> on) updates and draws by itself. Run any other world with <code>otherWorld.update()</code> and <code>otherWorld.draw()</code>.</li>
+<li>New objects go into the current world, or the world given in their <code>world</code> option. Objects can't move between worlds.</li>
+<li>The limit of 30 groups/objects using <code>ignore()</code> is shared by all worlds.</li>
+</ul>
+<h3 id="walls">Walls</h3>
+<p><code>world.addWalls(options)</code> makes four static walls around the canvas (or around any rectangle you give it) and returns them as a GameGroup. The group also has <code>top</code>, <code>bottom</code>, <code>left</code> and <code>right</code> properties.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code>, <code>y</code>, <code>width</code>, <code>height</code></td>
+<td>the canvas</td>
+<td>The area to wall in</td>
+</tr>
+<tr>
+<td><code>thickness</code></td>
+<td><code>100</code></td>
+<td>Wall thickness. The walls sit just outside the area.</td>
+</tr>
+<tr>
+<td><code>color</code>, <code>stroke</code></td>
+<td><code>null</code></td>
+<td>Invisible by default</td>
+</tr>
+<tr>
+<td><code>bounce</code>, <code>friction</code></td>
+<td><code>0.2</code>, <code>0.1</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>top</code></td>
+<td><code>true</code></td>
+<td><code>false</code> leaves the top open</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">let walls = world.addWalls();
+walls.bottom.destroy();                                    // an open bottom, like Breakout
+world.addWalls({ x: 0, y: 0, width: 2000, height: 1400 }); // a big level
+</code></pre>
+<h3 id="joints">Joints</h3>
+<p><code>world.connect(a, b, options)</code> joins two GameObjects. <code>world.pin(obj, x, y, options)</code> joins one object to a fixed point in the world (<code>x</code> and <code>y</code> default to the object's position). Both return a <a href="#gamelink">GameLink</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th><code>connect</code> default</th>
+<th><code>pin</code> default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>length</code></td>
+<td>current distance</td>
+<td>current distance</td>
+<td>Distance to keep</td>
+</tr>
+<tr>
+<td><code>stiffness</code></td>
+<td><code>0.7</code></td>
+<td><code>1</code></td>
+<td><code>1</code> = solid rod, <code>0.01</code> = very stretchy</td>
+</tr>
+<tr>
+<td><code>damping</code></td>
+<td><code>0</code></td>
+<td><code>0</code></td>
+<td><code>0</code> to <code>1</code>. Higher values stop the wobbling sooner.</td>
+</tr>
+<tr>
+<td><code>offsetA</code>, <code>offsetB</code></td>
+<td><code>{x: 0, y: 0}</code></td>
+<td></td>
+<td><code>connect</code>: attach points on <code>a</code> and <code>b</code>, from their centres</td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td></td>
+<td><code>{x: 0, y: 0}</code></td>
+<td><code>pin</code>: attach point on the object, from its centre</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">world.connect(a, b, { length: 100, stiffness: 0.02, damping: 0.05 });  // a spring
+world.pin(ball, 320, 40);                                             // a pendulum
+</code></pre>
+<hr />
+<h2 id="gameobject">GameObject</h2>
+<p>One physical thing in the game.</p>
+<h3 id="creating-a-game-object">Creating a game object</h3>
+<pre><code class="language-js">new GameObject(x, y)                          // a 40 × 40 box
+new GameObject(x, y, size)                    // a square
+new GameObject(x, y, width, height)
+new GameObject(x, y, width, height, options)
+new GameObject(x, y, size, options)
+new GameObject(options)                       // options.x, options.y, options.width, options.height
+</code></pre>
+<p>If <code>x</code> and <code>y</code> are missing, the object is placed at the centre of the canvas. The new object is added to the current world (or <code>options.world</code>) and to <code>world.objects</code>.</p>
+<h3 id="shapes">Shapes</h3>
+<p>Set with the <code>shape</code> option. Once made, <code>obj.shape</code> is read only.</p>
+<table>
+<thead>
+<tr>
+<th><code>shape</code></th>
+<th>Size</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'box'</code> (default)</td>
+<td><code>width</code> × <code>height</code></td>
+<td><code>cornerRadius</code> rounds the corners. <code>'rect'</code> and <code>'rectangle'</code> also work.</td>
+</tr>
+<tr>
+<td><code>'circle'</code></td>
+<td><code>width</code> is the diameter</td>
+<td>Draws a line from the centre so you can see it roll (<code>showRotation</code>)</td>
+</tr>
+<tr>
+<td><code>'triangle'</code></td>
+<td><code>width</code> is the diameter</td>
+<td>Equal sides, one point facing right at rotation 0</td>
+</tr>
+<tr>
+<td><code>'polygon'</code></td>
+<td><code>width</code> is the diameter</td>
+<td><code>sides</code> sets the number of sides (default <code>6</code>)</td>
+</tr>
+<tr>
+<td><code>'custom'</code></td>
+<td>from the points</td>
+<td>Give <code>vertices: [[x, y], ...]</code> around the centre. They should make a convex shape.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="object-options">Object options</h3>
+<p>Every option can also be read and changed later as a property, unless it's marked otherwise.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>shape</code></td>
+<td><code>'box'</code></td>
+<td>See <a href="#shapes">Shapes</a> (only when creating)</td>
+</tr>
+<tr>
+<td><code>sides</code></td>
+<td><code>6</code></td>
+<td>Sides of a <code>'polygon'</code> (only when creating)</td>
+</tr>
+<tr>
+<td><code>vertices</code></td>
+<td></td>
+<td>Points of a custom shape (only when creating)</td>
+</tr>
+<tr>
+<td><code>cornerRadius</code></td>
+<td><code>0</code></td>
+<td>Rounded corners for boxes (set only when creating)</td>
+</tr>
+<tr>
+<td><code>isStatic</code></td>
+<td><code>false</code></td>
+<td>Never moved by physics</td>
+</tr>
+<tr>
+<td><code>isSensor</code></td>
+<td><code>false</code></td>
+<td>Detects touches but doesn't collide</td>
+</tr>
+<tr>
+<td><code>bounce</code></td>
+<td><code>0.2</code></td>
+<td><code>0</code> to <code>1</code></td>
+</tr>
+<tr>
+<td><code>friction</code></td>
+<td><code>0.1</code></td>
+<td><code>0</code> (ice) to <code>1</code> (sticky)</td>
+</tr>
+<tr>
+<td><code>airFriction</code></td>
+<td><code>0.01</code></td>
+<td>Slows the object down all the time</td>
+</tr>
+<tr>
+<td><code>density</code></td>
+<td><code>0.001</code></td>
+<td>Weight per area</td>
+</tr>
+<tr>
+<td><code>mass</code></td>
+<td>from density</td>
+<td>Total weight</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td><code>0</code></td>
+<td>Starting angle in degrees</td>
+</tr>
+<tr>
+<td><code>fixedRotation</code></td>
+<td><code>false</code></td>
+<td>Never spins</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>random pastel</td>
+<td>The fill colour (what p5's <code>fill()</code> sets), or <code>null</code> for none. Can also be set with the <a href="#appearance"><code>fill()</code></a> method.</td>
+</tr>
+<tr>
+<td><code>stroke</code></td>
+<td><code>0</code> (black)</td>
+<td>The outline colour (what p5's <code>stroke()</code> sets), or <code>null</code> for none</td>
+</tr>
+<tr>
+<td><code>strokeWeight</code></td>
+<td><code>1</code></td>
+<td>Outline thickness</td>
+</tr>
+<tr>
+<td><code>opacity</code></td>
+<td><code>255</code></td>
+<td><code>0</code> to <code>255</code></td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td><code>null</code></td>
+<td>A <code>p5.Image</code> or <code>p5.Graphics</code>, stretched to the object's size</td>
+</tr>
+<tr>
+<td><code>imageOffsetX</code>, <code>imageOffsetY</code></td>
+<td><code>0</code></td>
+<td>Move the picture inside the object</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td><code>null</code></td>
+<td>Text drawn at the centre</td>
+</tr>
+<tr>
+<td><code>labelColor</code>, <code>labelSize</code></td>
+<td><code>0</code>, <code>14</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>visible</code></td>
+<td><code>true</code></td>
+<td><code>false</code> hides it (it still collides)</td>
+</tr>
+<tr>
+<td><code>depth</code></td>
+<td><code>0</code></td>
+<td>Higher numbers are drawn on top</td>
+</tr>
+<tr>
+<td><code>flipX</code>, <code>flipY</code></td>
+<td><code>false</code></td>
+<td>Mirror the drawing</td>
+</tr>
+<tr>
+<td><code>showRotation</code></td>
+<td><code>true</code></td>
+<td>Line on circles showing rotation</td>
+</tr>
+<tr>
+<td><code>draggable</code></td>
+<td><code>false</code></td>
+<td>Can be dragged with the mouse</td>
+</tr>
+<tr>
+<td><code>lifespan</code></td>
+<td><code>Infinity</code></td>
+<td>Frames until the object destroys itself</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>''</code></td>
+<td>For your own use</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td><code>{}</code></td>
+<td>For your own information: <code>obj.data.health = 3</code></td>
+</tr>
+<tr>
+<td><code>group</code></td>
+<td></td>
+<td>A GameGroup (or array of groups) to join (only when creating)</td>
+</tr>
+<tr>
+<td><code>world</code></td>
+<td>the current world</td>
+<td>The world to add the object to (only when creating)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="position-and-size">Position and size</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code>, <code>y</code></td>
+<td>Centre position. Setting it teleports the object.</td>
+</tr>
+<tr>
+<td><code>setPosition(x, y)</code></td>
+<td>Teleport. Keeps the velocity.</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td>Angle in degrees</td>
+</tr>
+<tr>
+<td><code>angle</code></td>
+<td>Angle in radians</td>
+</tr>
+<tr>
+<td><code>lookAt(x, y)</code>, <code>lookAt(obj)</code></td>
+<td>Turn to face a point or object, and stop spinning</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code></td>
+<td>Size. Setting either resizes the physics shape. For circles, triangles and polygons, both change together.</td>
+</tr>
+<tr>
+<td><code>setSize(width, height)</code></td>
+<td>Resize. <code>height</code> defaults to <code>width</code>.</td>
+</tr>
+<tr>
+<td><code>distanceTo(x, y)</code>, <code>distanceTo(obj)</code></td>
+<td>Distance from the centre, in pixels</td>
+</tr>
+<tr>
+<td><code>isOffscreen(margin)</code></td>
+<td><code>true</code> when the object is completely outside the camera's view, plus <code>margin</code> pixels (default <code>0</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Moving static objects:</strong> setting <code>x</code>, <code>y</code>, <code>rotation</code> or calling <code>setPosition()</code> on a static object in steps smaller than 50 px (or 0.5 radians) each frame counts as sliding, so things standing on it are carried along. Bigger jumps are teleports.</p>
+<h3 id="movement">Movement</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>velocityX</code>, <code>velocityY</code></td>
+<td>Velocity in pixels per frame</td>
+</tr>
+<tr>
+<td><code>setVelocity(vx, vy)</code></td>
+<td>Set both parts</td>
+</tr>
+<tr>
+<td><code>speed</code></td>
+<td>Pixels per frame. Setting it keeps the direction.</td>
+</tr>
+<tr>
+<td><code>direction</code></td>
+<td>Direction of travel in degrees. Setting it keeps the speed.</td>
+</tr>
+<tr>
+<td><code>rotationSpeed</code></td>
+<td>Spin in degrees per frame</td>
+</tr>
+<tr>
+<td><code>push(vx, vy)</code></td>
+<td>Add to the velocity. Ignores weight.</td>
+</tr>
+<tr>
+<td><code>applyForce(fx, fy)</code></td>
+<td>Push from the centre. Heavier objects move less. Values around <code>0.1</code>–<code>5</code> suit objects of normal size.</td>
+</tr>
+<tr>
+<td><code>moveToward(x, y, speed)</code>, <code>moveToward(obj, speed)</code></td>
+<td>Point the velocity at a target. <code>speed</code> defaults to <code>3</code>. Slows down to arrive exactly.</td>
+</tr>
+<tr>
+<td><code>moveForward(speed)</code></td>
+<td>Move the way the object is facing (its <code>rotation</code>). <code>speed</code> defaults to <code>3</code>.</td>
+</tr>
+<tr>
+<td><code>stop()</code></td>
+<td>Zero velocity and spin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="physical-properties">Physical properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isStatic</code></td>
+<td>Never moved by physics. Can be switched on and off.</td>
+</tr>
+<tr>
+<td><code>isSensor</code></td>
+<td>Overlaps instead of colliding, but still reports touches</td>
+</tr>
+<tr>
+<td><code>bounce</code></td>
+<td><code>0</code> to <code>1</code>. Two touching objects use the higher bounce.</td>
+</tr>
+<tr>
+<td><code>friction</code></td>
+<td><code>0</code> to <code>1</code>. Two touching objects use the lower friction.</td>
+</tr>
+<tr>
+<td><code>airFriction</code></td>
+<td>Slowing down over time</td>
+</tr>
+<tr>
+<td><code>density</code></td>
+<td>Changing it updates the mass</td>
+</tr>
+<tr>
+<td><code>mass</code></td>
+<td>Total weight</td>
+</tr>
+<tr>
+<td><code>fixedRotation</code></td>
+<td>Never spins</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td>The Matter.js body, for advanced use</td>
+</tr>
+<tr>
+<td><code>world</code></td>
+<td>The GameWorld the object belongs to (read only)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="appearance">Appearance</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color</code></td>
+<td>The fill colour, or <code>null</code> for none</td>
+</tr>
+<tr>
+<td><code>fill(...)</code></td>
+<td>Set <code>color</code> using the same arguments as p5's <code>fill()</code>: <code>obj.fill('red')</code>, <code>obj.fill(255, 0, 0)</code>, <code>obj.fill(0, 128)</code>, <code>obj.fill(null)</code>. Returns the object.</td>
+</tr>
+<tr>
+<td><code>stroke</code>, <code>strokeWeight</code></td>
+<td>The outline colour (or <code>null</code> for none) and its thickness</td>
+</tr>
+<tr>
+<td><code>opacity</code></td>
+<td><code>0</code> (invisible) to <code>255</code> (solid)</td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td>A picture instead of a shape</td>
+</tr>
+<tr>
+<td><code>imageOffsetX</code>, <code>imageOffsetY</code></td>
+<td>Move the picture inside the object</td>
+</tr>
+<tr>
+<td><code>label</code>, <code>labelColor</code>, <code>labelSize</code></td>
+<td>Text at the centre</td>
+</tr>
+<tr>
+<td><code>visible</code></td>
+<td>Hide or show</td>
+</tr>
+<tr>
+<td><code>depth</code></td>
+<td>Drawing order</td>
+</tr>
+<tr>
+<td><code>flipX</code>, <code>flipY</code></td>
+<td>Mirror</td>
+</tr>
+<tr>
+<td><code>showRotation</code></td>
+<td>Line on circles</td>
+</tr>
+<tr>
+<td><code>draw()</code></td>
+<td>Draw the object now. The world normally does this.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collisions">Collisions</h3>
+<p>See <a href="#collision-targets-and-callbacks">Collision targets and callbacks</a> for what <code>target</code> can be.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onCollide(target, fn)</code></td>
+<td>object</td>
+<td>Run <code>fn(thisObject, other)</code> once, when touching starts</td>
+</tr>
+<tr>
+<td><code>onCollideEnd(target, fn)</code></td>
+<td>object</td>
+<td>Run <code>fn(thisObject, other)</code> once, when touching stops</td>
+</tr>
+<tr>
+<td><code>whileTouching(target, fn)</code></td>
+<td>object</td>
+<td>Run <code>fn(thisObject, other)</code> every frame while touching</td>
+</tr>
+<tr>
+<td><code>isTouching(target)</code></td>
+<td>boolean</td>
+<td>Touching right now?</td>
+</tr>
+<tr>
+<td><code>getTouching()</code></td>
+<td>array</td>
+<td>Everything touching this object</td>
+</tr>
+<tr>
+<td><code>ignore(target)</code></td>
+<td>object</td>
+<td>Pass through <code>target</code> without colliding or reporting touches</td>
+</tr>
+<tr>
+<td><code>unignore(target)</code></td>
+<td>object</td>
+<td>Collide with <code>target</code> again</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mouse">Mouse</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isMouseOver()</code></td>
+<td><code>true</code> if the mouse is over the object's shape (uses world coordinates)</td>
+</tr>
+<tr>
+<td><code>draggable</code></td>
+<td>Can be grabbed and thrown. Static objects are moved directly.</td>
+</tr>
+<tr>
+<td><code>isDragging</code></td>
+<td><code>true</code> while the object is being dragged (read only)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="animation">Animation</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>addAnimation(name, frames, frameDelay, loop)</code></td>
+<td>Add an animation. <code>frames</code> is an array of <code>p5.Image</code> or <code>p5.Graphics</code>. <code>frameDelay</code> (default <code>6</code>) is how many frames each picture is shown. <code>loop</code> defaults to <code>true</code>. The first animation added starts playing.</td>
+</tr>
+<tr>
+<td><code>playAnimation(name, restart)</code></td>
+<td>Switch animation. If it's already playing it carries on, unless <code>restart</code> is <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>pauseAnimation()</code></td>
+<td>Freeze on the current frame</td>
+</tr>
+<tr>
+<td><code>animation</code></td>
+<td>Name of the current animation, or <code>null</code> (read only)</td>
+</tr>
+<tr>
+<td><code>animationFrame</code></td>
+<td>Index of the current picture. Can be set.</td>
+</tr>
+<tr>
+<td><code>animationDone</code></td>
+<td><code>true</code> when a non-looping animation has finished (read only)</td>
+</tr>
+</tbody>
+</table>
+<p>A playing animation is drawn instead of <code>image</code> and the shape. Use <a href="#the-gameobjects-namespace"><code>GameObjects.spriteSheet()</code></a> to cut frames out of a sheet.</p>
+<h3 id="groups-and-removal">Groups and removal</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>groups</code></td>
+<td>Array of the groups the object is in (read only)</td>
+</tr>
+<tr>
+<td><code>isIn(group)</code></td>
+<td>Is the object in this group?</td>
+</tr>
+<tr>
+<td><code>destroy()</code></td>
+<td>Remove from the world, every group, joints, the camera and the mouse. Safe inside collision callbacks.</td>
+</tr>
+<tr>
+<td><code>destroyed</code></td>
+<td><code>true</code> once destroyed</td>
+</tr>
+<tr>
+<td><code>lifespan</code></td>
+<td>Frames left before it destroys itself (<code>Infinity</code> = never)</td>
+</tr>
+<tr>
+<td><code>name</code>, <code>data</code></td>
+<td>Your own information</td>
+</tr>
+</tbody>
+</table>
+<h3 id="extending-gameobject">Extending GameObject</h3>
+<p>Make your own kinds of object with <code>class ... extends GameObject</code> and override these two methods:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>update()</code></td>
+<td>Runs once every frame, just before the physics step. Empty by default.</td>
+</tr>
+<tr>
+<td><code>drawShape(p)</code></td>
+<td>Draws the object. <code>(0, 0)</code> is the object's centre, the drawing is already rotated and flipped, and <code>rectMode</code>, <code>ellipseMode</code> and <code>imageMode</code> are <code>CENTER</code>. <code>p</code> is the p5 instance: use <code>p.fill()</code>, <code>p.rect()</code> and so on.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">class Enemy extends GameObject {
+  constructor(x, y) {
+    super(x, y, 30, { fixedRotation: true });
+    this.data.health = 3;
+  }
+  update() {
+    this.moveToward(player, 2);
+  }
+  drawShape(p) {
+    p.fill('purple');
+    p.circle(0, 0, this.width);
+  }
+}
+</code></pre>
+<hr />
+<h2 id="gamegroup">GameGroup</h2>
+<p>A collection of game objects. An object can be in any number of groups.</p>
+<h3 id="creating-a-group">Creating a group</h3>
+<pre><code class="language-js">let coins = new GameGroup();
+let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, color: 'gold' });
+</code></pre>
+<p>The optional object holds <strong>defaults</strong> for objects made with <code>create()</code>. Its <code>name</code> (if given) becomes the group's <code>name</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>defaults</code></td>
+<td>The defaults used by <code>create()</code>. Can be changed.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>For your own use</td>
+</tr>
+</tbody>
+</table>
+<h3 id="group-members">Group members</h3>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create(x, y, width, height, options)</code></td>
+<td>GameObject</td>
+<td>Make a new object with the group's defaults (overridden by <code>options</code>) and add it to the group. Takes the same arguments as <code>new GameObject()</code>.</td>
+</tr>
+<tr>
+<td><code>add(...objects)</code></td>
+<td>group</td>
+<td>Add objects or arrays of objects. Destroyed objects and existing members are skipped.</td>
+</tr>
+<tr>
+<td><code>remove(obj)</code></td>
+<td>group</td>
+<td>Take an object out of the group. It stays in the world.</td>
+</tr>
+<tr>
+<td><code>has(obj)</code></td>
+<td>boolean</td>
+<td>Is the object in this group?</td>
+</tr>
+<tr>
+<td><code>length</code>, <code>size</code></td>
+<td>number</td>
+<td>Number of objects</td>
+</tr>
+<tr>
+<td><code>get(i)</code></td>
+<td>GameObject</td>
+<td>Object at position <code>i</code></td>
+</tr>
+<tr>
+<td><code>first</code>, <code>last</code></td>
+<td>GameObject</td>
+<td>First and last object</td>
+</tr>
+<tr>
+<td><code>random()</code></td>
+<td>GameObject</td>
+<td>A random member</td>
+</tr>
+</tbody>
+</table>
+<h3 id="looping-and-searching">Looping and searching</h3>
+<p>Groups can be looped over with <code>for (let obj of group)</code>. It's safe to destroy objects while looping.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>forEach(fn)</code></td>
+<td>group</td>
+<td>Run <code>fn(obj, index)</code> for each member</td>
+</tr>
+<tr>
+<td><code>filter(fn)</code>, <code>map(fn)</code></td>
+<td>array</td>
+<td>Like the array methods</td>
+</tr>
+<tr>
+<td><code>find(fn)</code></td>
+<td>GameObject</td>
+<td>First member where <code>fn(obj)</code> is true</td>
+</tr>
+<tr>
+<td><code>some(fn)</code>, <code>every(fn)</code></td>
+<td>boolean</td>
+<td>Like the array methods</td>
+</tr>
+<tr>
+<td><code>toArray()</code></td>
+<td>array</td>
+<td>A copy of the members as a plain array</td>
+</tr>
+<tr>
+<td><code>closestTo(x, y)</code>, <code>closestTo(obj)</code></td>
+<td>GameObject</td>
+<td>The nearest member (an object is never closest to itself)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="changing-and-removing">Changing and removing</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>set(properties)</code></td>
+<td>group</td>
+<td>Assign properties to every member: <code>group.set({ color: 'red', bounce: 1 })</code></td>
+</tr>
+<tr>
+<td><code>destroyAll()</code></td>
+<td>group</td>
+<td>Destroy every member</td>
+</tr>
+<tr>
+<td><code>draw()</code></td>
+<td>group</td>
+<td>Draw the members now, sorted by <code>depth</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="group-collisions">Group collisions</h3>
+<p>The same as for a single object, but they apply to <strong>every</strong> member, including ones added later. In callbacks, the first argument is the member involved.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onCollide(target, fn)</code></td>
+<td>group</td>
+<td><code>fn(member, other)</code> once, when touching starts</td>
+</tr>
+<tr>
+<td><code>onCollideEnd(target, fn)</code></td>
+<td>group</td>
+<td><code>fn(member, other)</code> once, when touching stops</td>
+</tr>
+<tr>
+<td><code>whileTouching(target, fn)</code></td>
+<td>group</td>
+<td><code>fn(member, other)</code> every frame while touching</td>
+</tr>
+<tr>
+<td><code>isTouching(target)</code></td>
+<td>boolean</td>
+<td>Is any member touching <code>target</code>?</td>
+</tr>
+<tr>
+<td><code>ignore(target)</code></td>
+<td>group</td>
+<td>Members pass through <code>target</code>. <code>group.ignore(group)</code> makes members ignore each other.</td>
+</tr>
+<tr>
+<td><code>unignore(target)</code></td>
+<td>group</td>
+<td>Collide again</td>
+</tr>
+</tbody>
+</table>
+<p><code>ignore()</code> can be used by up to 30 different groups and objects. Ignores add up: an object in a group that ignores walls won't hit walls, even if it's in other groups too.</p>
+<hr />
+<h2 id="gamecamera">GameCamera</h2>
+<p>Every world has one, as <code>world.camera</code>. It chooses which part of the world is shown. By default it shows the canvas area, so world and screen coordinates match.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code>, <code>y</code></td>
+<td>The world point at the centre of the screen. Defaults to the centre of the canvas.</td>
+</tr>
+<tr>
+<td><code>zoom</code></td>
+<td><code>1</code> is normal, <code>2</code> is twice as close</td>
+</tr>
+<tr>
+<td><code>follow(obj, ease, offsetX, offsetY)</code></td>
+<td>Follow an object each frame. <code>ease</code> (default <code>0.1</code>) is how much of the gap closes per frame: <code>1</code> locks on. Offsets shift the view. Stops automatically if the object is destroyed.</td>
+</tr>
+<tr>
+<td><code>stopFollowing()</code></td>
+<td>Stop following</td>
+</tr>
+<tr>
+<td><code>reset()</code></td>
+<td>Back to the canvas centre, zoom <code>1</code>, not following</td>
+</tr>
+<tr>
+<td><code>screenToWorld(x, y)</code></td>
+<td>Convert a screen point to <code>{ x, y }</code> in the world</td>
+</tr>
+<tr>
+<td><code>worldToScreen(x, y)</code></td>
+<td>Convert a world point to <code>{ x, y }</code> on the screen</td>
+</tr>
+<tr>
+<td><code>viewBounds()</code></td>
+<td><code>{ left, top, right, bottom }</code> of the visible area, in world coordinates</td>
+</tr>
+<tr>
+<td><code>begin()</code>, <code>end()</code></td>
+<td>Draw your own things in world space between these two calls</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="gamelink">GameLink</h2>
+<p>A joint made by <code>world.connect()</code> or <code>world.pin()</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a</code>, <code>b</code></td>
+<td>The two objects (<code>a</code> is <code>null</code> for a pin)</td>
+</tr>
+<tr>
+<td><code>length</code></td>
+<td>Distance to keep. Can be changed.</td>
+</tr>
+<tr>
+<td><code>stiffness</code></td>
+<td><code>0</code> to <code>1</code>. Can be changed.</td>
+</tr>
+<tr>
+<td><code>visible</code></td>
+<td>Draw the link as a line (default <code>true</code>)</td>
+</tr>
+<tr>
+<td><code>stroke</code>, <code>strokeWeight</code></td>
+<td>Line style (default <code>80</code>, <code>2</code>)</td>
+</tr>
+<tr>
+<td><code>destroy()</code></td>
+<td>Remove the joint. Joints are also removed when either object is destroyed.</td>
+</tr>
+<tr>
+<td><code>destroyed</code></td>
+<td><code>true</code> once removed</td>
+</tr>
+<tr>
+<td><code>constraint</code></td>
+<td>The Matter.js constraint, for advanced use</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="the-gameobjects-namespace">The GameObjects namespace</h2>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameObjects.spriteSheet(image, frameWidth, frameHeight, count, start)</code></td>
+<td>Cut a sprite sheet into an array of frames, reading left to right, top to bottom. <code>frameHeight</code> defaults to <code>frameWidth</code>. <code>count</code> (default: all) and <code>start</code> (default <code>0</code>) choose a run of frames.</td>
+</tr>
+<tr>
+<td><code>GameObjects.world</code></td>
+<td>The current world (the same as the global <code>world</code>)</td>
+</tr>
+<tr>
+<td><code>GameObjects.currentWorld</code></td>
+<td>The current world</td>
+</tr>
+<tr>
+<td><code>GameObjects.Matter</code></td>
+<td>The Matter.js library</td>
+</tr>
+<tr>
+<td><code>GameObjects.version</code></td>
+<td><code>'0.1.0'</code></td>
+</tr>
+<tr>
+<td><code>GameObjects.GameWorld</code>, <code>.GameObject</code>, <code>.GameGroup</code>, <code>.GameCamera</code>, <code>.GameLink</code></td>
+<td>The classes</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">let sheet = await loadImage('hero.png');
+let run = GameObjects.spriteSheet(sheet, 48, 48, 4, 4);   // frames 4, 5, 6, 7
+</code></pre>
+<hr />
+<h2 id="collision-targets-and-callbacks">Collision targets and callbacks</h2>
+<p>The collision methods (<code>onCollide</code>, <code>onCollideEnd</code>, <code>whileTouching</code>, <code>isTouching</code>, <code>ignore</code>) take a <strong>target</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a GameObject</td>
+<td>just that object</td>
+</tr>
+<tr>
+<td>a GameGroup</td>
+<td>any member of the group, including members added later</td>
+</tr>
+<tr>
+<td>left out</td>
+<td>anything at all (not for <code>ignore</code>)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">player.onCollide(coins, (me, coin) =&gt; coin.destroy());   // any coin
+ball.onCollide((me, other) =&gt; bumpSound.play());         // anything
+</code></pre>
+<p>Callbacks are given <code>(self, other)</code>. For groups, <code>self</code> is the member involved.</p>
+<ul>
+<li><strong>Timing:</strong> callbacks run during the physics step, before your <code>draw()</code>.</li>
+<li><strong>Destroying:</strong> objects destroyed inside a callback are removed safely after the step.</li>
+<li><strong>Sensors</strong> (<code>isSensor: true</code>) trigger callbacks and <code>isTouching()</code> but don't collide.</li>
+<li><strong>Ignored</strong> pairs never trigger them.</li>
+<li><strong>Changing levels:</strong> do it from <code>draw()</code> (for example after checking <code>isTouching()</code>), not from inside a callback.</li>
+</ul>
+    <nav class="pager">
+      <span></span>
+      <span></span>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

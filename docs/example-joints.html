@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Joints Playground · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-example-joints">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html" class="current" aria-current="page">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li class=current><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num"><a href="examples.html">Example Games</a> › Joints Playground</p>
+<h1 id="joints-playground">Joints Playground</h1>
+<p class="lead">Joints hold objects together. In this tutorial you'll build a wobbly rope bridge, a swinging pendulum and a bouncy spring, then drop things on them and drag them around.</p>
+<p><strong>You'll learn:</strong> <code>world.connect()</code> · <code>world.pin()</code> · attach points (offsets) · stiffness and damping · building things in a loop</p>
+<h2 id="play-the-finished-sketch">Play the finished sketch</h2>
+<p>Drag anything with the mouse. Try bouncing a box on the bridge, or flinging the spring.</p>
+<div class="demo" data-sketch="examples/joints" data-width="800" data-height="500"></div>
+<h2 id="step-1-planks-joined-end-to-end">Step 1: Planks joined end to end</h2>
+<p>A rope bridge is just a row of planks, each joined to the next. We make them in a <code>for</code> loop, keeping track of the <code>previous</code> plank so each new plank can be joined to it.</p>
+<p><code>world.connect(a, b, options)</code> joins two objects. By default it joins their centres, but a bridge needs the <strong>ends</strong> joined. <code>offsetA</code> and <code>offsetB</code> move the attach points, measured from each object's centre:</p>
+<pre><code class="language-js">world.connect(previous, plank, {
+  offsetA: { x: plankW / 2, y: 0 },   // right end of the previous plank
+  offsetB: { x: -plankW / 2, y: 0 },  // left end of this plank
+  length: 4,                          // keep a small gap
+  stiffness: 0.9,                     // nearly rigid, a tiny bit of give
+});
+</code></pre>
+<p>Nothing holds the chain up yet, so it falls to the floor in a heap. Drag a plank to see how they're linked.</p>
+<div class="demo" data-sketch="examples/joints-step-1" data-width="800" data-height="500"></div>
+<h2 id="step-2-pin-the-ends">Step 2: Pin the ends</h2>
+<p><code>world.pin(obj, x, y, options)</code> nails an object to a fixed point in the world. Pinning the outside end of the first and last plank turns the chain into a bridge. The group's <code>first</code> and <code>last</code> properties give us those planks.</p>
+<pre><code class="language-js">world.pin(planks.first, planks.first.x - plankW / 2, bridgeY, { offset: { x: -plankW / 2, y: 0 } });
+world.pin(planks.last, planks.last.x + plankW / 2, bridgeY, { offset: { x: plankW / 2, y: 0 } });
+</code></pre>
+<div class="demo" data-sketch="examples/joints-step-2" data-width="800" data-height="500"></div>
+<blockquote>
+<p><strong>Try it:</strong> change <code>stiffness</code> in step 1's <code>connect</code> to <code>0.2</code> for a stretchy bridge, or make <code>count</code> bigger for a longer, saggier one.</p>
+</blockquote>
+<h2 id="step-3-a-pendulum">Step 3: A pendulum</h2>
+<p>A pendulum is a ball pinned to a point above it. The pin keeps the distance the same, so the ball swings in an arc. <code>pin()</code> returns a <strong>link</strong>, and links are drawn as lines, so we give this one a grey colour.</p>
+<pre><code class="language-js">let bob = new GameObject(650, 260, 50, { shape: 'circle', color: '#f06595', draggable: true });
+let string = world.pin(bob, 650, 60);
+string.stroke = '#555';
+</code></pre>
+<div class="demo" data-sketch="examples/joints-step-3" data-width="800" data-height="500"></div>
+<h2 id="step-4-a-spring">Step 4: A spring</h2>
+<p>A <strong>low stiffness</strong> makes a connection stretchy, like a spring. <strong>Damping</strong> makes the bouncing die down instead of going on forever. We also set the <code>length</code> the spring wants to be.</p>
+<pre><code class="language-js">let a = new GameObject(560, 400, 40, { color: '#74c0fc', draggable: true });
+let b = new GameObject(660, 400, 40, { color: '#74c0fc', draggable: true });
+let spring = world.connect(a, b, { length: 100, stiffness: 0.02, damping: 0.05 });
+spring.stroke = '#1c7ed6';
+</code></pre>
+<div class="demo" data-sketch="examples/joints-step-4" data-width="800" data-height="500"></div>
+<blockquote>
+<p><strong>Try it:</strong> set <code>damping</code> to <code>0</code> and watch the spring bounce much longer.</p>
+</blockquote>
+<h2 id="step-5-things-to-play-with-the-finished-sketch">Step 5: Things to play with (the finished sketch)</h2>
+<p>Last, we drop a few random boxes and balls onto the bridge, and show a message while something is being dragged. <code>world.dragging</code> is the object under the mouse, or <code>null</code>.</p>
+<pre><code class="language-js">for (let i = 0; i &lt; 6; i++) {
+  new GameObject(random(200, 550), random(40, 150), random(20, 40), {
+    shape: random(['box', 'circle']),
+    draggable: true,
+  });
+}
+</code></pre>
+<pre><code class="language-js">if (world.dragging) text('Dragging an object', 10, 40);
+</code></pre>
+<div class="demo" data-sketch="examples/joints" data-width="800" data-height="500"></div>
+<h2 id="make-it-your-own">Make it your own</h2>
+<ul>
+<li><strong>Cut the rope:</strong> press a key to <code>destroy()</code> a link in the middle of the bridge. Keep the links in an array as you make them.</li>
+<li><strong>A chain:</strong> pin the first link of a vertical chain and hang a heavy ball on the end (see <a href="physics.html#joints-connecting-things-together">Physics</a>).</li>
+<li><strong>A car:</strong> connect two circles (wheels) to a box (the body) with stiff joints, and push it with the arrow keys.</li>
+<li><strong>A wrecking ball:</strong> a heavy pendulum (<code>density: 0.01</code>) and a tower of boxes to knock down.</li>
+</ul>
+    <nav class="pager">
+      <a class="prev" href="example-basics.html"><small>Previous</small>Physics Sandbox</a>
+      <a class="next" href="example-breakout.html"><small>Next</small>Breakout</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

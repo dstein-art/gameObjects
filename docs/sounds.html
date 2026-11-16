@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sounds · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-sounds">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li class="current"><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 8 of 11</p>
+<h1 id="sounds">Sounds</h1>
+<p class="lead">Sound makes a game feel alive. A blip when you jump, a ding for a coin and a thud when something lands all make the game feel more responsive. GameObjects doesn't need anything special for sound. You use the <strong>p5.sound</strong> library and play sounds from your collision and input code.</p>
+<h2 id="adding-p5sound">Adding p5.sound</h2>
+<p>Make sure your <code>index.html</code> loads p5.sound <strong>after</strong> p5.js:</p>
+<pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<blockquote>
+<p><strong>Watch out:</strong> p5.sound 0.4 is made for <strong>p5.js 2.x</strong>. If your sketch uses p5.js 1.x, use the older p5.sound that came with it, and load sounds in <code>preload()</code> instead of with <code>await</code>.</p>
+</blockquote>
+<h2 id="loading-sounds">Loading sounds</h2>
+<p>Load sounds in <strong><code>async setup()</code></strong> using <strong><code>await</code></strong>, just like images:</p>
+<pre><code class="language-js">let jumpSound, coinSound;
+
+async function setup() {
+  createCanvas(640, 360);
+  jumpSound = await loadSound('jump.wav');
+  coinSound = await loadSound('coin.mp3');
+  // ... make your world and objects
+}
+</code></pre>
+<p>Upload your sound files to your sketch (or put them in your sketch folder). The most reliable formats are <strong>.mp3</strong>, <strong>.wav</strong> and <strong>.ogg</strong>.</p>
+<h2 id="browsers-need-a-click-first">Browsers need a click first</h2>
+<p>Web browsers don't let a page make noise until the player has <strong>clicked or pressed a key</strong>. This stops websites from blasting sound at you. It's normal to start a game with "Click to start":</p>
+<pre><code class="language-js">function mousePressed() {
+  userStartAudio();   // allow sound from now on
+}
+</code></pre>
+<p>Playing a sound in response to a click or key press also unlocks audio by itself.</p>
+<h2 id="playing-sounds">Playing sounds</h2>
+<pre><code class="language-js">coinSound.play();          // play once
+music.loop();              // play over and over
+music.stop();              // stop
+music.isPlaying();         // true or false
+
+coinSound.amp(0.5);        // volume: 0 = silent, 1 = full
+jumpSound.rate(1.5);       // speed and pitch: 2 = double speed, higher pitch
+</code></pre>
+<div class="demo" data-sketch="sound-board" data-width="640" data-height="300" data-keys="1"></div>
+<h2 id="sounds-when-things-happen">Sounds when things happen</h2>
+<p>Put <code>play()</code> inside your <a href="collisions.html">collision callbacks</a> and input code:</p>
+<pre><code class="language-js">player.onCollide(coins, (me, coin) =&gt; {
+  coin.destroy();
+  coinSound.play();
+});
+
+function keyPressed() {
+  if (key === ' ' &amp;&amp; player.isTouching(ground)) {
+    player.velocityY = -15;
+    jumpSound.play();
+  }
+}
+</code></pre>
+<p><strong>Make bumps sound different.</strong> Use the object's <code>speed</code> to set the volume, so hard hits are loud and gentle taps are quiet. Use its size to set the pitch, so big things sound low:</p>
+<pre><code class="language-js">balls.onCollide((ball) =&gt; {
+  bumpSound.amp(constrain(ball.speed / 10, 0, 1));
+  bumpSound.rate(map(ball.width, 10, 80, 1.8, 0.6));
+  bumpSound.play();
+});
+</code></pre>
+<div class="demo" data-sketch="sound-bumps" data-width="640" data-height="320"></div>
+<blockquote>
+<p><strong>Tip:</strong> use <code>onCollide</code> for sounds, not <code>whileTouching</code>. <code>whileTouching</code> runs every frame, so the sound would restart 60 times a second.</p>
+</blockquote>
+<h2 id="background-music">Background music</h2>
+<p>Start music once, when the game begins, with <code>loop()</code>. Keep it quieter than your sound effects:</p>
+<pre><code class="language-js">function startGame() {
+  music.amp(0.3);
+  if (!music.isPlaying()) music.loop();
+}
+</code></pre>
+<div class="demo" data-sketch="music-game" data-width="640" data-height="340" data-keys="1"></div>
+<h2 id="finding-sounds">Finding sounds</h2>
+<ul>
+<li><strong>Make your own</strong> retro sound effects with free tools like <a href="https://sfxr.me">jsfxr</a> (download as .wav).</li>
+<li><strong>Free sound libraries:</strong> <a href="https://freesound.org">Freesound.org</a>, <a href="https://opengameart.org">OpenGameArt.org</a>, <a href="https://kenney.nl/assets/category:Audio">Kenney.nl</a>. Check each sound's license and credit the creator if it asks.</li>
+<li><strong>Keep files small.</strong> Short effects load faster. Trim silence from the start of a sound so it plays the instant something happens.</li>
+</ul>
+<h2 id="quick-reference">Quick reference</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>await loadSound('file.mp3')</code></td>
+<td>Load a sound (in <code>async setup()</code>)</td>
+</tr>
+<tr>
+<td><code>userStartAudio()</code></td>
+<td>Unlock sound after a click</td>
+</tr>
+<tr>
+<td><code>play()</code>, <code>loop()</code>, <code>stop()</code>, <code>pause()</code></td>
+<td>Playback</td>
+</tr>
+<tr>
+<td><code>isPlaying()</code></td>
+<td>Is it playing?</td>
+</tr>
+<tr>
+<td><code>amp(volume)</code></td>
+<td>Volume, 0 to 1</td>
+</tr>
+<tr>
+<td><code>rate(speed)</code></td>
+<td>Speed and pitch, 1 = normal</td>
+</tr>
+</tbody>
+</table>
+    <nav class="pager">
+      <a class="prev" href="animation.html"><small>Previous</small>Spritesheets and Animations</a>
+      <a class="next" href="input-camera.html"><small>Next</small>Player Input and Camera</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

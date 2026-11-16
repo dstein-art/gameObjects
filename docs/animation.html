@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spritesheets and Animations · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-animation">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html" class="current" aria-current="page">Learn</a>
+      <a href="examples.html">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li class="current"><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 7 of 11</p>
+<h1 id="spritesheets-and-animations">Spritesheets and Animations</h1>
+<p class="lead">An <strong>animation</strong> is a list of pictures shown one after another, like a flip book. GameObjects can play animations on any object, switch between them (standing, running, jumping), and cut them out of a <strong>spritesheet</strong> for you.</p>
+<h2 id="whats-a-spritesheet">What's a spritesheet?</h2>
+<p>A spritesheet is one image holding many animation frames, laid out in a grid of equal-sized boxes. This is the one used in the demos below. Each frame is 48 × 48 pixels:</p>
+<p><img alt="The hero spritesheet: 4 columns and 3 rows of 48 by 48 pixel frames" src="assets/hero.png" style="width: 384px; image-rendering: auto; background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 0 0 / 24px 24px; border: 1px solid #ddd; border-radius: 6px;" /></p>
+<p>Frames are numbered <strong>left to right, top to bottom</strong>, starting at <strong>0</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Frames</th>
+<th>Animation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0, 1 (2 and 3 are empty)</td>
+<td>standing still ("idle")</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4, 5, 6, 7</td>
+<td>running</td>
+</tr>
+<tr>
+<td>3</td>
+<td>8, 9</td>
+<td>jumping</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cutting-up-a-spritesheet">Cutting up a spritesheet</h2>
+<p><strong><code>GameObjects.spriteSheet(image, frameWidth, frameHeight, count, start)</code></strong> cuts a sheet into an array of frames:</p>
+<pre><code class="language-js">let sheet = await loadImage('hero.png');
+
+let all  = GameObjects.spriteSheet(sheet, 48, 48);        // every frame
+let idle = GameObjects.spriteSheet(sheet, 48, 48, 2, 0);  // 2 frames, starting at frame 0
+let run  = GameObjects.spriteSheet(sheet, 48, 48, 4, 4);  // 4 frames, starting at frame 4
+let jump = GameObjects.spriteSheet(sheet, 48, 48, 2, 8);  // 2 frames, starting at frame 8
+</code></pre>
+<blockquote>
+<p><strong>Tip:</strong> in p5.js 2.x, load images inside <strong><code>async setup()</code></strong> using <strong><code>await</code></strong>. In p5.js 1.x, use <code>preload()</code> instead.</p>
+</blockquote>
+<h2 id="adding-animations-to-an-object">Adding animations to an object</h2>
+<p><strong><code>addAnimation(name, frames, frameDelay)</code></strong> gives an object an animation. <strong><code>frameDelay</code></strong> is how many frames of your game each picture stays on screen. Bigger numbers make slower animations. The first animation you add starts playing straight away.</p>
+<pre><code class="language-js">hero = new GameObject(100, 100, 48, 48, { fixedRotation: true });
+hero.addAnimation('idle', idle, 20);   // slow breathing
+hero.addAnimation('run', run, 6);      // quick steps
+hero.addAnimation('jump', jump, 8);
+</code></pre>
+<p>Switch animations with <strong><code>playAnimation(name)</code></strong>. If that animation is already playing it carries on smoothly, so it's safe to call every frame:</p>
+<pre><code class="language-js">if (!hero.isTouching(ground))       hero.playAnimation('jump');
+else if (abs(hero.velocityX) &gt; 0.5) hero.playAnimation('run');
+else                                hero.playAnimation('idle');
+</code></pre>
+<p><strong>Facing left:</strong> draw your art facing right, then mirror it with <code>flipX</code>:</p>
+<pre><code class="language-js">if (hero.velocityX &lt; 0) hero.flipX = true;
+if (hero.velocityX &gt; 0) hero.flipX = false;
+</code></pre>
+<div class="demo" data-sketch="hero" data-width="640" data-height="320" data-keys="1"></div>
+<h2 id="controlling-animations">Controlling animations</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>addAnimation(name, frames, frameDelay, loop)</code></td>
+<td>Add an animation. <code>loop</code> is <code>true</code> unless you say <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>playAnimation(name)</code></td>
+<td>Switch to an animation (keeps going if it's already playing)</td>
+</tr>
+<tr>
+<td><code>playAnimation(name, true)</code></td>
+<td>Switch <strong>and</strong> start again from the first frame</td>
+</tr>
+<tr>
+<td><code>pauseAnimation()</code></td>
+<td>Freeze on the current frame</td>
+</tr>
+<tr>
+<td><code>animation</code></td>
+<td>The name of the current animation</td>
+</tr>
+<tr>
+<td><code>animationFrame</code></td>
+<td>Which frame is showing (you can set it too)</td>
+</tr>
+<tr>
+<td><code>animationDone</code></td>
+<td><code>true</code> when a non-looping animation has finished</td>
+</tr>
+</tbody>
+</table>
+<h2 id="play-once-non-looping-animations">Play once: non-looping animations</h2>
+<p>Explosions, "poof" clouds and attacks should play <strong>once</strong>. Pass <code>false</code> as the fourth argument, then check <code>animationDone</code>:</p>
+<pre><code class="language-js">let boom = new GameObject(x, y, 64, 64, { isSensor: true, isStatic: true });
+boom.addAnimation('boom', explosionFrames, 4, false);   // false = don't loop
+
+// in draw():
+if (boom.animationDone) boom.destroy();
+</code></pre>
+<div class="demo" data-sketch="coin-spin" data-width="640" data-height="300"></div>
+<h2 id="frames-from-separate-images">Frames from separate images</h2>
+<p>Frames don't have to come from a spritesheet. Any array of images works, so separately loaded files are fine:</p>
+<pre><code class="language-js">let walk = [
+  await loadImage('walk1.png'),
+  await loadImage('walk2.png'),
+  await loadImage('walk3.png'),
+];
+hero.addAnimation('walk', walk, 8);
+</code></pre>
+<p>You can even <strong>draw frames in code</strong> with <code>createGraphics()</code>. The coin demo above draws its "pop" animation that way.</p>
+<h2 id="tips-for-good-looking-sprites">Tips for good-looking sprites</h2>
+<ul>
+<li><strong>Size the object to the art.</strong> The picture is stretched to the object's <code>width</code> and <code>height</code>, so give a 48 × 48 frame a 48 × 48 object, or exactly 2× for chunky pixel art.</li>
+<li><strong>Pixel art looks blurry?</strong> Call <code>noSmooth()</code> in <code>setup()</code>.</li>
+<li><strong>Check the physics shape</strong> with <code>world.debug = true</code>. Players usually feel best with <code>fixedRotation: true</code>.</li>
+<li><strong>Free art:</strong> sites like <a href="https://opengameart.org">OpenGameArt.org</a> and <a href="https://kenney.nl/assets">Kenney.nl</a> have free spritesheets made for games. Check each one's license.</li>
+</ul>
+<h2 id="quick-reference">Quick reference</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameObjects.spriteSheet(img, w, h, count, start)</code></td>
+<td>Cut frames out of a sheet</td>
+</tr>
+<tr>
+<td><code>image</code> option / property</td>
+<td>A single still picture</td>
+</tr>
+<tr>
+<td><code>addAnimation(name, frames, frameDelay, loop)</code></td>
+<td>Add an animation</td>
+</tr>
+<tr>
+<td><code>playAnimation(name, restart)</code></td>
+<td>Switch animation</td>
+</tr>
+<tr>
+<td><code>pauseAnimation()</code></td>
+<td>Freeze</td>
+</tr>
+<tr>
+<td><code>animation</code>, <code>animationFrame</code>, <code>animationDone</code></td>
+<td>What's playing</td>
+</tr>
+<tr>
+<td><code>flipX</code>, <code>flipY</code></td>
+<td>Mirror</td>
+</tr>
+</tbody>
+</table>
+    <nav class="pager">
+      <a class="prev" href="collisions.html"><small>Previous</small>Collisions and Overlaps</a>
+      <a class="next" href="sounds.html"><small>Next</small>Sounds</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

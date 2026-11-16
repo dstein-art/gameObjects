@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Example Games · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="css/docs.css" />
+</head>
+<body class="page-examples">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html" class="current" aria-current="page">Examples</a>
+      <a href="api.html">API</a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li class="current"><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num">Section 11 of 11</p>
+<h1 id="example-games">Example Games</h1>
+<p class="lead">Five complete games built with GameObjects. Each has its own page where you can <strong>play the finished game</strong>, then <strong>build it yourself, step by step</strong>. Every step is a complete sketch you can run, change and break.</p>
+<p>The tutorials go roughly from easiest to hardest. Each one starts from an empty sketch, so you can do them in any order.</p>
+<div class="game-cards">
+  <a class="game-card" href="example-basics.html">
+    <img src="assets/thumbs/ex-basics.jpg" alt="Physics sandbox screenshot" loading="lazy">
+    <span class="steps">5 steps</span>
+    <h3>Physics Sandbox</h3>
+    <p>Drop, drag and throw shapes. Your first sketch with a floor, a ramp, a group and the mouse.</p>
+  </a>
+  <a class="game-card" href="example-joints.html">
+    <img src="assets/thumbs/ex-joints.jpg" alt="Joints playground screenshot" loading="lazy">
+    <span class="steps">5 steps</span>
+    <h3>Joints Playground</h3>
+    <p>A rope bridge, a pendulum and a spring, all held together with joints.</p>
+  </a>
+  <a class="game-card" href="example-breakout.html">
+    <img src="assets/thumbs/ex-breakout.jpg" alt="Breakout screenshot" loading="lazy">
+    <span class="steps">6 steps</span>
+    <h3>Breakout</h3>
+    <p>A paddle, a ball and a wall of bricks. Your first class that extends GameObject.</p>
+  </a>
+  <a class="game-card" href="example-platformer.html">
+    <img src="assets/thumbs/ex-platformer.jpg" alt="Platformer screenshot" loading="lazy">
+    <span class="steps">6 steps</span>
+    <h3>Platformer</h3>
+    <p>Run, jump and collect coins across a level bigger than the screen, with a following camera.</p>
+  </a>
+  <a class="game-card" href="example-space-shooter.html">
+    <img src="assets/thumbs/ex-space-shooter.jpg" alt="Space shooter screenshot" loading="lazy">
+    <span class="steps">7 steps</span>
+    <h3>Space Shooter</h3>
+    <p>Thrust, shoot and split asteroids, plus an animated rocket flame.</p>
+  </a>
+</div>
+
+<h2 id="how-the-tutorials-work">How the tutorials work</h2>
+<ul>
+<li><strong>Each step adds one idea</strong> and explains the new code.</li>
+<li><strong>Each step has a live demo</strong> with the complete code so far. Press <strong>▶</strong> to run your changes, or use the copy icon to take the code into the p5.js Web Editor.</li>
+<li><strong>The last step is the finished game.</strong> The "Make it your own" ideas at the end of each page suggest where to take it next.</li>
+</ul>
+<blockquote>
+<p><strong>Tip:</strong> the bigger games are shrunk to fit the page. Use the <strong>open in a new tab</strong> icon to play them at full size.</p>
+</blockquote>
+    <nav class="pager">
+      <a class="prev" href="levels-score.html"><small>Previous</small>Managing your Game with Levels and Score</a>
+      <a class="next" href="example-basics.html"><small>Next</small>Physics Sandbox</a>
+    </nav>
+  </main>
+  <script src="js/docs.js"></script>
+</body>
+</html>

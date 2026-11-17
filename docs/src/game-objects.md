@@ -196,6 +196,8 @@ class Robot extends GameObject {
 
 > **Tip:** inside `drawShape`, the drawing is already moved to the centre of the object and rotated, and `rectMode` and `ellipseMode` are `CENTER`.
 
+> **Watch out:** don't give your class a property with a built-in name, like `speed = 5` at the top of the class. It hides the real `speed`, so changing it does nothing. Pick another name (`topSpeed`), or set the real one in the constructor after `super()`: `this.speed = 5`. If you forget, GameObjects prints a warning in the console.
+
 ## Quick reference
 
 | | |

@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=6f727a10" />
+  <link rel="stylesheet" href="css/docs.css?v=72a8ff09" />
 </head>
 <body class="page-api">
   <header class="topbar">
@@ -739,6 +739,7 @@ new GameObject(options)                       // options.x, options.y, options.w
   }
 }
 </code></pre>
+<p>Don't give your class its own property with a built-in name, like <code>speed = 5</code> or <code>x = 0</code> at the top of the class. That makes a plain property that hides the real one, so <code>enemy.speed = 10</code> would do nothing. Use a different name (<code>topSpeed</code>), or set the built-in one in the constructor after <code>super()</code>: <code>this.speed = 5</code>. GameObjects prints a warning in the console if it finds one.</p>
 <hr />
 <h2 id="gamegroup">GameGroup</h2>
 <p>A collection of game objects. An object can be in any number of groups.</p>
@@ -746,7 +747,7 @@ new GameObject(options)                       // options.x, options.y, options.w
 <pre><code class="language-js">let coins = new GameGroup();
 let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, color: 'gold' });
 </code></pre>
-<p>The optional object holds <strong>defaults</strong> for objects made with <code>create()</code>. Its <code>name</code> (if given) becomes the group's <code>name</code>.</p>
+<p>The optional object holds <strong>defaults</strong> for objects made with <code>create()</code>. Its <code>name</code> (if given) becomes the group's <code>name</code>. Each member gets its own copy of <code>data</code>, so <code>new GameGroup({ data: { hp: 3 } })</code> gives every enemy its own <code>hp</code>.</p>
 <table>
 <thead>
 <tr>
@@ -1650,6 +1651,6 @@ player.fill('seagreen');
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=6f727a10"></script>
+  <script src="js/docs.js?v=72a8ff09"></script>
 </body>
 </html>

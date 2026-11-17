@@ -59,6 +59,48 @@
     return v !== null && typeof v === 'object' && !Array.isArray(v) && !(v instanceof GameObject);
   }
 
+  // A fresh copy of plain objects and arrays, at any depth, so each group member
+  // gets its own data. Anything else (images, sounds, other game objects,
+  // functions) stays shared, as you'd expect.
+  function copyData(v) {
+    if (Array.isArray(v)) return v.map(copyData);
+    if (v !== null && typeof v === 'object') {
+      let proto = Object.getPrototypeOf(v);
+      if (proto === Object.prototype || proto === null) {
+        let out = {};
+        for (let k of Object.keys(v)) out[k] = copyData(v[k]);
+        return out;
+      }
+    }
+    return v;
+  }
+
+  // A class that extends GameObject and declares a property with a built-in
+  // name (class Car extends GameObject { speed = 5 }) gets a plain property that
+  // hides the real one, so car.speed = 10 does nothing. JavaScript can't stop
+  // that, so the first time each such class is updated we look for it and warn.
+  let checkedClasses = new WeakSet();
+  function checkSubclass(obj) {
+    let cls = obj.constructor;
+    if (cls === GameObject || checkedClasses.has(cls)) return;
+    checkedClasses.add(cls);
+    let builtIn = Object.getOwnPropertyDescriptors(GameObject.prototype);
+    for (let name of Object.getOwnPropertyNames(obj)) {
+      let d = builtIn[name];
+      if (!d || name === 'constructor') continue;
+      let isProperty = d.get || d.set;
+      let isMethod = typeof d.value === 'function' && typeof obj[name] !== 'function';
+      if (!isProperty && !isMethod) continue;
+      let what = isProperty ? 'property' : 'method';
+      console.warn(
+        `GameObjects: class ${cls.name || '(your class)'} has its own "${name}", which hides GameObject's ` +
+          `built-in ${name} ${what}, so changing it won't do anything. ` +
+          `Give yours a different name (for example my${name[0].toUpperCase() + name.slice(1)}), ` +
+          `or set the built-in one in the constructor after super(): this.${name} = ...`
+      );
+    }
+  }
+
   // Apply a color value (string, number, array or p5.Color) with fill()/stroke()
   function applyColor(p, fnName, value) {
     if (value === null || value === undefined || value === false) {
@@ -752,6 +794,7 @@
       let defaults = Object.assign({}, this.defaults);
       delete defaults.group;
       delete defaults.name;
+      if (defaults.data !== undefined) defaults.data = copyData(defaults.data); // each member gets its own data
       let opts = Object.assign(defaults, options || {});
       let obj = new GameObject(x, y, width ?? opts.width, height ?? opts.height, opts);
       this.add(obj);
@@ -1259,7 +1302,9 @@
 
       this.frame++;
       for (let o of this.objects) {
-        if (!o.destroyed) o.update();
+        if (o.destroyed) continue;
+        checkSubclass(o);
+        o.update();
       }
 
       this._stepping = true;

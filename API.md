@@ -318,6 +318,8 @@ class Enemy extends GameObject {
 }
 ```
 
+Don't give your class its own property with a built-in name, like `speed = 5` or `x = 0` at the top of the class. That makes a plain property that hides the real one, so `enemy.speed = 10` would do nothing. Use a different name (`topSpeed`), or set the built-in one in the constructor after `super()`: `this.speed = 5`. GameObjects prints a warning in the console if it finds one.
+
 ---
 
 ## GameGroup
@@ -331,7 +333,7 @@ let coins = new GameGroup();
 let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, color: 'gold' });
 ```
 
-The optional object holds **defaults** for objects made with `create()`. Its `name` (if given) becomes the group's `name`.
+The optional object holds **defaults** for objects made with `create()`. Its `name` (if given) becomes the group's `name`. Each member gets its own copy of `data`, so `new GameGroup({ data: { hp: 3 } })` gives every enemy its own `hp`.
 
 | Property | Description |
 |---|---|

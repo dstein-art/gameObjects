@@ -1,29 +1,26 @@
 // SUPER CATCH: catch the stars, avoid the bombs.
-// Shows: score, lives, game states, restarting and a saved high score.
+// Shows: the game manager (score, start and game over), lives and a saved high score.
 
 let basket, stars, bombs, ground;
 let starImg;
-let state = 'title';
-let score = 0;
 let lives = 3;
-let best = 0;
 
 async function setup() {
   createCanvas(640, 360);
   world.gravityY = 0.25;
   starImg = await loadImage('../assets/star.png');
-  best = getItem('catchBest') || 0;
+  gameManager.highScore = getItem('catchBest') || 0; // remembered from last time
 
   // groups are made once; their rules stay even after world.clear()
   stars = new GameGroup({ image: starImg, isSensor: true, airFriction: 0.02 });
   bombs = new GameGroup({ shape: 'circle', color: '#212529', isSensor: true, airFriction: 0.02, label: '!', labelColor: 'tomato' });
 
-  world.paused = true;
+  world.paused = true; // nothing falls until the game starts
 }
 
-function startGame() {
+// gameManager.startGame() calls this
+function gameStarted() {
   world.clear();
-  score = 0;
   lives = 3;
 
   ground = new GameObject(320, 380, 640, 40, { isStatic: true, isSensor: true });
@@ -31,7 +28,7 @@ function startGame() {
 
   basket.onCollide(stars, (me, star) => {
     star.destroy();
-    score++;
+    gameManager.addScore(1);
   });
   basket.onCollide(bombs, (me, bomb) => {
     bomb.destroy();
@@ -44,27 +41,23 @@ function startGame() {
   ground.onCollide(bombs, (me, bomb) => bomb.destroy());
 
   world.paused = false;
-  state = 'playing';
 }
 
 function loseLife() {
   lives--;
-  if (lives <= 0) gameOver();
+  if (lives <= 0) gameManager.endGame();
 }
 
-function gameOver() {
-  state = 'gameover';
+// gameManager.endGame() calls this
+function gameEnded() {
   world.paused = true;
-  if (score > best) {
-    best = score;
-    storeItem('catchBest', best);
-  }
+  storeItem('catchBest', gameManager.highScore);
 }
 
 function draw() {
   background('#1b1f3b');
 
-  if (state === 'playing') {
+  if (gameManager.isPlaying) {
     // move the basket
     let target = basket.x;
     if (keyIsDown(LEFT_ARROW)) target -= 9;
@@ -73,7 +66,7 @@ function draw() {
     basket.x = constrain(target, 45, width - 45);
 
     // drop things, faster as the score goes up
-    let rate = max(20, 60 - score);
+    let rate = max(20, 60 - gameManager.score);
     if (frameCount % rate === 0) {
       if (random() < 0.75) stars.create(random(30, 610), -20, 32, 32, { rotation: random(360) });
       else bombs.create(random(30, 610), -20, 28);
@@ -83,11 +76,11 @@ function draw() {
 
 // Runs after the game objects are drawn: the score and messages are always on top
 function drawOnTop() {
-  if (state === 'title') {
+  if (gameManager.state === 'title') {
     drawCentered('SUPER CATCH', 44, -40);
     drawCentered('Catch the stars, dodge the bombs. Move with the mouse or arrow keys.', 16, 10);
     drawCentered('Click or press any key to start', 18, 50);
-    drawCentered('Best: ' + best, 16, 90);
+    drawCentered('Best: ' + gameManager.highScore, 16, 90);
     return;
   }
 
@@ -95,16 +88,17 @@ function drawOnTop() {
   noStroke();
   textSize(18);
   textAlign(LEFT, TOP);
-  text('Score: ' + score, 12, 10);
+  text('Score: ' + gameManager.score, 12, 10);
   text('Lives: ' + '♥'.repeat(max(lives, 0)), 12, 34);
   textAlign(RIGHT, TOP);
-  text('Best: ' + best, width - 12, 10);
+  text('Best: ' + gameManager.highScore, width - 12, 10);
 
-  if (state === 'gameover') {
+  if (gameManager.isOver) {
     fill(0, 150);
     rect(0, 0, width, height);
+    let best = gameManager.score > 0 && gameManager.score >= gameManager.highScore;
     drawCentered('GAME OVER', 44, -30);
-    drawCentered('Score: ' + score + (score >= best && score > 0 ? '  — new best!' : ''), 20, 20);
+    drawCentered('Score: ' + gameManager.score + (best ? '  — new best!' : ''), 20, 20);
     drawCentered('Press R or click to play again', 16, 60);
   }
 }
@@ -119,11 +113,11 @@ function drawCentered(msg, size, dy) {
 
 function keyPressed() {
   if (!stars) return; // still loading
-  if (state === 'title') startGame();
-  else if (state === 'gameover' && (key === 'r' || key === 'R')) startGame();
+  if (gameManager.state === 'title') gameManager.startGame();
+  else if (gameManager.isOver && (key === 'r' || key === 'R')) gameManager.startGame();
 }
 
 function mousePressed() {
   if (!stars) return;
-  if (state === 'title' || state === 'gameover') startGame();
+  if (!gameManager.isPlaying) gameManager.startGame();
 }

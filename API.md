@@ -36,6 +36,10 @@ Every class, property and method in GameObjects.js. For a step-by-step introduct
     - [More than one world](#more-than-one-world)
     - [Walls](#walls)
     - [Joints](#joints)
+- [GameManager](#gamemanager)
+    - [Game manager properties](#game-manager-properties)
+    - [Game manager methods](#game-manager-methods)
+    - [Game manager callbacks](#game-manager-callbacks)
 - [GameCamera](#gamecamera)
 - [GameLink](#gamelink)
 - [The GameObjects namespace](#the-gameobjects-namespace)
@@ -63,7 +67,7 @@ Load the scripts in this order in `index.html`:
 
 p5.sound is optional: GameObjects doesn't need it.
 
-GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created automatically), `GameWorld`, `GameObject`, `GameGroup` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
+GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created automatically), **`gameManager`** (a [GameManager](#gamemanager) created automatically), `GameWorld`, `GameObject`, `GameGroup`, `GameManager` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
 
 ## Units and conventions
 
@@ -502,6 +506,67 @@ world.addWalls({ x: 0, y: 0, width: 2000, height: 1400 }); // a big level
 world.connect(a, b, { length: 100, stiffness: 0.02, damping: 0.05 });  // a spring
 world.pin(ball, 320, 40);                                             // a pendulum
 ```
+
+---
+
+## GameManager
+
+Every sketch has one, as **`gameManager`**, created automatically. It keeps the score and the level, knows whether the game is on, and calls your callback functions when the game and its levels start and end.
+
+```js
+function setup() {
+  createCanvas(640, 360);
+  gameManager.levels = 3;
+  gameManager.startGame();          // calls gameStarted(), then levelStarted(1)
+}
+
+function levelStarted(level) {
+  world.clear();
+  // build level 1, 2 or 3
+}
+
+function draw() {
+  if (player.isTouching(exit)) gameManager.endLevel();   // levelEnded(1), then levelStarted(2)
+  if (player.y > height) gameManager.endGame();          // gameEnded(false)
+}
+```
+
+### Game manager properties
+
+| Property | Type | Description |
+|---|---|---|
+| `score` | number | The score. `startGame()` sets it to `0`. |
+| `highScore` | number | The best score since the page loaded. Updated whenever `score` goes above it. Set it from `getItem()` to remember it between visits. |
+| `level` | number | The current level: `1` for the first, `0` before the game starts |
+| `levels` | number | How many levels the game has. Finishing the last one ends the game with `won` set to `true`. Default `Infinity` (levels never run out). |
+| `state` | string | `'title'` before the first `startGame()`, `'playing'` while the game is on, `'over'` after it ends |
+| `isPlaying` | boolean | `state === 'playing'` (read only) |
+| `isOver` | boolean | `state === 'over'` (read only) |
+| `won` | boolean | `true` if the game ended because the last level was finished |
+
+### Game manager methods
+
+| Method | Returns | Description |
+|---|---|---|
+| `startGame()` | gameManager | Start, or restart: `score` `0`, `level` `1`, `state` `'playing'`. Calls `gameStarted()`, then `levelStarted(1)`. |
+| `endLevel()` | gameManager | Finish the current level. Calls `levelEnded(level)`, then `levelStarted(level + 1)`. After the last level (see `levels`), it ends the game and calls `gameEnded(true)` instead. Does nothing unless the game is playing. |
+| `endGame()` | gameManager | End the game now. Calls `gameEnded(false)`. Does nothing unless the game is playing. |
+| `addScore(points)` | gameManager | Add to the score (`1` if left out). A negative number takes points away. |
+
+All three of `startGame()`, `endLevel()` and `endGame()` are safe to call from anywhere, including inside collision callbacks: if the physics is in the middle of a step, the game manager waits until the step is over. Calling the same one more than once in a single step counts once, so two coins collected together can't skip a level.
+
+### Game manager callbacks
+
+Write any of these functions in your sketch and the game manager calls them. All are optional. In instance mode, put them on the p5 instance (`p.gameStarted = () => {...}`).
+
+| Function | Called |
+|---|---|
+| `gameStarted()` | By `startGame()`, before the first level starts |
+| `levelStarted(level)` | When a level begins: `1` straight after `gameStarted()`, then after each `endLevel()` |
+| `levelEnded(level)` | By `endLevel()`, with the number of the level that was finished |
+| `gameEnded(won)` | By `endGame()` (`won` is `false`), or after the last level (`won` is `true`) |
+
+If GameObjects finds a function whose name differs only in capitals, like `gamestarted()`, it prints a hint in the console.
 
 ---
 

@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=72a8ff09" />
+  <link rel="stylesheet" href="css/docs.css?v=12c08eef" />
 </head>
 <body class="page-api">
   <header class="topbar">
@@ -40,6 +40,7 @@
       <li><a href="#gameobject">GameObject</a><ul class="sub"><li><a href="#creating-a-game-object">Creating a game object</a></li><li><a href="#shapes">Shapes</a></li><li><a href="#object-options">Object options</a></li><li><a href="#position-and-size">Position and size</a></li><li><a href="#movement">Movement</a></li><li><a href="#physical-properties">Physical properties</a></li><li><a href="#appearance">Appearance</a></li><li><a href="#collisions">Collisions</a></li><li><a href="#mouse">Mouse</a></li><li><a href="#animation">Animation</a></li><li><a href="#groups-and-removal">Groups and removal</a></li><li><a href="#extending-gameobject">Extending GameObject</a></li></ul></li>
       <li><a href="#gamegroup">GameGroup</a><ul class="sub"><li><a href="#creating-a-group">Creating a group</a></li><li><a href="#group-members">Group members</a></li><li><a href="#looping-and-searching">Looping and searching</a></li><li><a href="#changing-and-removing">Changing and removing</a></li><li><a href="#group-collisions">Group collisions</a></li></ul></li>
       <li><a href="#gameworld">GameWorld</a><ul class="sub"><li><a href="#world-options">World options</a></li><li><a href="#world-properties">World properties</a></li><li><a href="#world-methods">World methods</a></li><li><a href="#more-than-one-world">More than one world</a></li><li><a href="#walls">Walls</a></li><li><a href="#joints">Joints</a></li></ul></li>
+      <li><a href="#gamemanager">GameManager</a><ul class="sub"><li><a href="#game-manager-properties">Game manager properties</a></li><li><a href="#game-manager-methods">Game manager methods</a></li><li><a href="#game-manager-callbacks">Game manager callbacks</a></li></ul></li>
       <li><a href="#gamecamera">GameCamera</a></li>
       <li><a href="#gamelink">GameLink</a></li>
       <li><a href="#the-gameobjects-namespace">The GameObjects namespace</a></li>
@@ -68,7 +69,7 @@
 &lt;script src=&quot;sketch.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 <p>p5.sound is optional: GameObjects doesn't need it.</p>
-<p>GameObjects adds these globals: <strong><code>world</code></strong> (a <a href="#gameworld">GameWorld</a> created automatically), <code>GameWorld</code>, <code>GameObject</code>, <code>GameGroup</code> and the <code>GameObjects</code> namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.</p>
+<p>GameObjects adds these globals: <strong><code>world</code></strong> (a <a href="#gameworld">GameWorld</a> created automatically), <strong><code>gameManager</code></strong> (a <a href="#gamemanager">GameManager</a> created automatically), <code>GameWorld</code>, <code>GameObject</code>, <code>GameGroup</code>, <code>GameManager</code> and the <code>GameObjects</code> namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.</p>
 <h2 id="units-and-conventions">Units and conventions</h2>
 <table>
 <thead>
@@ -1235,6 +1236,139 @@ world.addWalls({ x: 0, y: 0, width: 2000, height: 1400 }); // a big level
 world.pin(ball, 320, 40);                                             // a pendulum
 </code></pre>
 <hr />
+<h2 id="gamemanager">GameManager</h2>
+<p>Every sketch has one, as <strong><code>gameManager</code></strong>, created automatically. It keeps the score and the level, knows whether the game is on, and calls your callback functions when the game and its levels start and end.</p>
+<pre><code class="language-js">function setup() {
+  createCanvas(640, 360);
+  gameManager.levels = 3;
+  gameManager.startGame();          // calls gameStarted(), then levelStarted(1)
+}
+
+function levelStarted(level) {
+  world.clear();
+  // build level 1, 2 or 3
+}
+
+function draw() {
+  if (player.isTouching(exit)) gameManager.endLevel();   // levelEnded(1), then levelStarted(2)
+  if (player.y &gt; height) gameManager.endGame();          // gameEnded(false)
+}
+</code></pre>
+<h3 id="game-manager-properties">Game manager properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>score</code></td>
+<td>number</td>
+<td>The score. <code>startGame()</code> sets it to <code>0</code>.</td>
+</tr>
+<tr>
+<td><code>highScore</code></td>
+<td>number</td>
+<td>The best score since the page loaded. Updated whenever <code>score</code> goes above it. Set it from <code>getItem()</code> to remember it between visits.</td>
+</tr>
+<tr>
+<td><code>level</code></td>
+<td>number</td>
+<td>The current level: <code>1</code> for the first, <code>0</code> before the game starts</td>
+</tr>
+<tr>
+<td><code>levels</code></td>
+<td>number</td>
+<td>How many levels the game has. Finishing the last one ends the game with <code>won</code> set to <code>true</code>. Default <code>Infinity</code> (levels never run out).</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>string</td>
+<td><code>'title'</code> before the first <code>startGame()</code>, <code>'playing'</code> while the game is on, <code>'over'</code> after it ends</td>
+</tr>
+<tr>
+<td><code>isPlaying</code></td>
+<td>boolean</td>
+<td><code>state === 'playing'</code> (read only)</td>
+</tr>
+<tr>
+<td><code>isOver</code></td>
+<td>boolean</td>
+<td><code>state === 'over'</code> (read only)</td>
+</tr>
+<tr>
+<td><code>won</code></td>
+<td>boolean</td>
+<td><code>true</code> if the game ended because the last level was finished</td>
+</tr>
+</tbody>
+</table>
+<h3 id="game-manager-methods">Game manager methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>startGame()</code></td>
+<td>gameManager</td>
+<td>Start, or restart: <code>score</code> <code>0</code>, <code>level</code> <code>1</code>, <code>state</code> <code>'playing'</code>. Calls <code>gameStarted()</code>, then <code>levelStarted(1)</code>.</td>
+</tr>
+<tr>
+<td><code>endLevel()</code></td>
+<td>gameManager</td>
+<td>Finish the current level. Calls <code>levelEnded(level)</code>, then <code>levelStarted(level + 1)</code>. After the last level (see <code>levels</code>), it ends the game and calls <code>gameEnded(true)</code> instead. Does nothing unless the game is playing.</td>
+</tr>
+<tr>
+<td><code>endGame()</code></td>
+<td>gameManager</td>
+<td>End the game now. Calls <code>gameEnded(false)</code>. Does nothing unless the game is playing.</td>
+</tr>
+<tr>
+<td><code>addScore(points)</code></td>
+<td>gameManager</td>
+<td>Add to the score (<code>1</code> if left out). A negative number takes points away.</td>
+</tr>
+</tbody>
+</table>
+<p>All three of <code>startGame()</code>, <code>endLevel()</code> and <code>endGame()</code> are safe to call from anywhere, including inside collision callbacks: if the physics is in the middle of a step, the game manager waits until the step is over. Calling the same one more than once in a single step counts once, so two coins collected together can't skip a level.</p>
+<h3 id="game-manager-callbacks">Game manager callbacks</h3>
+<p>Write any of these functions in your sketch and the game manager calls them. All are optional. In instance mode, put them on the p5 instance (<code>p.gameStarted = () =&gt; {...}</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gameStarted()</code></td>
+<td>By <code>startGame()</code>, before the first level starts</td>
+</tr>
+<tr>
+<td><code>levelStarted(level)</code></td>
+<td>When a level begins: <code>1</code> straight after <code>gameStarted()</code>, then after each <code>endLevel()</code></td>
+</tr>
+<tr>
+<td><code>levelEnded(level)</code></td>
+<td>By <code>endLevel()</code>, with the number of the level that was finished</td>
+</tr>
+<tr>
+<td><code>gameEnded(won)</code></td>
+<td>By <code>endGame()</code> (<code>won</code> is <code>false</code>), or after the last level (<code>won</code> is <code>true</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>If GameObjects finds a function whose name differs only in capitals, like <code>gamestarted()</code>, it prints a hint in the console.</p>
+<hr />
 <h2 id="gamecamera">GameCamera</h2>
 <p>Every world has one, as <code>world.camera</code>. It chooses which part of the world is shown. By default it shows the canvas area, so world and screen coordinates match.</p>
 <table>
@@ -1651,6 +1785,6 @@ player.fill('seagreen');
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=72a8ff09"></script>
+  <script src="js/docs.js?v=12c08eef"></script>
 </body>
 </html>

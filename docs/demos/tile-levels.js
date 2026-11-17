@@ -43,9 +43,6 @@ let levels = [
 
 let TILE = 32;
 let ground, coins, spikes, player, exit;
-let level = 0;
-let score = 0;
-let state = 'playing';
 let startX, startY;
 
 function setup() {
@@ -57,12 +54,17 @@ function setup() {
   coins = new GameGroup({ shape: 'circle', isStatic: true, isSensor: true, color: 'gold', stroke: '#b8860b', strokeWeight: 2 });
   spikes = new GameGroup({ shape: 'triangle', rotation: -90, isStatic: true, isSensor: true, color: '#adb5bd' });
 
-  buildLevel(level);
+  gameManager.levels = levels.length; // finishing the last level wins the game
+  gameManager.startGame();
 }
 
-function buildLevel(n) {
+// The game manager calls this at the start of every level: 1, 2, 3...
+function levelStarted(level) {
+  buildLevel(levels[level - 1]);
+}
+
+function buildLevel(map) {
   world.clear();
-  let map = levels[n];
   for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
       let ch = map[row][col];
@@ -81,7 +83,7 @@ function buildLevel(n) {
   player = new GameObject(startX, startY, 22, 28, { color: 'tomato', fixedRotation: true, friction: 0, cornerRadius: 5 });
   player.onCollide(coins, (me, coin) => {
     coin.destroy();
-    score++;
+    gameManager.addScore(1);
   });
 }
 
@@ -93,18 +95,14 @@ function respawn() {
 function draw() {
   background('#e7f5ff');
 
-  if (state === 'playing') {
+  if (gameManager.isPlaying) {
     player.velocityX = 0;
     if (keyIsDown(LEFT_ARROW)) player.velocityX = -4;
     if (keyIsDown(RIGHT_ARROW)) player.velocityX = 4;
 
     // rules (checked here in draw, not inside a callback)
     if (player.isTouching(spikes) || player.y > height + 50) respawn();
-    if (player.isTouching(exit) && coins.length === 0) {
-      level++;
-      if (level < levels.length) buildLevel(level);
-      else state = 'won';
-    }
+    if (player.isTouching(exit) && coins.length === 0) gameManager.endLevel();
     exit.opacity = coins.length === 0 ? 255 : 90; // the exit lights up when it's open
   }
 }
@@ -115,9 +113,9 @@ function drawOnTop() {
   noStroke();
   textSize(15);
   textAlign(LEFT, TOP);
-  text('Level ' + (level + 1) + ' of ' + levels.length + '    Coins left: ' + coins.length + '    Score: ' + score, 10, 8);
+  text('Level ' + gameManager.level + ' of ' + levels.length + '    Coins left: ' + coins.length + '    Score: ' + gameManager.score, 10, 8);
   text('Arrows to move, up/space to jump. Collect every coin to open the exit.', 10, 28);
-  if (state === 'won') {
+  if (gameManager.won) {
     textAlign(CENTER, CENTER);
     textSize(36);
     text('You finished every level!', width / 2, height / 2 - 40);
@@ -130,10 +128,5 @@ function keyPressed() {
   if ((key === ' ' || keyCode === UP_ARROW) && player.isTouching(ground)) {
     player.velocityY = -10.5;
   }
-  if ((key === 'r' || key === 'R') && state === 'won') {
-    level = 0;
-    score = 0;
-    state = 'playing';
-    buildLevel(level);
-  }
+  if ((key === 'r' || key === 'R') && gameManager.isOver) gameManager.startGame();
 }

@@ -41,6 +41,7 @@
   let lib = {
     p: null, // the p5 instance we draw with
     world: null, // the current GameWorld
+    manager: null, // the GameManager (score, levels, game start and end)
     version: '0.1.0',
   };
 
@@ -1324,6 +1325,8 @@
       }
       this._movedStatics.clear();
       this._flushRemovals();
+      // startGame()/endLevel()/endGame() called inside a collision callback wait until here
+      if (lib.manager) lib.manager._runQueued();
 
       for (let o of this.objects) {
         if (o.destroyed) continue;
@@ -1403,6 +1406,153 @@
       frames.push(img.get(cx, cy, frameWidth, frameHeight));
     }
     return frames;
+  }
+
+  // ===========================================================================
+  // GameManager — score, levels, and the start and end of the game
+  // ===========================================================================
+  // One is made automatically as `gameManager`. It keeps the score and level and
+  // calls these functions in your sketch, if you write them:
+  //   gameStarted()        after gameManager.startGame()
+  //   levelStarted(level)  when a level begins (level 1 straight after gameStarted)
+  //   levelEnded(level)    after gameManager.endLevel(), before the next level starts
+  //   gameEnded(won)       after gameManager.endGame(), or after the last level
+  let CALLBACKS = ['gameStarted', 'gameEnded', 'levelStarted', 'levelEnded'];
+
+  class GameManager {
+    constructor() {
+      this.state = 'title'; // 'title' (not started yet), 'playing' or 'over'
+      this.level = 0; // 1 for the first level, 0 before the game starts
+      this.levels = Infinity; // how many levels there are: finishing the last one wins
+      this.won = false; // true when the game ended because the last level was finished
+      this.highScore = 0; // the best score since the page loaded
+      this._score = 0;
+      this._queue = [];
+      lib.manager = this;
+    }
+
+    get score() {
+      return this._score;
+    }
+    set score(v) {
+      this._score = v;
+      if (v > this.highScore) this.highScore = v;
+    }
+
+    /** Add points to the score (use a negative number to take some away). */
+    addScore(points = 1) {
+      this.score = this._score + points;
+      return this;
+    }
+
+    get isPlaying() {
+      return this.state === 'playing';
+    }
+    get isOver() {
+      return this.state === 'over';
+    }
+
+    /** Start (or restart) the game: score 0, level 1. Calls gameStarted() then levelStarted(1). */
+    startGame() {
+      return this._later('startGame', () => {
+        this.state = 'playing';
+        this.won = false;
+        this._score = 0;
+        this.level = 1;
+        callBack('gameStarted');
+        callBack('levelStarted', this.level);
+      });
+    }
+
+    /** Finish the current level. Calls levelEnded(level), then starts the next one (or ends the game after the last). */
+    endLevel() {
+      return this._later('endLevel', () => {
+        if (this.state !== 'playing') return;
+        let finished = this.level;
+        callBack('levelEnded', finished);
+        if (this.state !== 'playing' || this.level !== finished) return; // levelEnded() ended or changed the game
+        if (finished >= this.levels) {
+          this._finish(true);
+        } else {
+          this.level = finished + 1;
+          callBack('levelStarted', this.level);
+        }
+      });
+    }
+
+    /** End the game now (the player lost, or quit). Calls gameEnded(false). */
+    endGame() {
+      return this._later('endGame', () => {
+        if (this.state === 'playing') this._finish(false);
+      });
+    }
+
+    _finish(won) {
+      this.state = 'over';
+      this.won = won;
+      callBack('gameEnded', won);
+    }
+
+    // Collision callbacks run in the middle of a physics step, where building or
+    // clearing a level isn't safe. Calls made then wait until the step is over.
+    // The same call made twice in one step (two coins collected at once, say)
+    // only counts once, so a level is never skipped.
+    _later(kind, action) {
+      let w = lib.world;
+      if (w && w._stepping) {
+        if (!this._queue.some((q) => q.kind === kind)) this._queue.push({ kind, action });
+      } else {
+        action();
+      }
+      return this;
+    }
+
+    _runQueued() {
+      while (this._queue.length) this._queue.shift().action();
+    }
+  }
+
+  // Find one of the sketch's callbacks: a global function (global mode) or p.name (instance mode)
+  function findCallback(name) {
+    let p = getP5();
+    if (p && typeof p[name] === 'function' && !(name in P5Proto())) return p[name].bind(p);
+    if (typeof global[name] === 'function') return global[name];
+    return null;
+  }
+  function P5Proto() {
+    return (global.p5 && global.p5.prototype) || {};
+  }
+  function callBack(name, ...args) {
+    checkCallbackSpelling(getP5());
+    let fn = findCallback(name);
+    if (fn) fn(...args);
+  }
+
+  // A callback with the wrong capitals (gamestarted, LevelEnded...) would never run,
+  // so point it out once, the first time the game manager looks for its callbacks.
+  let checkedCallbackSpelling = false;
+  function checkCallbackSpelling(p) {
+    if (checkedCallbackSpelling) return;
+    checkedCallbackSpelling = true;
+    let names = new Set([...Object.keys(global), ...Object.keys(p || {})]);
+    for (let right of CALLBACKS) {
+      if (findCallback(right)) continue;
+      for (let name of names) {
+        if (name === right || name.toLowerCase() !== right.toLowerCase()) continue;
+        let value;
+        try {
+          value = global[name] !== undefined ? global[name] : p[name];
+        } catch (e) {
+          continue;
+        }
+        if (typeof value === 'function') {
+          console.warn(
+            `GameObjects: found a function called "${name}()". Did you mean ${right}()? ` +
+              `The game manager only calls it if it's spelled exactly ${right}.`
+          );
+        }
+      }
+    }
   }
 
   // ===========================================================================
@@ -1544,6 +1694,7 @@
   lib.GameGroup = GameGroup;
   lib.GameCamera = GameCamera;
   lib.GameLink = GameLink;
+  lib.GameManager = GameManager;
   lib.spriteSheet = spriteSheet;
   lib.Matter = M;
   Object.defineProperty(lib, 'currentWorld', { get: currentWorld });
@@ -1552,6 +1703,7 @@
   global.GameWorld = GameWorld;
   global.GameObject = GameObject;
   global.GameGroup = GameGroup;
+  global.GameManager = GameManager;
 
   // ---------------------------------------------------------------------------
   // A ready-made world. Sketches can use `world` straight away without making
@@ -1574,6 +1726,25 @@
         } else {
           // someone is using `world` for something else: let them
           Object.defineProperty(global, 'world', { value: w, writable: true, configurable: true });
+        }
+      },
+    });
+  }
+
+  // A ready-made game manager, the same way: `gameManager.startGame()`, `gameManager.score`...
+  new GameManager();
+  if (!Object.prototype.hasOwnProperty.call(global, 'gameManager')) {
+    Object.defineProperty(global, 'gameManager', {
+      configurable: true,
+      enumerable: false,
+      get() {
+        return lib.manager;
+      },
+      set(m) {
+        if (m instanceof GameManager) {
+          lib.manager = m;
+        } else {
+          Object.defineProperty(global, 'gameManager', { value: m, writable: true, configurable: true });
         }
       },
     });

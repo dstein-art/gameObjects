@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=72a8ff09" />
+  <link rel="stylesheet" href="css/docs.css?v=12c08eef" />
 </head>
 <body class="page-levels-score">
   <header class="topbar">
@@ -50,19 +50,45 @@
   <main class="content">
     <p class="section-num">Section 10 of 11</p>
 <h1 id="managing-your-game-with-levels-and-score">Managing your Game with Levels and Score</h1>
-<p class="lead">You have objects that move, collide, animate and make noise. This section turns them into a <strong>game</strong>: something with a score, lives, a start and an end, and more than one level.</p>
-<h2 id="keeping-score">Keeping score</h2>
-<p>The score is just a variable. Change it when something happens, and draw it every frame:</p>
-<pre><code class="language-js">let score = 0;
+<p class="lead">You have objects that move, collide, animate and make noise. This section turns them into a <strong>game</strong>: something with a score, a start and an end, and more than one level.</p>
+<h2 id="the-game-manager">The game manager</h2>
+<p>GameObjects gives every sketch a <strong><code>gameManager</code></strong>. It keeps the <strong>score</strong> and the <strong>level</strong>, and it knows whether the game has started, is being played, or is over. There's nothing to set up: just use it.</p>
+<p>You move the game along with three calls:</p>
+<pre><code class="language-js">gameManager.startGame();   // start (or restart): score 0, level 1
+gameManager.endLevel();    // this level is done: go on to the next one
+gameManager.endGame();     // game over
+</code></pre>
+<p>And the game manager calls <strong>your</strong> functions when those things happen, if you write them:</p>
+<pre><code class="language-js">function gameStarted() {
+  // the game is starting: reset lives, make the player...
+}
 
-function setup() {
-  // ...
-  player.onCollide(coins, (me, coin) =&gt; {
-    coin.destroy();
-    score += 10;
-  });
+function levelStarted(level) {
+  // level 1, 2, 3... is starting: build it
+}
+
+function levelEnded(level) {
+  // a level was finished
+}
+
+function gameEnded(won) {
+  // the game is over. won is true if the last level was finished
 }
 </code></pre>
+<p>All four are optional. Write the ones you need and leave the rest out.</p>
+<p>When you call <code>startGame()</code>, the game manager calls <code>gameStarted()</code> and then <code>levelStarted(1)</code>. When you call <code>endLevel()</code>, it calls <code>levelEnded()</code> for the level you just finished, then <code>levelStarted()</code> for the next one.</p>
+<blockquote>
+<p><strong>Watch out:</strong> spell them exactly: <code>gameStarted</code>, <code>gameEnded</code>, <code>levelStarted</code>, <code>levelEnded</code>. If GameObjects finds a function with different capitals, like <code>gamestarted</code>, it prints a hint in the console.</p>
+</blockquote>
+<h2 id="keeping-score">Keeping score</h2>
+<p>The score lives in the game manager. Add points when something happens:</p>
+<pre><code class="language-js">player.onCollide(coins, (me, coin) =&gt; {
+  coin.destroy();
+  gameManager.addScore(10);
+});
+</code></pre>
+<p>You can also set it directly, like <code>gameManager.score = 0</code> or <code>gameManager.score += 10</code>. <code>startGame()</code> sets it back to <code>0</code>.</p>
+<p>The game manager also keeps <strong><code>gameManager.highScore</code></strong>, the best score so far, which stays when the game restarts.</p>
 <h3 id="drawing-the-score-on-top">Drawing the score on top</h3>
 <p>GameObjects draws your objects <strong>after</strong> <code>draw()</code> finishes. So anything you draw in <code>draw()</code>, like the score, ends up <strong>behind</strong> the objects, and a platform or a coin can cover it.</p>
 <p>For text that should always be on top, write a function called <strong><code>drawOnTop()</code></strong>. GameObjects calls it every frame, <strong>after</strong> all the objects are drawn:</p>
@@ -74,83 +100,106 @@ function setup() {
 function drawOnTop() {
   fill(0);
   textSize(20);
-  text('Score: ' + score, 10, 30);
+  text('Score: ' + gameManager.score, 10, 30);
+  text('Level: ' + gameManager.level, 10, 55);
 }
 </code></pre>
 <p><code>drawOnTop()</code> is optional: leave it out and nothing changes. It's drawn in <strong>screen space</strong>, so the <a href="input-camera.html#the-camera">camera</a> doesn't move it, which is just right for a score, lives or a message.</p>
 <blockquote>
 <p><strong>Watch out:</strong> spell it exactly <code>drawOnTop</code>, with a capital <strong>O</strong> and <strong>T</strong>. If GameObjects finds a function with a similar name, like <code>drawontop</code>, it prints a hint in the console.</p>
 </blockquote>
+<h2 id="title-playing-and-game-over">Title, playing and game over</h2>
+<p>Most games have <strong>screens</strong>: a title screen, the game itself, a game-over screen. The game manager knows which one you're on:</p>
+<table>
+<thead>
+<tr>
+<th><code>gameManager.state</code></th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'title'</code></td>
+<td><code>startGame()</code> hasn't been called yet</td>
+</tr>
+<tr>
+<td><code>'playing'</code></td>
+<td>The game is on</td>
+</tr>
+<tr>
+<td><code>'over'</code></td>
+<td><code>endGame()</code> was called, or the last level was finished</td>
+</tr>
+</tbody>
+</table>
+<p><code>gameManager.isPlaying</code> and <code>gameManager.isOver</code> are short ways to ask. Draw something different for each screen, and start the game when the player presses a key:</p>
+<pre><code class="language-js">function draw() {
+  background(30);
+  if (gameManager.isPlaying) {
+    // move things, check the rules
+  }
+}
+
+function drawOnTop() {
+  if (gameManager.state === 'title') {
+    text('SUPER CATCH — press any key', 200, 180);
+  } else if (gameManager.isPlaying) {
+    text('Score: ' + gameManager.score, 10, 30);
+  } else if (gameManager.isOver) {
+    text('GAME OVER — press any key', 200, 180);
+  }
+}
+
+function keyPressed() {
+  if (!gameManager.isPlaying) gameManager.startGame();
+}
+</code></pre>
+<p>The game logic goes in <code>draw()</code>, and everything the player reads goes in <code>drawOnTop()</code>, so messages always appear over the game.</p>
 <h2 id="lives-and-losing">Lives and losing</h2>
-<p>Lives work the same way: a variable, and a check for when they run out.</p>
+<p>Lives are your own variable. Reset them in <code>gameStarted()</code>, and end the game when they run out:</p>
 <pre><code class="language-js">let lives = 3;
+
+function gameStarted() {
+  lives = 3;
+}
 
 function loseLife() {
   lives--;
   if (lives &lt;= 0) {
-    gameOver();
+    gameManager.endGame();
   } else {
     player.setPosition(startX, startY);   // back to the start
     player.stop();
   }
 }
-
-// falling off the bottom of the level
-if (player.y &gt; height + 100) loseLife();
 </code></pre>
-<h2 id="game-states-title-playing-game-over">Game states: title, playing, game over</h2>
-<p>Most games have <strong>screens</strong>: a title screen, the game itself, a game-over screen. Keep track of which one you're on with a <strong>state</strong> variable, and draw something different for each:</p>
-<pre><code class="language-js">let state = 'title';
-
-function draw() {
-  background(30);
-  if (state === 'playing') {
-    playGame();       // move things, check the rules
-  }
-}
-
-function drawOnTop() {
-  if (state === 'title') {
-    text('SUPER CATCH — press any key', 200, 180);
-  } else if (state === 'playing') {
-    drawScore();
-  } else if (state === 'gameover') {
-    drawScore();
-    text('GAME OVER — press R', 200, 180);
-  }
-}
-</code></pre>
-<p>The game logic goes in <code>draw()</code>, and everything the player reads goes in <code>drawOnTop()</code>, so messages always appear over the game.</p>
-<p>Freeze the physics while you're not playing with <strong><code>world.paused</code></strong>:</p>
-<pre><code class="language-js">function gameOver() {
-  state = 'gameover';
+<p>Freeze the physics when the game ends with <strong><code>world.paused</code></strong>, and unfreeze it when a new game starts:</p>
+<pre><code class="language-js">function gameEnded() {
   world.paused = true;
 }
 </code></pre>
 <h2 id="starting-again">Starting again</h2>
-<p>To restart, you need to <strong>remove everything</strong> and <strong>build it again</strong>. Put all the building code in one function, so you can call it at the start and again later:</p>
-<pre><code class="language-js">function startGame() {
+<p>To restart, you need to <strong>remove everything</strong> and <strong>build it again</strong>. <code>gameStarted()</code> is the place for that, so the same code runs for the first game and for every game after it:</p>
+<pre><code class="language-js">function gameStarted() {
   world.clear();          // destroy every object and joint
-  score = 0;
   lives = 3;
   player = new GameObject(320, 300, 40);
   // ... make the rest of the game
   world.paused = false;
-  state = 'playing';
 }
 </code></pre>
 <blockquote>
-<p><strong>Watch out:</strong> <code>world.clear()</code> destroys <strong>everything</strong>, including walls from <code>world.addWalls()</code>. Make them again inside <code>startGame()</code>. Also make your groups <strong>once</strong> in <code>setup()</code>. <code>clear()</code> empties them, but they keep their settings and collision rules.</p>
+<p><strong>Watch out:</strong> <code>world.clear()</code> destroys <strong>everything</strong>, including walls from <code>world.addWalls()</code>. Make them again inside <code>gameStarted()</code> (or <code>levelStarted()</code>). Also make your groups <strong>once</strong> in <code>setup()</code>. <code>clear()</code> empties them, but they keep their settings and collision rules.</p>
 </blockquote>
 <h2 id="saving-a-high-score">Saving a high score</h2>
-<p>p5.js can remember things in the browser even after the page is closed, using <code>storeItem</code> and <code>getItem</code>:</p>
-<pre><code class="language-js">let best = getItem('bestScore') || 0;     // 0 the first time
+<p><code>gameManager.highScore</code> is forgotten when the page is closed. p5.js can remember it in the browser using <code>storeItem</code> and <code>getItem</code>:</p>
+<pre><code class="language-js">function setup() {
+  // ...
+  gameManager.highScore = getItem('bestScore') || 0;     // 0 the first time
+}
 
-function gameOver() {
-  if (score &gt; best) {
-    best = score;
-    storeItem('bestScore', best);
-  }
+function gameEnded() {
+  storeItem('bestScore', gameManager.highScore);
 }
 </code></pre>
 <div class="demo" data-sketch="catch-game" data-width="640" data-height="360" data-keys="1"></div>
@@ -177,12 +226,12 @@ function gameOver() {
 </code></pre>
 <p>Here <code>#</code> is ground, <code>o</code> is a coin, <code>P</code> is where the player starts, <code>E</code> is the exit and a space is empty. Changing a level is as easy as typing.</p>
 <h3 id="building-a-level-from-the-map">Building a level from the map</h3>
-<p>Loop through every row and every character, and make the right object for each one:</p>
+<p>The game manager calls <code>levelStarted()</code> with the level number: <code>1</code> for the first level, <code>2</code> for the next, and so on. Arrays start at <code>0</code>, so level <code>1</code> is <code>levels[0]</code>. Loop through every row and every character, and make the right object for each one:</p>
 <pre><code class="language-js">let TILE = 32;
 
-function buildLevel(n) {
+function levelStarted(level) {
   world.clear();
-  let map = levels[n];
+  let map = levels[level - 1];
   for (let row = 0; row &lt; map.length; row++) {
     for (let col = 0; col &lt; map[row].length; col++) {
       let ch = map[row][col];
@@ -197,35 +246,32 @@ function buildLevel(n) {
 }
 </code></pre>
 <h3 id="moving-to-the-next-level">Moving to the next level</h3>
-<p>Keep the current level number in a variable. When the player reaches the exit, add one and build the next level:</p>
-<pre><code class="language-js">let level = 0;
-
-function nextLevel() {
-  level++;
-  if (level &gt;= levels.length) {
-    state = 'won';            // no more levels!
-  } else {
-    buildLevel(level);
-  }
+<p>Tell the game manager how many levels there are, and call <strong><code>endLevel()</code></strong> when the player reaches the exit. It builds the next level by calling <code>levelStarted()</code> again:</p>
+<pre><code class="language-js">function setup() {
+  // ...
+  gameManager.levels = levels.length;
+  gameManager.startGame();
 }
 
 // in draw():
-if (player.isTouching(exit) &amp;&amp; coins.length === 0) nextLevel();
+if (player.isTouching(exit) &amp;&amp; coins.length === 0) gameManager.endLevel();
 </code></pre>
+<p>After the <strong>last</strong> level, <code>endLevel()</code> ends the game instead: <code>gameEnded(true)</code> is called and <code>gameManager.won</code> is <code>true</code>. Use it to show a "You won!" screen.</p>
 <blockquote>
-<p><strong>Tip:</strong> change levels <strong>in <code>draw()</code></strong>, not inside an <code>onCollide</code> callback. Building a whole level in the middle of the physics step can cause strange results. Checking <code>isTouching</code> in <code>draw()</code> avoids the problem.</p>
+<p><strong>Tip:</strong> it's safe to call <code>startGame()</code>, <code>endLevel()</code> and <code>endGame()</code> anywhere, even inside an <code>onCollide</code> callback. If the physics is in the middle of a step, the game manager waits until the step is over before building the next level.</p>
 </blockquote>
 <div class="demo" data-sketch="tile-levels" data-width="640" data-height="360" data-keys="1"></div>
 <h2 id="putting-it-all-together">Putting it all together</h2>
 <p>A complete game usually has these parts:</p>
 <ol>
-<li><strong><code>setup()</code></strong> loads images and sounds, makes the world and groups (with their collision rules), then shows the title screen.</li>
-<li><strong><code>startGame()</code></strong> resets the score and lives, and builds the first level.</li>
-<li><strong><code>buildLevel(n)</code></strong> clears the world and makes everything for level <code>n</code>.</li>
-<li><strong><code>draw()</code></strong> checks the <strong>state</strong>, reads the keys, checks the rules (won? lost? next level?), then draws the world and the score.</li>
-<li><strong><code>keyPressed()</code></strong> handles jumping, starting and restarting.</li>
+<li><strong><code>setup()</code></strong> loads images and sounds, makes the groups (with their collision rules), and sets <code>gameManager.levels</code>.</li>
+<li><strong><code>gameStarted()</code></strong> resets lives and anything else that lasts the whole game.</li>
+<li><strong><code>levelStarted(level)</code></strong> clears the world and builds the level.</li>
+<li><strong><code>draw()</code></strong> reads the keys and checks the rules: call <code>endLevel()</code> when a level is done, and <code>endGame()</code> when the player loses.</li>
+<li><strong><code>drawOnTop()</code></strong> draws the score and the title, game-over and "you won" screens.</li>
+<li><strong><code>keyPressed()</code></strong> handles jumping, and calls <code>gameManager.startGame()</code> to start and restart.</li>
 </ol>
-<p>The <a href="examples.html">example games</a> that come with GameObjects follow this pattern. Open them up, change things and see what happens.</p>
+<p>The two demos on this page follow this pattern. For more complete games, open the <a href="examples.html">example games</a>, change things and see what happens.</p>
 <p><strong>Have fun making games!</strong></p>
     <nav class="pager">
       <a class="prev" href="input-camera.html"><small>Previous</small>Player Input and Camera</a>
@@ -236,6 +282,6 @@ if (player.isTouching(exit) &amp;&amp; coins.length === 0) nextLevel();
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=72a8ff09"></script>
+  <script src="js/docs.js?v=12c08eef"></script>
 </body>
 </html>

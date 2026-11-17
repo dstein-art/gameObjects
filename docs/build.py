@@ -18,6 +18,7 @@ Special lines you can use in the Markdown:
                                            a sketch from docs/examples/, with its canvas
                                            size (it's scaled down to fit the page)
 """
+import hashlib
 import html
 import pathlib
 import re
@@ -26,6 +27,24 @@ import markdown
 
 ROOT = pathlib.Path(__file__).parent
 SRC = ROOT / "src"
+
+
+def site_version():
+    """A short fingerprint of the library, the site's scripts and every sketch.
+
+    It's added to the end of addresses (?v=...), so when any of these files
+    change, browsers fetch the new copies instead of using old ones they saved.
+    """
+    files = [ROOT.parent / "gameObjects.js", ROOT / "js" / "docs.js", ROOT / "css" / "docs.css",
+             ROOT / "demos" / "run.html"]
+    files += sorted((ROOT / "demos").glob("*.js")) + sorted((ROOT / "examples").glob("*.js"))
+    h = hashlib.md5()
+    for f in files:
+        h.update(f.read_bytes())
+    return h.hexdigest()[:8]
+
+
+VERSION = site_version()
 
 # The order of the site. Each entry is (file name, menu title, [sub-pages]).
 PAGES = [
@@ -66,7 +85,7 @@ LAYOUT = """<!DOCTYPE html>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
-  <link rel="stylesheet" href="css/docs.css" />
+  <link rel="stylesheet" href="css/docs.css?v={version}" />
 </head>
 <body class="page-{slug}">
   <header class="topbar">
@@ -93,7 +112,7 @@ LAYOUT = """<!DOCTYPE html>
       {next}
     </nav>
   </main>
-  <script src="js/docs.js"></script>
+  <script src="js/docs.js?v={version}"></script>
 </body>
 </html>
 """
@@ -185,6 +204,7 @@ def render(md, slug, title, text, kicker, area, prev=None, nxt=None):
         top_examples=on if area == "examples" else "",
         top_api=on if area == "api" else "",
         body=body,
+        version=VERSION,
         kicker=kicker,
         prev=pager_link("prev", "Previous", prev),
         next=pager_link("next", "Next", nxt),
@@ -227,6 +247,14 @@ def build():
     text = re.sub(r"\]\(docs/", "](", text)
     text = re.sub(r"\]\((README|LICENSE|API)\.md", r"](../\1.md", text)
     render(md, slug, title, text, "Reference", "api")
+
+    # the home page isn't built from Markdown, but it uses the same files
+    home = ROOT.parent / "index.html"
+    page = home.read_text(encoding="utf-8")
+    page = re.sub(r'docs/css/docs\.css(\?v=\w+)?"', f'docs/css/docs.css?v={VERSION}"', page)
+    page = re.sub(r'docs/js/docs\.js(\?v=\w+)?"', f'docs/js/docs.js?v={VERSION}"', page)
+    home.write_text(page, encoding="utf-8")
+    print(f"updated index.html (version {VERSION})")
 
 
 if __name__ == "__main__":

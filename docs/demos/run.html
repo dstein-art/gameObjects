@@ -48,7 +48,7 @@
         });
         addEventListener('unhandledrejection', function (e) {
           var r = e.reason || {};
-          var m = /(?:blob:\S+?|\/(?:demos|examples)\/[\w-]+\.js):(\d+):\d+/.exec(r.stack || '');
+          var m = /(?:blob:\S+?|\/(?:demos|examples)\/[\w-]+\.js(?:\?v=\w+)?):(\d+):\d+/.exec(r.stack || '');
           report((r.name ? r.name + ': ' : '') + (r.message || String(r)), m ? +m[1] : null);
         });
       })();
@@ -56,7 +56,12 @@
     <script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
-    <script src="../../gameObjects.js"></script>
+    <script>
+      // ?v= is the site version: it makes browsers fetch fresh copies after an update
+      var GO_VERSION = new URLSearchParams(location.search).get('v');
+      var GO_V = GO_VERSION ? '?v=' + encodeURIComponent(GO_VERSION) : '';
+      document.write('<script src="../../gameObjects.js' + GO_V + '"><\/script>');
+    </script>
     <script>
       (function () {
         var params = new URLSearchParams(location.search);
@@ -73,9 +78,9 @@
           var url = URL.createObjectURL(new Blob([edited], { type: 'text/javascript' }));
           document.write('<script src="' + url + '"><\/script>');
         } else if (/^[\w-]+$/.test(s)) {
-          document.write('<script src="' + s + '.js"><\/script>');
+          document.write('<script src="' + s + '.js' + GO_V + '"><\/script>');
         } else if (/^examples\/[\w-]+$/.test(s)) {
-          document.write('<script src="../' + s + '.js"><\/script>');
+          document.write('<script src="../' + s + '.js' + GO_V + '"><\/script>');
         }
         document.title = s + ' · GameObjects demo';
       })();

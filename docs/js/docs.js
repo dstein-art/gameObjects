@@ -2,6 +2,14 @@
 (function () {
   'use strict';
 
+  // The site version, from this script's own address (docs.js?v=...). It's added
+  // to the demo addresses so browsers never run an old saved copy.
+  let VERSION = '';
+  try {
+    VERSION = new URL(document.currentScript.src).searchParams.get('v') || '';
+  } catch (e) {}
+  let withVersion = (url) => (VERSION ? url + (url.includes('?') ? '&' : '?') + 'v=' + VERSION : url);
+
   // ---------------------------------------------------------------------------
   // A small JavaScript highlighter (no dependencies)
   // ---------------------------------------------------------------------------
@@ -216,7 +224,7 @@
     let height = parseInt(box.dataset.height || '360', 10);
     let srcPath = name.startsWith('examples/') ? `${name}.js` : `demos/${name}.js`;
     let fileName = name.split('/').pop() + '.js';
-    let fileUrl = `demos/run.html?s=${encodeURIComponent(name)}`;
+    let fileUrl = withVersion(`demos/run.html?s=${encodeURIComponent(name)}`);
     let runUrl = `${fileUrl}&id=${id}`;
 
     let icon = (path) =>
@@ -351,7 +359,7 @@
     if ('ResizeObserver' in window) new ResizeObserver(fitToPage).observe(stage);
     else addEventListener('resize', fitToPage);
 
-    fetch(srcPath)
+    fetch(withVersion(srcPath))
       .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
       .then((src) => {
         original = src.trimEnd() + '\n';

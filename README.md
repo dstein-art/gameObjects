@@ -122,6 +122,8 @@ pip install markdown
 python3 docs/build.py
 ```
 
+Run the build after changing `gameObjects.js`, a demo or an example too. It stamps the site with a version number (`?v=...` on the end of each address), so browsers load the new files instead of old copies they saved.
+
 Every demo's code is editable right on the page, using [CodeMirror 5](https://codemirror.net/5/) (MIT) loaded from jsDelivr. Readers change it, press ▶ or Ctrl/⌘+Enter, and errors are shown with their line highlighted. Add a demo to a page with a line like:
 
 ```text

@@ -342,7 +342,7 @@ The optional object holds **defaults** for objects made with `create()`. Its `na
 
 | Member | Returns | Description |
 |---|---|---|
-| `create(x, y, width, height, options)` | GameObject | Make a new object with the group's defaults (overridden by `options`) and add it to the group. Takes the same arguments as `new GameObject()`. |
+| `create(x, y, width, height, options)` | GameObject | Make a new object with the group's defaults (overridden by `options`) and add it to the group. Takes the same arguments as `new GameObject()`. Members don't inherit the group's `name`, but a `name` in `options` is used. |
 | `add(...objects)` | group | Add objects or arrays of objects. Destroyed objects and existing members are skipped. |
 | `remove(obj)` | group | Take an object out of the group. It stays in the world. |
 | `has(obj)` | boolean | Is the object in this group? |

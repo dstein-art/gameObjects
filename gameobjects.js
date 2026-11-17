@@ -747,9 +747,12 @@
         options = height;
         height = undefined;
       }
-      let opts = Object.assign({}, this.defaults, options || {});
-      delete opts.group;
-      delete opts.name;
+      // The group's own name (and any group setting) stays with the group: members
+      // don't inherit them from the defaults. A name or group passed in here is kept.
+      let defaults = Object.assign({}, this.defaults);
+      delete defaults.group;
+      delete defaults.name;
+      let opts = Object.assign(defaults, options || {});
       let obj = new GameObject(x, y, width ?? opts.width, height ?? opts.height, opts);
       this.add(obj);
       return obj;

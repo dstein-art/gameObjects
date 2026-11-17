@@ -38,13 +38,13 @@ Load the scripts **in this order** in `index.html`:
 <script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
-<script src="gameObjects.js"></script>
+<script src="gameobjects.js"></script>
 <script src="sketch.js"></script>
 ```
 
 The help site and example games load p5.js, p5.sound and Matter.js (MIT licensed) from jsDelivr, so they need an internet connection. p5.sound is optional; GameObjects doesn't need it.
 
-**p5.js Web Editor:** upload `gameObjects.js` to your sketch and add the Matter.js line and the `gameObjects.js` line to `index.html`, after p5.
+**p5.js Web Editor:** upload `gameobjects.js` to your sketch and add the Matter.js line and the `gameobjects.js` line to `index.html`, after p5.
 
 ---
 
@@ -88,7 +88,7 @@ Everything to read and play with starts at **[`index.html`](index.html)** in the
 
 ```text
 index.html            home page: links to every section and example game
-gameObjects.js        the library
+gameobjects.js        the library
 API.md                the API reference (also built into docs/api.html)
 docs/
   getting-started.html … levels-score.html   the 10 help sections
@@ -122,7 +122,7 @@ pip install markdown
 python3 docs/build.py
 ```
 
-Run the build after changing `gameObjects.js`, a demo or an example too. It stamps the site with a version number (`?v=...` on the end of each address), so browsers load the new files instead of old copies they saved.
+Run the build after changing `gameobjects.js`, a demo or an example too. It stamps the site with a version number (`?v=...` on the end of each address), so browsers load the new files instead of old copies they saved.
 
 Every demo's code is editable right on the page, using [CodeMirror 5](https://codemirror.net/5/) (MIT) loaded from jsDelivr. Readers change it, press ▶ or Ctrl/⌘+Enter, and errors are shown with their line highlighted. Add a demo to a page with a line like:
 

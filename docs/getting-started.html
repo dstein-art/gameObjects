@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
-  <link rel="stylesheet" href="css/docs.css?v=3c6589cc" />
+  <link rel="stylesheet" href="css/docs.css?v=6aa6de2c" />
 </head>
 <body class="page-getting-started">
   <header class="topbar">
@@ -57,12 +57,12 @@
 <ul>
 <li>A p5.js sketch. GameObjects works with <strong>p5.js 2.x</strong> (recommended) and 1.x.</li>
 <li>Three extra <code>&lt;script&gt;</code> lines in your <code>index.html</code>.</li>
-<li>The file <code>gameObjects.js</code>.</li>
+<li>The file <code>gameobjects.js</code>.</li>
 </ul>
 <h2 id="setting-up-in-the-p5js-web-editor">Setting up in the p5.js Web Editor</h2>
 <ol>
-<li><strong>Download <code>gameObjects.js</code></strong> from the GameObjects repository.</li>
-<li>In the Web Editor, open the sketch files panel (the <strong>›</strong> arrow on the left), click <strong>+</strong>, choose <strong>Upload file</strong> and upload <code>gameObjects.js</code>.</li>
+<li><strong>Download <code>gameobjects.js</code></strong> from the GameObjects repository.</li>
+<li>In the Web Editor, open the sketch files panel (the <strong>›</strong> arrow on the left), click <strong>+</strong>, choose <strong>Upload file</strong> and upload <code>gameobjects.js</code>.</li>
 <li>Open <code>index.html</code> and make the <code>&lt;head&gt;</code> load the scripts <strong>in this order</strong>:</li>
 </ol>
 <pre><code class="language-html">&lt;!-- 1. p5.js and p5.sound --&gt;
@@ -71,18 +71,18 @@
 &lt;!-- 2. the physics engine --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js&quot;&gt;&lt;/script&gt;
 &lt;!-- 3. GameObjects --&gt;
-&lt;script src=&quot;gameObjects.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;gameobjects.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 <p>Your <code>sketch.js</code> is loaded after these, in the <code>&lt;body&gt;</code>, as usual.</p>
 <blockquote>
-<p><strong>Watch out:</strong> the order matters. p5.js first, then Matter.js, then <code>gameObjects.js</code>. If you see <em>"GameObjects.js needs Matter.js"</em> in the console, the Matter.js line is missing or comes too late.</p>
+<p><strong>Watch out:</strong> the order matters. p5.js first, then Matter.js, then <code>gameobjects.js</code>. If you see <em>"GameObjects.js needs Matter.js"</em> in the console, the Matter.js line is missing or comes too late.</p>
 </blockquote>
 <h2 id="setting-up-on-your-own-computer">Setting up on your own computer</h2>
 <p>Make a folder like this:</p>
 <pre><code class="language-text">my-game/
   index.html
   sketch.js
-  gameObjects.js
+  gameobjects.js
 </code></pre>
 <p>Use the same <code>&lt;script&gt;</code> lines as above. Open the folder with a local web server, for example the <strong>Live Server</strong> extension in VS Code. Opening <code>index.html</code> by double-clicking it won't load images or sounds.</p>
 <h2 id="your-first-sketch">Your first sketch</h2>
@@ -175,6 +175,6 @@ function draw() {
       <a class="next" href="game-objects.html"><small>Next</small>Game Objects</a>
     </nav>
   </main>
-  <script src="js/docs.js?v=3c6589cc"></script>
+  <script src="js/docs.js?v=6aa6de2c"></script>
 </body>
 </html>

@@ -15,12 +15,12 @@ Click the demo above to drop more boxes. That whole sketch is about 20 lines of 
 
 - A p5.js sketch. GameObjects works with **p5.js 2.x** (recommended) and 1.x.
 - Three extra `<script>` lines in your `index.html`.
-- The file `gameObjects.js`.
+- The file `gameobjects.js`.
 
 ## Setting up in the p5.js Web Editor
 
-1. **Download `gameObjects.js`** from the GameObjects repository.
-2. In the Web Editor, open the sketch files panel (the **›** arrow on the left), click **+**, choose **Upload file** and upload `gameObjects.js`.
+1. **Download `gameobjects.js`** from the GameObjects repository.
+2. In the Web Editor, open the sketch files panel (the **›** arrow on the left), click **+**, choose **Upload file** and upload `gameobjects.js`.
 3. Open `index.html` and make the `<head>` load the scripts **in this order**:
 
 ```html
@@ -30,12 +30,12 @@ Click the demo above to drop more boxes. That whole sketch is about 20 lines of 
 <!-- 2. the physics engine -->
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <!-- 3. GameObjects -->
-<script src="gameObjects.js"></script>
+<script src="gameobjects.js"></script>
 ```
 
 Your `sketch.js` is loaded after these, in the `<body>`, as usual.
 
-> **Watch out:** the order matters. p5.js first, then Matter.js, then `gameObjects.js`. If you see *"GameObjects.js needs Matter.js"* in the console, the Matter.js line is missing or comes too late.
+> **Watch out:** the order matters. p5.js first, then Matter.js, then `gameobjects.js`. If you see *"GameObjects.js needs Matter.js"* in the console, the Matter.js line is missing or comes too late.
 
 ## Setting up on your own computer
 
@@ -45,7 +45,7 @@ Make a folder like this:
 my-game/
   index.html
   sketch.js
-  gameObjects.js
+  gameobjects.js
 ```
 
 Use the same `<script>` lines as above. Open the folder with a local web server, for example the **Live Server** extension in VS Code. Opening `index.html` by double-clicking it won't load images or sounds.

@@ -50,7 +50,7 @@ Load the scripts in this order in `index.html`:
 ```html
 <script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
-<script src="gameObjects.js"></script>
+<script src="gameobjects.js"></script>
 <script src="sketch.js"></script>
 ```
 

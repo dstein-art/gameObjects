@@ -35,7 +35,7 @@ def site_version():
     It's added to the end of addresses (?v=...), so when any of these files
     change, browsers fetch the new copies instead of using old ones they saved.
     """
-    files = [ROOT.parent / "gameObjects.js", ROOT / "js" / "docs.js", ROOT / "css" / "docs.css",
+    files = [ROOT.parent / "gameobjects.js", ROOT / "js" / "docs.js", ROOT / "css" / "docs.css",
              ROOT / "demos" / "run.html"]
     files += sorted((ROOT / "demos").glob("*.js")) + sorted((ROOT / "examples").glob("*.js"))
     h = hashlib.md5()

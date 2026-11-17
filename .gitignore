@@ -11,6 +11,9 @@
 
 # ---- docs and examples (the help site; examples live in docs/examples) ----
 !/index.html
+!/favicon.ico
+!/favicon.svg
+!/apple-touch-icon.png
 !/docs/
 !/API.md
 !/README.md

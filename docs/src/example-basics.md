@@ -13,7 +13,7 @@ Click empty space to drop a shape, drag shapes to throw them, press **D** for th
 
 ## Step 1: A floor and a falling box
 
-Every sketch gets a ready-made physics world called `world`, so all we need is a **floor** and something to fall on it.
+All we need is a **floor** and something to fall on it.
 
 The floor is a long, thin box. Making it **static** means gravity and collisions never move it. Notice that `x` and `y` are the **centre** of the object, so the floor's centre is 20 pixels above the bottom of the canvas.
 
@@ -84,7 +84,7 @@ new GameObject(250, 300, 300, 20, { isStatic: true, rotation: 15, color: 120 });
 
 Three improvements:
 
-1. **Walls.** Shapes can roll off the edge of the canvas and fall forever. `world.addWalls()` puts invisible walls around the canvas.
+1. **Walls.** Shapes can roll off the edge of the canvas and fall forever. `world.addWalls()` puts invisible walls around the canvas. (`world` is an object that GameObjects creates automatically. It holds all the objects and the physics.)
 2. **A group.** We put every shape in a `GameGroup`, which lets us count them with `shapes.length`. The group also has **defaults**: every shape made with `shapes.create()` is `draggable` and a little bouncy.
 3. **Dragging.** Draggable objects can be grabbed with the mouse. But a click now does two things: grab a shape *and* make a new one. `world.objectsAt()` lists the objects under the mouse, so we only make a new shape when the click lands on empty space.
 

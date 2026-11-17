@@ -22,8 +22,6 @@ function draw() {
 }
 ```
 
-There's no world to set up: GameObjects gives every sketch a ready-made physics world called `world` (`world.gravityY = 0`, `world.camera.follow(player)`, …).
-
 **📖 Learn:** open [`index.html`](index.html), the home page for the step-by-step guide, five example games with build-it-yourself tutorials, and the API reference. Every demo runs live, and you can edit its code right on the page.
 
 **📚 API reference:** [`API.md`](API.md) lists every class, property and method (also on the site as `docs/api.html`).
@@ -73,9 +71,9 @@ The full reference is in **[API.md](API.md)**. In brief:
 
 | | |
 |---|---|
-| `world` | The ready-made physics world: gravity, camera, walls, joints, pausing, debug view |
 | `new GameObject(x, y, w, h, options)` | One physical thing: a box, circle, polygon or picture that moves and collides |
 | `new GameGroup(defaults)` | A collection of objects to make, loop through and collide as one |
+| `world` | The physics world, created automatically: gravity, camera, walls, joints, pausing, debug view |
 | `onCollide` / `isTouching` / `ignore` | Reacting to touches, on objects and on groups |
 | `world.camera` | Follow, zoom and scroll |
 | `GameObjects.spriteSheet()` | Cut sprite sheets into animation frames |

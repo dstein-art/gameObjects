@@ -13,7 +13,7 @@ The ship points at the mouse. Hold **W** or **↑** to thrust, and click or pres
 
 ## Step 1: A ship that faces the mouse
 
-In space there's no gravity, so we set `world.gravityY = 0`. The ship is a **triangle**, which points right when its rotation is 0. That's the direction it will fly and shoot.
+In space there's no gravity, so we set `world.gravityY = 0` (`world` is an object GameObjects creates automatically, holding the physics settings). The ship is a **triangle**, which points right when its rotation is 0. That's the direction it will fly and shoot.
 
 Every frame, `lookAt()` turns the ship to face the mouse:
 

@@ -13,7 +13,7 @@ Move the mouse to steer the paddle and click to launch the ball. Break all the b
 
 ## Step 1: No gravity, walls and a paddle
 
-Breakout has no gravity: the ball should fly in straight lines. Every sketch has a ready-made `world`, and we turn its gravity off with `world.gravityY = 0`.
+Breakout has no gravity: the ball should fly in straight lines. We turn gravity off with `world.gravityY = 0`. `world` is an object that GameObjects creates automatically, holding all the objects and the physics settings.
 
 The walls make the ball bounce, so they're perfectly bouncy (`bounce: 1`) with no friction. The bottom wall is removed: that's where you lose the ball.
 

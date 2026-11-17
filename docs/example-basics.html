@@ -9,12 +9,15 @@
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
-  <link rel="stylesheet" href="css/docs.css?v=6aa6de2c" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/docs.css?v=b09d8b46" />
 </head>
 <body class="page-example-basics">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html">Learn</a>
@@ -52,7 +55,7 @@
 <p>Click empty space to drop a shape, drag shapes to throw them, press <strong>D</strong> for the debug view and <strong>C</strong> to clear.</p>
 <div class="demo" data-sketch="examples/basics" data-width="800" data-height="500" data-keys="1"></div>
 <h2 id="step-1-a-floor-and-a-falling-box">Step 1: A floor and a falling box</h2>
-<p>Every sketch gets a ready-made physics world called <code>world</code>, so all we need is a <strong>floor</strong> and something to fall on it.</p>
+<p>All we need is a <strong>floor</strong> and something to fall on it.</p>
 <p>The floor is a long, thin box. Making it <strong>static</strong> means gravity and collisions never move it. Notice that <code>x</code> and <code>y</code> are the <strong>centre</strong> of the object, so the floor's centre is 20 pixels above the bottom of the canvas.</p>
 <pre><code class="language-js">ground = new GameObject(width / 2, height - 20, width, 40, {
   isStatic: true,
@@ -100,7 +103,7 @@ new GameObject(mouseX, mouseY, size, size, {
 <h2 id="step-4-a-group-walls-and-dragging">Step 4: A group, walls and dragging</h2>
 <p>Three improvements:</p>
 <ol>
-<li><strong>Walls.</strong> Shapes can roll off the edge of the canvas and fall forever. <code>world.addWalls()</code> puts invisible walls around the canvas.</li>
+<li><strong>Walls.</strong> Shapes can roll off the edge of the canvas and fall forever. <code>world.addWalls()</code> puts invisible walls around the canvas. (<code>world</code> is an object that GameObjects creates automatically. It holds all the objects and the physics.)</li>
 <li><strong>A group.</strong> We put every shape in a <code>GameGroup</code>, which lets us count them with <code>shapes.length</code>. The group also has <strong>defaults</strong>: every shape made with <code>shapes.create()</code> is <code>draggable</code> and a little bouncy.</li>
 <li><strong>Dragging.</strong> Draggable objects can be grabbed with the mouse. But a click now does two things: grab a shape <em>and</em> make a new one. <code>world.objectsAt()</code> lists the objects under the mouse, so we only make a new shape when the click lands on empty space.</li>
 </ol>
@@ -140,6 +143,6 @@ shapes = new GameGroup({ draggable: true, bounce: 0.4 });
       <a class="next" href="example-joints.html"><small>Next</small>Joints Playground</a>
     </nav>
   </main>
-  <script src="js/docs.js?v=6aa6de2c"></script>
+  <script src="js/docs.js?v=b09d8b46"></script>
 </body>
 </html>

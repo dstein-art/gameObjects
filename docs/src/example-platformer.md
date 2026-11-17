@@ -13,7 +13,7 @@ Arrow keys or **A**/**D** to move, **Space**, **W** or **↑** to jump. Click th
 
 ## Step 1: A floor and a player
 
-We start with stronger gravity than normal (`1.5`), which makes jumps feel snappier. The player is a box with three important settings:
+We start with stronger gravity than normal (`world.gravityY = 1.5`), which makes jumps feel snappier. `world` is an object that GameObjects creates automatically, holding the physics settings and all the objects. The player is a box with three important settings:
 
 - `fixedRotation: true` keeps the player upright. Without it, they'd tip over the first time they bump into something.
 - `friction: 0` stops the player sticking to the sides of platforms when pushing against them in mid-air.

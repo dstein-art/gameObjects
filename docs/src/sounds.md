@@ -25,7 +25,7 @@ async function setup() {
   createCanvas(640, 360);
   jumpSound = await loadSound('jump.wav');
   coinSound = await loadSound('coin.mp3');
-  // ... make your world and objects
+  // ... make your objects
 }
 ```
 

@@ -5,7 +5,7 @@ The physics engine makes your game feel solid. Things fall, slide, bounce and pu
 
 ## The world and gravity
 
-Every sketch gets a ready-made physics world called **`world`**. Gravity pulls down by default (`gravityY` is `1`). Change it in `setup()`, or any time during the game:
+Gravity is a setting of **`world`**, the object GameObjects creates automatically to hold your objects and the physics. Gravity pulls down by default (`gravityY` is `1`). Change it in `setup()`, or any time during the game:
 
 ```js
 world.gravityY = 0;        // no gravity: space or top-down games
@@ -14,8 +14,6 @@ world.gravityY = -1;       // upside down!
 world.gravityX = 0.5;      // a sideways wind
 world.setGravity(0, 1);    // both at once
 ```
-
-> **Tip:** you can also make a world with all its settings at once: `world = new GameWorld({ gravityY: 0, debug: true })`. Most games never need to. See the [API reference](api.html#more-than-one-world) for when more than one world is useful.
 
 [[demo: gravity | 320 | keys]]
 

@@ -9,12 +9,15 @@
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
-  <link rel="stylesheet" href="css/docs.css?v=6aa6de2c" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/docs.css?v=b09d8b46" />
 </head>
 <body class="page-example-platformer">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html">Learn</a>
@@ -52,7 +55,7 @@
 <p>Arrow keys or <strong>A</strong>/<strong>D</strong> to move, <strong>Space</strong>, <strong>W</strong> or <strong>↑</strong> to jump. Click the game first so it can hear the keyboard.</p>
 <div class="demo" data-sketch="examples/platformer" data-width="800" data-height="500" data-keys="1"></div>
 <h2 id="step-1-a-floor-and-a-player">Step 1: A floor and a player</h2>
-<p>We start with stronger gravity than normal (<code>1.5</code>), which makes jumps feel snappier. The player is a box with three important settings:</p>
+<p>We start with stronger gravity than normal (<code>world.gravityY = 1.5</code>), which makes jumps feel snappier. <code>world</code> is an object that GameObjects creates automatically, holding the physics settings and all the objects. The player is a box with three important settings:</p>
 <ul>
 <li><code>fixedRotation: true</code> keeps the player upright. Without it, they'd tip over the first time they bump into something.</li>
 <li><code>friction: 0</code> stops the player sticking to the sides of platforms when pushing against them in mid-air.</li>
@@ -163,6 +166,6 @@ for (let p of platforms) {
       <a class="next" href="example-space-shooter.html"><small>Next</small>Space Shooter</a>
     </nav>
   </main>
-  <script src="js/docs.js?v=6aa6de2c"></script>
+  <script src="js/docs.js?v=b09d8b46"></script>
 </body>
 </html>

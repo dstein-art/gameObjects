@@ -9,12 +9,15 @@
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
-  <link rel="stylesheet" href="css/docs.css?v=6aa6de2c" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/docs.css?v=b09d8b46" />
 </head>
 <body class="page-example-joints">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html">Learn</a>
@@ -53,7 +56,7 @@
 <div class="demo" data-sketch="examples/joints" data-width="800" data-height="500"></div>
 <h2 id="step-1-planks-joined-end-to-end">Step 1: Planks joined end to end</h2>
 <p>A rope bridge is just a row of planks, each joined to the next. We make them in a <code>for</code> loop, keeping track of the <code>previous</code> plank so each new plank can be joined to it.</p>
-<p><code>world.connect(a, b, options)</code> joins two objects. By default it joins their centres, but a bridge needs the <strong>ends</strong> joined. <code>offsetA</code> and <code>offsetB</code> move the attach points, measured from each object's centre:</p>
+<p><code>world.connect(a, b, options)</code> joins two objects. (<code>world</code> is an object that GameObjects creates automatically, holding all the objects and the physics.) By default it joins their centres, but a bridge needs the <strong>ends</strong> joined. <code>offsetA</code> and <code>offsetB</code> move the attach points, measured from each object's centre:</p>
 <pre><code class="language-js">world.connect(previous, plank, {
   offsetA: { x: plankW / 2, y: 0 },   // right end of the previous plank
   offsetB: { x: -plankW / 2, y: 0 },  // left end of this plank
@@ -121,6 +124,6 @@ spring.stroke = '#1c7ed6';
       <a class="next" href="example-breakout.html"><small>Next</small>Breakout</a>
     </nav>
   </main>
-  <script src="js/docs.js?v=6aa6de2c"></script>
+  <script src="js/docs.js?v=b09d8b46"></script>
 </body>
 </html>

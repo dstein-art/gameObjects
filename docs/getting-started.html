@@ -9,12 +9,15 @@
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
-  <link rel="stylesheet" href="css/docs.css?v=6aa6de2c" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/docs.css?v=b09d8b46" />
 </head>
 <body class="page-getting-started">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo">●■▲</span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html" class="current" aria-current="page">Learn</a>
@@ -102,7 +105,6 @@ function draw() {
 </code></pre>
 <p>Things to notice:</p>
 <ul>
-<li><strong>There's no world to set up.</strong> GameObjects gives every sketch a ready-made physics world called <strong><code>world</code></strong>, with gravity pulling down. Your objects go into it automatically.</li>
 <li><strong><code>new GameObject(x, y, width, height)</code></strong> makes an object. If you leave out the height, you get a square.</li>
 <li><strong>You don't draw the objects.</strong> GameObjects moves and draws them for you, right after your <code>draw()</code> function runs.</li>
 <li><strong><code>x</code> and <code>y</code> are the centre</strong> of the object, not its top-left corner.</li>
@@ -154,6 +156,7 @@ function draw() {
 <p>Turn on <strong>debug view</strong> to see the shape the physics engine is using for each object:</p>
 <pre><code class="language-js">world.debug = true;
 </code></pre>
+<p><code>world</code> is an object that GameObjects creates automatically (a <code>GameWorld</code>). It holds all your objects and the physics settings.</p>
 <p>Outlines are <strong>green</strong>, turn <strong>red</strong> while touching something, and are <strong>orange</strong> for sensors (more on those in <a href="collisions.html">Collisions and Overlaps</a>). This is very useful when something isn't colliding the way you expect.</p>
 <div class="demo" data-sketch="debug-view" data-width="640" data-height="320" data-keys="1"></div>
 <h2 id="where-next">Where next?</h2>
@@ -175,6 +178,6 @@ function draw() {
       <a class="next" href="game-objects.html"><small>Next</small>Game Objects</a>
     </nav>
   </main>
-  <script src="js/docs.js?v=6aa6de2c"></script>
+  <script src="js/docs.js?v=b09d8b46"></script>
 </body>
 </html>

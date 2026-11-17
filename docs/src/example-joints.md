@@ -15,7 +15,7 @@ Drag anything with the mouse. Try bouncing a box on the bridge, or flinging the 
 
 A rope bridge is just a row of planks, each joined to the next. We make them in a `for` loop, keeping track of the `previous` plank so each new plank can be joined to it.
 
-`world.connect(a, b, options)` joins two objects. By default it joins their centres, but a bridge needs the **ends** joined. `offsetA` and `offsetB` move the attach points, measured from each object's centre:
+`world.connect(a, b, options)` joins two objects. (`world` is an object that GameObjects creates automatically, holding all the objects and the physics.) By default it joins their centres, but a bridge needs the **ends** joined. `offsetA` and `offsetB` move the attach points, measured from each object's centre:
 
 ```js
 world.connect(previous, plank, {

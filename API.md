@@ -10,13 +10,6 @@ Every class, property and method in GameObjects.js. For a step-by-step introduct
 - [Units and conventions](#units-and-conventions)
 - [The frame loop](#the-frame-loop)
 - [drawOnTop()](#drawontop)
-- [GameWorld](#gameworld)
-    - [World options](#world-options)
-    - [World properties](#world-properties)
-    - [World methods](#world-methods)
-    - [More than one world](#more-than-one-world)
-    - [Walls](#walls)
-    - [Joints](#joints)
 - [GameObject](#gameobject)
     - [Creating a game object](#creating-a-game-object)
     - [Shapes](#shapes)
@@ -36,6 +29,13 @@ Every class, property and method in GameObjects.js. For a step-by-step introduct
     - [Looping and searching](#looping-and-searching)
     - [Changing and removing](#changing-and-removing)
     - [Group collisions](#group-collisions)
+- [GameWorld](#gameworld)
+    - [World options](#world-options)
+    - [World properties](#world-properties)
+    - [World methods](#world-methods)
+    - [More than one world](#more-than-one-world)
+    - [Walls](#walls)
+    - [Joints](#joints)
 - [GameCamera](#gamecamera)
 - [GameLink](#gamelink)
 - [The GameObjects namespace](#the-gameobjects-namespace)
@@ -54,7 +54,7 @@ Load the scripts in this order in `index.html`:
 <script src="sketch.js"></script>
 ```
 
-GameObjects adds these globals: **`world`** (a ready-made [GameWorld](#gameworld)), `GameWorld`, `GameObject`, `GameGroup` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
+GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created automatically), `GameWorld`, `GameObject`, `GameGroup` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
 
 ## Units and conventions
 
@@ -77,6 +77,8 @@ Each frame, while a world is current:
 2. **Your `draw()`** runs.
 3. **After `draw()`**, the world's `draw()` draws every link and object (sorted by `depth`) through the camera.
 4. **Then your `drawOnTop()`** runs, if the sketch has one (see [drawOnTop()](#drawontop)).
+
+For the first 5 seconds a sketch runs, a small "created with GameObjects.org" note is shown in the top left, over everything, then it fades away.
 
 If your sketch calls `world.update()` or `world.draw()` itself, the automatic step is skipped for that frame. Calling `update()` yourself switches `autoUpdate` off. Physics runs at a fixed step of 1/60 s per frame, so the game runs in slow motion if the frame rate drops.
 
@@ -103,120 +105,6 @@ function drawOnTop() {
 - **Always runs.** It runs even when `world.paused` is `true` or `world.autoDraw` is `false`.
 - **Instance mode:** set `p.drawOnTop = () => { ... }`.
 - **Spelling:** if `drawOnTop` isn't defined but a function with a similar name is (for example `drawontop` or `postdraw`), a hint is printed in the console once.
-
----
-
-## GameWorld
-
-The physics world: gravity, every object, the camera, joints and drawing.
-
-**You don't need to make one.** GameObjects creates a world when it loads and makes it available as the global **`world`**. Change its settings in `setup()`:
-
-```js
-function setup() {
-  createCanvas(640, 360);
-  world.gravityY = 0;      // a top-down game
-  world.debug = true;
-  new GameObject(100, 100, 40);
-}
-```
-
-You can still make a world yourself, for example to pass options all at once. Making a world makes it the **current** world, the one new objects go into and the one `world` refers to:
-
-```js
-world = new GameWorld({ gravityY: 0, debug: true });
-```
-
-If your sketch declares its own `let world`, your variable is used instead of the built-in one, and the old style keeps working: `let world;` then `world = new GameWorld();` in `setup()`.
-
-### World options
-
-| Option | Default | Description |
-|---|---|---|
-| `gravityX` | `0` | Sideways gravity |
-| `gravityY` | `1` | Downward gravity. Use `0` for space or top-down games. |
-| `debug` | `false` | Draw physics outlines (see `debug` below) |
-| `autoUpdate` | `true` | Update automatically before `draw()` |
-| `autoDraw` | `true` | Draw automatically after `draw()`. Turn it off to call `world.draw()` yourself at a different moment. For text on top, use [`drawOnTop()`](#drawontop) instead. |
-| `timeScale` | `1` | Speed of time: `0.5` is slow motion |
-| `background` | `null` | If set, the world clears the canvas with this colour before drawing |
-
-### World properties
-
-| Property | Type | Description |
-|---|---|---|
-| `gravityX`, `gravityY` | number | Gravity. Read or change any time. |
-| `objects` | GameGroup | Every object in the world |
-| `camera` | GameCamera | The camera (see [GameCamera](#gamecamera)) |
-| `paused` | boolean | `true` freezes physics, animations and lifespans. Objects are still drawn. |
-| `timeScale` | number | `1` is normal, `0.3` slow motion, `2` fast |
-| `debug` | boolean | Draws every physics outline: green normally, red while touching, orange for sensors, with a magenta cross at each centre |
-| `background` | colour or `null` | Clears the canvas before the world draws |
-| `autoUpdate`, `autoDraw` | boolean | Automatic update and draw (see [The frame loop](#the-frame-loop)) |
-| `mouseX`, `mouseY` | number | Mouse position in **world** coordinates (read only). Differs from p5's `mouseX` once the camera moves. |
-| `mouse` | `{ x, y }` | Both of the above at once (read only) |
-| `dragging` | GameObject or `null` | The object being dragged with the mouse (read only) |
-| `links` | array of GameLink | Every joint in the world (read only) |
-| `frame` | number | How many physics steps have run (read only) |
-| `engine` | Matter.Engine | The Matter.js engine, for advanced use |
-
-### World methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `setGravity(x, y)` | world | Set both parts of gravity |
-| `update()` | world | Run one frame: dragging, `update()` on each object, physics, collisions, animations, lifespans, camera. Called automatically. |
-| `draw()` | world | Draw all links and objects through the camera. Called automatically. |
-| `addWalls(options)` | GameGroup | Static walls around the canvas. See [Walls](#walls). |
-| `connect(a, b, options)` | GameLink | Join two objects. See [Joints](#joints). |
-| `pin(obj, x, y, options)` | GameLink | Pin an object to a point in the world. See [Joints](#joints). |
-| `objectsAt(x, y)` | array | Objects under a point (world coordinates) |
-| `raycast(x1, y1, x2, y2, width)` | array | Objects crossed by a line, nearest to `(x1, y1)` first. `width` defaults to `1`. |
-| `clear()` | world | Destroy every object and link. Groups keep their settings and collision rules. |
-| `makeCurrent()` | world | Make this the current world: new objects go into it, it runs automatically, and the global `world` refers to it |
-
-### More than one world
-
-Most games need only one world. Use `world.clear()` to restart or change levels. A second world is useful when you want two separate physics scenes, such as a title screen with its own falling letters while a paused game waits underneath.
-
-- Only the **current** world (the newest, or the one you called `makeCurrent()` on) updates and draws by itself. Run any other world with `otherWorld.update()` and `otherWorld.draw()`.
-- New objects go into the current world, or the world given in their `world` option. Objects can't move between worlds.
-- The limit of 30 groups/objects using `ignore()` is shared by all worlds.
-
-### Walls
-
-`world.addWalls(options)` makes four static walls around the canvas (or around any rectangle you give it) and returns them as a GameGroup. The group also has `top`, `bottom`, `left` and `right` properties.
-
-| Option | Default | Description |
-|---|---|---|
-| `x`, `y`, `width`, `height` | the canvas | The area to wall in |
-| `thickness` | `100` | Wall thickness. The walls sit just outside the area. |
-| `color`, `stroke` | `null` | Invisible by default |
-| `bounce`, `friction` | `0.2`, `0.1` | |
-| `top` | `true` | `false` leaves the top open |
-
-```js
-let walls = world.addWalls();
-walls.bottom.destroy();                                    // an open bottom, like Breakout
-world.addWalls({ x: 0, y: 0, width: 2000, height: 1400 }); // a big level
-```
-
-### Joints
-
-`world.connect(a, b, options)` joins two GameObjects. `world.pin(obj, x, y, options)` joins one object to a fixed point in the world (`x` and `y` default to the object's position). Both return a [GameLink](#gamelink).
-
-| Option | `connect` default | `pin` default | Description |
-|---|---|---|---|
-| `length` | current distance | current distance | Distance to keep |
-| `stiffness` | `0.7` | `1` | `1` = solid rod, `0.01` = very stretchy |
-| `damping` | `0` | `0` | `0` to `1`. Higher values stop the wobbling sooner. |
-| `offsetA`, `offsetB` | `{x: 0, y: 0}` | | `connect`: attach points on `a` and `b`, from their centres |
-| `offset` | | `{x: 0, y: 0}` | `pin`: attach point on the object, from its centre |
-
-```js
-world.connect(a, b, { length: 100, stiffness: 0.02, damping: 0.05 });  // a spring
-world.pin(ball, 320, 40);                                             // a pendulum
-```
 
 ---
 
@@ -489,6 +377,120 @@ The same as for a single object, but they apply to **every** member, including o
 | `unignore(target)` | group | Collide again |
 
 `ignore()` can be used by up to 30 different groups and objects. Ignores add up: an object in a group that ignores walls won't hit walls, even if it's in other groups too.
+
+---
+
+## GameWorld
+
+The physics world: gravity, every object, the camera, joints and drawing.
+
+**You don't need to make one.** GameObjects creates a world when it loads and makes it available as the global **`world`**. Change its settings in `setup()`:
+
+```js
+function setup() {
+  createCanvas(640, 360);
+  world.gravityY = 0;      // a top-down game
+  world.debug = true;
+  new GameObject(100, 100, 40);
+}
+```
+
+You can still make a world yourself, for example to pass options all at once. Making a world makes it the **current** world, the one new objects go into and the one `world` refers to:
+
+```js
+world = new GameWorld({ gravityY: 0, debug: true });
+```
+
+If your sketch declares its own `let world`, your variable is used instead of the built-in one, and the old style keeps working: `let world;` then `world = new GameWorld();` in `setup()`.
+
+### World options
+
+| Option | Default | Description |
+|---|---|---|
+| `gravityX` | `0` | Sideways gravity |
+| `gravityY` | `1` | Downward gravity. Use `0` for space or top-down games. |
+| `debug` | `false` | Draw physics outlines (see `debug` below) |
+| `autoUpdate` | `true` | Update automatically before `draw()` |
+| `autoDraw` | `true` | Draw automatically after `draw()`. Turn it off to call `world.draw()` yourself at a different moment. For text on top, use [`drawOnTop()`](#drawontop) instead. |
+| `timeScale` | `1` | Speed of time: `0.5` is slow motion |
+| `background` | `null` | If set, the world clears the canvas with this colour before drawing |
+
+### World properties
+
+| Property | Type | Description |
+|---|---|---|
+| `gravityX`, `gravityY` | number | Gravity. Read or change any time. |
+| `objects` | GameGroup | Every object in the world |
+| `camera` | GameCamera | The camera (see [GameCamera](#gamecamera)) |
+| `paused` | boolean | `true` freezes physics, animations and lifespans. Objects are still drawn. |
+| `timeScale` | number | `1` is normal, `0.3` slow motion, `2` fast |
+| `debug` | boolean | Draws every physics outline: green normally, red while touching, orange for sensors, with a magenta cross at each centre |
+| `background` | colour or `null` | Clears the canvas before the world draws |
+| `autoUpdate`, `autoDraw` | boolean | Automatic update and draw (see [The frame loop](#the-frame-loop)) |
+| `mouseX`, `mouseY` | number | Mouse position in **world** coordinates (read only). Differs from p5's `mouseX` once the camera moves. |
+| `mouse` | `{ x, y }` | Both of the above at once (read only) |
+| `dragging` | GameObject or `null` | The object being dragged with the mouse (read only) |
+| `links` | array of GameLink | Every joint in the world (read only) |
+| `frame` | number | How many physics steps have run (read only) |
+| `engine` | Matter.Engine | The Matter.js engine, for advanced use |
+
+### World methods
+
+| Method | Returns | Description |
+|---|---|---|
+| `setGravity(x, y)` | world | Set both parts of gravity |
+| `update()` | world | Run one frame: dragging, `update()` on each object, physics, collisions, animations, lifespans, camera. Called automatically. |
+| `draw()` | world | Draw all links and objects through the camera. Called automatically. |
+| `addWalls(options)` | GameGroup | Static walls around the canvas. See [Walls](#walls). |
+| `connect(a, b, options)` | GameLink | Join two objects. See [Joints](#joints). |
+| `pin(obj, x, y, options)` | GameLink | Pin an object to a point in the world. See [Joints](#joints). |
+| `objectsAt(x, y)` | array | Objects under a point (world coordinates) |
+| `raycast(x1, y1, x2, y2, width)` | array | Objects crossed by a line, nearest to `(x1, y1)` first. `width` defaults to `1`. |
+| `clear()` | world | Destroy every object and link. Groups keep their settings and collision rules. |
+| `makeCurrent()` | world | Make this the current world: new objects go into it, it runs automatically, and the global `world` refers to it |
+
+### More than one world
+
+Most games need only one world. Use `world.clear()` to restart or change levels. A second world is useful when you want two separate physics scenes, such as a title screen with its own falling letters while a paused game waits underneath.
+
+- Only the **current** world (the newest, or the one you called `makeCurrent()` on) updates and draws by itself. Run any other world with `otherWorld.update()` and `otherWorld.draw()`.
+- New objects go into the current world, or the world given in their `world` option. Objects can't move between worlds.
+- The limit of 30 groups/objects using `ignore()` is shared by all worlds.
+
+### Walls
+
+`world.addWalls(options)` makes four static walls around the canvas (or around any rectangle you give it) and returns them as a GameGroup. The group also has `top`, `bottom`, `left` and `right` properties.
+
+| Option | Default | Description |
+|---|---|---|
+| `x`, `y`, `width`, `height` | the canvas | The area to wall in |
+| `thickness` | `100` | Wall thickness. The walls sit just outside the area. |
+| `color`, `stroke` | `null` | Invisible by default |
+| `bounce`, `friction` | `0.2`, `0.1` | |
+| `top` | `true` | `false` leaves the top open |
+
+```js
+let walls = world.addWalls();
+walls.bottom.destroy();                                    // an open bottom, like Breakout
+world.addWalls({ x: 0, y: 0, width: 2000, height: 1400 }); // a big level
+```
+
+### Joints
+
+`world.connect(a, b, options)` joins two GameObjects. `world.pin(obj, x, y, options)` joins one object to a fixed point in the world (`x` and `y` default to the object's position). Both return a [GameLink](#gamelink).
+
+| Option | `connect` default | `pin` default | Description |
+|---|---|---|---|
+| `length` | current distance | current distance | Distance to keep |
+| `stiffness` | `0.7` | `1` | `1` = solid rod, `0.01` = very stretchy |
+| `damping` | `0` | `0` | `0` to `1`. Higher values stop the wobbling sooner. |
+| `offsetA`, `offsetB` | `{x: 0, y: 0}` | | `connect`: attach points on `a` and `b`, from their centres |
+| `offset` | | `{x: 0, y: 0}` | `pin`: attach point on the object, from its centre |
+
+```js
+world.connect(a, b, { length: 100, stiffness: 0.02, damping: 0.05 });  // a spring
+world.pin(ball, 320, 40);                                             // a pendulum
+```
 
 ---
 

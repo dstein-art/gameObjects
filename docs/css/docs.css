@@ -33,6 +33,10 @@ body {
 }
 .brand { font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; }
 .logo { color: var(--accent); letter-spacing: 1px; margin-right: 4px; font-size: 15px; }
+/* the same colours as the favicon */
+.logo-circle { color: #e2574c; }
+.logo-square { color: #2f7fd8; }
+.logo-triangle { color: #f5c542; }
 .tagline { color: var(--muted); font-size: 14px; }
 .menu-btn { display: none; border: 0; background: none; font-size: 22px; cursor: pointer; }
 .topnav { margin-left: auto; display: flex; gap: 6px; }

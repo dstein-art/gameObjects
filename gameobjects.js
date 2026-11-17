@@ -1374,6 +1374,34 @@
         this.pop();
       }
     }
+
+    // 3. a small credit in the top left for the first few seconds
+    drawCredit(this);
+  }
+
+  // "created with GameObjects.org", shown for 5 seconds, fading out in the last one
+  let CREDIT_TEXT = 'created with GameObjects.org';
+  let CREDIT_TIME = 5000; // milliseconds
+  let CREDIT_FADE = 1000;
+  function drawCredit(p) {
+    if (p._goCreditStart === undefined) p._goCreditStart = p.millis();
+    let age = p.millis() - p._goCreditStart;
+    if (age >= CREDIT_TIME) return;
+    let alpha = Math.min(1, (CREDIT_TIME - age) / CREDIT_FADE);
+    p.push();
+    p.resetMatrix();
+    p.textFont('sans-serif');
+    p.textSize(12);
+    p.textAlign(p.LEFT, p.CENTER);
+    p.textStyle(p.NORMAL);
+    let w = p.textWidth(CREDIT_TEXT) + 16;
+    p.noStroke();
+    p.rectMode(p.CORNER);
+    p.fill(0, 215 * alpha);
+    p.rect(6, 6, w, 22, 6);
+    p.fill(255, 255 * alpha);
+    p.text(CREDIT_TEXT, 14, 17);
+    p.pop();
   }
 
   // drawOnTop() can be a global function (global mode) or p.drawOnTop (instance mode)

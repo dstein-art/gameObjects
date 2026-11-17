@@ -70,7 +70,6 @@ function draw() {
 
 Things to notice:
 
-- **There's no world to set up.** GameObjects gives every sketch a ready-made physics world called **`world`**, with gravity pulling down. Your objects go into it automatically.
 - **`new GameObject(x, y, width, height)`** makes an object. If you leave out the height, you get a square.
 - **You don't draw the objects.** GameObjects moves and draws them for you, right after your `draw()` function runs.
 - **`x` and `y` are the centre** of the object, not its top-left corner.
@@ -114,6 +113,8 @@ Turn on **debug view** to see the shape the physics engine is using for each obj
 ```js
 world.debug = true;
 ```
+
+`world` is an object that GameObjects creates automatically (a `GameWorld`). It holds all your objects and the physics settings.
 
 Outlines are **green**, turn **red** while touching something, and are **orange** for sensors (more on those in [Collisions and Overlaps](collisions.html)). This is very useful when something isn't colliding the way you expect.
 

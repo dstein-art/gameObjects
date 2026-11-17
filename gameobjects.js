@@ -3,7 +3,7 @@
  * Physics-powered game objects for p5.js, built on Matter.js.
  * by David Stein — MIT License
  *
- * Requires (load these BEFORE gameObjects.js):
+ * Requires (load these BEFORE gameobjects.js):
  *   - p5.js  (1.x or 2.x)
  *   - Matter.js 0.20+  https://brm.io/matter-js/
  *
@@ -23,7 +23,7 @@
 
   if (typeof global.Matter === 'undefined') {
     throw new Error(
-      'GameObjects.js needs Matter.js. Add this line BEFORE gameObjects.js in your index.html:\n' +
+      'GameObjects.js needs Matter.js. Add this line BEFORE gameobjects.js in your index.html:\n' +
         '<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>'
     );
   }
@@ -1425,7 +1425,7 @@
       P5.prototype.registerMethod('post', onPostDraw);
     }
   } else {
-    console.warn('GameObjects.js: load p5.js before gameObjects.js');
+    console.warn('GameObjects.js: load p5.js before gameobjects.js');
   }
 
   // ===========================================================================

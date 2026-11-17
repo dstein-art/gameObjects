@@ -133,7 +133,147 @@
     tocLinks.forEach((a) => a.addEventListener('click', () => document.body.classList.remove('nav-open')));
   }
 
-  // Blockquotes that start with "Tip:" or "Watch out:" get a colour
+  // ---------- API search ----------
+  let searchBox = document.getElementById('api-search');
+  if (searchBox) {
+    let results = document.querySelector('.api-results');
+    let toc = document.querySelector('.api-toc');
+    let clean = (t) => t.replace(/\s+/g, ' ').trim();
+    let entries = [];
+    let h2 = '', h3 = '';
+    let rowCount = 0;
+    document.querySelectorAll('.content h2[id], .content h3[id], .content tbody tr').forEach((el) => {
+      if (el.tagName === 'H2') {
+        h2 = clean(el.textContent);
+        h3 = '';
+        entries.push({ name: h2, where: 'Section', desc: '', el });
+      } else if (el.tagName === 'H3') {
+        h3 = clean(el.textContent);
+        entries.push({ name: h3, where: h2, desc: '', el });
+      } else {
+        let cells = [...el.children];
+        if (!cells.length) return;
+        if (!el.id) el.id = 'api-row-' + ++rowCount;
+        let name = clean(cells[0].textContent);
+        let where = h3 ? h2 + ' › ' + h3 : h2;
+        let swatchNames = [...el.querySelectorAll('.swatch-name')].map((n) => n.textContent);
+        if (swatchNames.length) {
+          // the Color names table: each color is its own result
+          swatchNames.forEach((n) => entries.push({ name: n, where: where + ' › ' + name, desc: 'color name', el }));
+          entries.push({ name, where, desc: swatchNames.join(', '), el });
+          return;
+        }
+        let desc = clean(cells.slice(1).map((c) => c.textContent).join(' · '));
+        entries.push({ name, where, desc, el });
+      }
+    });
+    let plain = (t) => t.toLowerCase().replace(/[()`'"]/g, '');
+
+    let score = (e, words) => {
+      let name = plain(e.name), all = name + ' ' + plain(e.where) + ' ' + plain(e.desc);
+      let s = 0;
+      for (let w of words) {
+        if (!all.includes(w)) return 0;
+        if (name === w) s += 100;
+        else if (name.split(/[\s,.(]+/).some((part) => part.startsWith(w))) s += 50;
+        else if (name.includes(w)) s += 30;
+        else if (plain(e.where).includes(w)) s += 10;
+        else s += 3;
+      }
+      return s;
+    };
+    let escapeHtml = (t) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    let shown = [], selected = 0;
+
+    let render = () => {
+      let q = plain(searchBox.value).trim();
+      if (!q) {
+        results.hidden = true;
+        toc.hidden = false;
+        return;
+      }
+      let words = q.split(/\s+/);
+      shown = entries
+        .map((e) => ({ e, s: score(e, words) }))
+        .filter((r) => r.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .slice(0, 40)
+        .map((r) => r.e);
+      selected = 0;
+      toc.hidden = true;
+      results.hidden = false;
+      if (!shown.length) {
+        results.innerHTML = '<li class="none">Nothing found</li>';
+        return;
+      }
+      results.innerHTML = shown
+        .map(
+          (e, i) =>
+            `<li><a href="#${e.el.id}" data-i="${i}"${i === 0 ? ' class="sel"' : ''}>` +
+            `<code>${escapeHtml(e.name)}</code><span class="where">${escapeHtml(e.where)}</span>` +
+            (e.desc ? `<span class="desc">${escapeHtml(e.desc.length > 90 ? e.desc.slice(0, 88) + '…' : e.desc)}</span>` : '') +
+            `</a></li>`
+        )
+        .join('');
+    };
+    let go = (e) => {
+      if (!e) return;
+      document.body.classList.remove('nav-open');
+      let top = e.el.getBoundingClientRect().top + scrollY - 76;
+      scrollTo({ top, behavior: 'smooth' });
+      history.replaceState(null, '', '#' + e.el.id);
+      e.el.classList.remove('search-hit');
+      void e.el.offsetWidth; // restart the flash
+      e.el.classList.add('search-hit');
+      setTimeout(() => e.el.classList.remove('search-hit'), 2000);
+    };
+    let select = (i) => {
+      let links = [...results.querySelectorAll('a')];
+      if (!links.length) return;
+      selected = (i + links.length) % links.length;
+      links.forEach((a, k) => a.classList.toggle('sel', k === selected));
+      links[selected].scrollIntoView({ block: 'nearest' });
+    };
+    searchBox.addEventListener('input', render);
+    searchBox.addEventListener('keydown', (ev) => {
+      if (ev.key === 'ArrowDown') { ev.preventDefault(); select(selected + 1); }
+      else if (ev.key === 'ArrowUp') { ev.preventDefault(); select(selected - 1); }
+      else if (ev.key === 'Enter') { ev.preventDefault(); go(shown[selected]); }
+      else if (ev.key === 'Escape') { searchBox.value = ''; render(); }
+    });
+    results.addEventListener('click', (ev) => {
+      let a = ev.target.closest('a[data-i]');
+      if (!a) return;
+      ev.preventDefault();
+      go(shown[+a.dataset.i]);
+    });
+    let focusSearch = () => {
+      document.body.classList.add('nav-open'); // on small screens the sidebar is a slide-out menu
+      document.querySelector('.sidebar').scrollTop = 0;
+      searchBox.focus();
+      searchBox.select();
+    };
+    // the magnifying glass in the top bar, and api.html#search from other pages
+    document.querySelectorAll('.search-link').forEach((a) =>
+      a.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        focusSearch();
+      })
+    );
+    if (location.hash === '#search') {
+      history.replaceState(null, '', location.pathname);
+      focusSearch();
+    }
+    // press / anywhere on the page to search
+    addEventListener('keydown', (ev) => {
+      if (ev.key === '/' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName) && !document.activeElement.closest('.CodeMirror')) {
+        ev.preventDefault();
+        focusSearch();
+      }
+    });
+  }
+
+  // Blockquotes that start with "Tip:" or "Watch out:" get a color
   document.querySelectorAll('blockquote').forEach((q) => {
     let t = q.textContent.trim();
     if (/^Tip\b/i.test(t)) q.classList.add('tip');
@@ -389,5 +529,55 @@
       }
     });
     demos.forEach((f) => io.observe(f));
+  }
+
+  // ---------- Color names page: click a swatch to copy its name ----------
+  document.querySelectorAll('.swatch[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      let text = btn.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        let ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      let name = btn.querySelector('.swatch-name');
+      let old = name.textContent;
+      btn.classList.add('copied');
+      name.textContent = 'Copied!';
+      setTimeout(() => {
+        name.textContent = old;
+        btn.classList.remove('copied');
+      }, 1200);
+    });
+  });
+
+  // ---------- Footer: the current list of David Stein sites ----------
+  let footer = document.getElementById('site-footer');
+  if (footer) {
+    let year = footer.querySelector('.footer-year');
+    if (year) year.textContent = new Date().getFullYear();
+    fetch('https://davidstein.us/shared/footer.json')
+      .then((r) => r.json())
+      .then((f) => {
+        let promo = footer.querySelector('.footer-promo');
+        if (!promo || !f || !Array.isArray(f.links)) return;
+        promo.textContent = (f.credit || 'Another David Stein Production') + ': ';
+        f.links.forEach((l, i) => {
+          if (!/^https?:\/\//.test(l.url)) return;
+          if (i) promo.append(' · ');
+          let a = document.createElement('a');
+          a.href = l.url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = l.label;
+          promo.append(a);
+        });
+      })
+      .catch(() => {}); // keep the built-in list if the fetch fails
   }
 })();

@@ -60,27 +60,29 @@ new GameObject(480, 50, {
 
 | Option | What it does | Default |
 |---|---|---|
-| `color` | The inside colour, like p5's `fill()`. Any p5 colour: `'red'`, `'#ff8800'`, `[255, 0, 0]`. `null` for none. | random pastel |
-| `stroke` | The outline colour, like p5's `stroke()`. `null` for no outline. | black |
+| `color` | The inside color, like p5's `fill()`. Any p5 color: `'red'`, `'#ff8800'`, `[255, 0, 0]`. `null` for none. | random pastel |
+| `stroke` | The outline color, like p5's `stroke()`. `null` for no outline. | black |
 | `strokeWeight` | Outline thickness | `1` |
 | `opacity` | `0` (invisible) to `255` (solid) | `255` |
 | `label` | Text drawn in the middle of the object | none |
-| `labelColor`, `labelSize` | Colour and size of the label | black, `14` |
+| `labelColor`, `labelSize` | Color and size of the label | black, `14` |
 | `visible` | `false` hides it (it still collides!) | `true` |
 | `depth` | Drawing order. Higher numbers are drawn on top. | `0` |
 | `flipX`, `flipY` | Mirror the object (handy for images facing left/right) | `false` |
 | `showRotation` | Circles draw a line so you can see them roll | `true` |
 
-You can change the colours at any time. `fill()` works just like p5's `fill()`, so any colour p5 understands works here too:
+You can change the colors at any time. `fill()` works just like p5's `fill()`, so any color p5 understands works here too:
 
 ```js
-player.color = 'gold';       // set the colour directly...
+player.color = 'gold';       // set the color directly...
 player.fill(255, 200, 0);    // ...or the p5 way
 player.fill(0, 0, 255, 128); // with transparency
-player.stroke = 'navy';      // outline colour
+player.stroke = 'navy';      // outline color
 player.stroke = null;        // no outline
 player.strokeWeight = 4;
 ```
+
+There are 148 color names to choose from, like `'tomato'`, `'seagreen'` and `'midnightblue'`. See them all in the [color names](api.html#color-names) list.
 
 [[demo: appearance | 300]]
 
@@ -202,7 +204,7 @@ class Robot extends GameObject {
 | `width`, `height`, `setSize(w, h)` | Size |
 | `rotation` | Angle in degrees |
 | `shape` | `'box'`, `'circle'`, `'triangle'`, `'polygon'` or `'custom'` (read only) |
-| `color`, `fill(...)`, `stroke`, `strokeWeight`, `opacity` | Colours |
+| `color`, `fill(...)`, `stroke`, `strokeWeight`, `opacity` | Colors |
 | `image`, `imageOffsetX`, `imageOffsetY` | Picture |
 | `label`, `labelColor`, `labelSize` | Text on the object |
 | `visible`, `depth`, `flipX`, `flipY` | Drawing |

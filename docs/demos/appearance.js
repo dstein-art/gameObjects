@@ -40,7 +40,7 @@ function draw() {
 function drawOnTop() {
   fill(0);
   noStroke();
-  text('Click a shape to give it a random colour with fill()', 10, 20);
+  text('Click a shape to give it a random color with fill()', 10, 20);
 }
 
 function mousePressed() {

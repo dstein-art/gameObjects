@@ -45,7 +45,7 @@ function setup() {
     friction: 0,
   });
 
-  // 5 rows of 10 bricks, one colour per row
+  // 5 rows of 10 bricks, one color per row
   bricks = new GameGroup({ isStatic: true, bounce: 1, friction: 0, stroke: '#222', strokeWeight: 2 });
   let colors = ['#ff6b6b', '#ffa94d', '#ffd43b', '#69db7c', '#4dabf7'];
   for (let row = 0; row < 5; row++) {

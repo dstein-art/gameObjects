@@ -130,6 +130,8 @@ sparks.ignore(sparks);         // members of a group ignore each other
 ship.unignore(bullets);        // collide again
 ```
 
+> **Tip:** use `ignore()` with groups when you can. Up to 30 objects or groups can have `ignore()` rules at the same time (a destroyed object gives its place back). So `ship.ignore(bullets)` once is better than `bullet.ignore(ship)` for every new bullet.
+
 Ignored objects don't trigger `onCollide` or `isTouching` with each other either.
 
 [[demo: ignore | 320]]

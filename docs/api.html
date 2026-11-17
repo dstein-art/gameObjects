@@ -12,21 +12,26 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=d6305a77" />
+  <link rel="stylesheet" href="css/docs.css?v=e027a379" />
 </head>
 <body class="page-api">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> <span class="brand-name">GameObjects.js</span></a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html">Learn</a>
       <a href="examples.html">Examples</a>
       <a href="api.html" class="current" aria-current="page">API</a>
+      <a href="api.html#search" class="search-link" title="Search the API" aria-label="Search the API"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
     </nav>
   </header>
   <nav class="sidebar">
     <p class="sidebar-title"><span class="ref-icon">{ }</span> API Reference</p>
+    <div class="api-search" id="search">
+      <input id="api-search" type="search" placeholder="Search the API…" autocomplete="off" spellcheck="false" aria-label="Search the API" />
+      <ul class="api-results" hidden></ul>
+    </div>
     <ul class="api-toc">
       <li><a href="#loading-the-library">Loading the library</a></li>
       <li><a href="#units-and-conventions">Units and conventions</a></li>
@@ -39,6 +44,8 @@
       <li><a href="#gamelink">GameLink</a></li>
       <li><a href="#the-gameobjects-namespace">The GameObjects namespace</a></li>
       <li><a href="#collision-targets-and-callbacks">Collision targets and callbacks</a></li>
+      <li><a href="#input-mouse-and-keys">Input: mouse and keys</a><ul class="sub"><li><a href="#keyboard">Keyboard</a></li><li><a href="#key-codes">Key codes</a></li><li><a href="#mouse-p5js">Mouse (p5.js)</a></li><li><a href="#gameobjects-mouse-extras">GameObjects mouse extras</a></li></ul></li>
+      <li><a href="#color-names">Color names</a></li>
     </ul>
     <div class="sidebar-ref">
       <a href="getting-started.html"><span class="ref-icon learn">?</span> Learn GameObjects</a>
@@ -92,8 +99,8 @@
 <td>frames</td>
 </tr>
 <tr>
-<td>Colours</td>
-<td>anything p5's <code>fill()</code> accepts: <code>'red'</code>, <code>'#ff8800'</code>, <code>[255, 0, 0]</code>, <code>[255, 0, 0, 128]</code>, a <code>p5.Color</code>, or <code>null</code> for none</td>
+<td>Colors</td>
+<td>anything p5's <code>fill()</code> accepts: a <a href="#color-names">color name</a> like <code>'red'</code>, <code>'#ff8800'</code>, <code>[255, 0, 0]</code>, <code>[255, 0, 0, 128]</code>, a <code>p5.Color</code>, or <code>null</code> for none</td>
 </tr>
 </tbody>
 </table>
@@ -258,12 +265,12 @@ new GameObject(options)                       // options.x, options.y, options.w
 <tr>
 <td><code>color</code></td>
 <td>random pastel</td>
-<td>The fill colour (what p5's <code>fill()</code> sets), or <code>null</code> for none. Can also be set with the <a href="#appearance"><code>fill()</code></a> method.</td>
+<td>The fill color (what p5's <code>fill()</code> sets), or <code>null</code> for none. Can also be set with the <a href="#appearance"><code>fill()</code></a> method. Any p5 color works, including the 148 <a href="#color-names">color names</a>.</td>
 </tr>
 <tr>
 <td><code>stroke</code></td>
 <td><code>0</code> (black)</td>
-<td>The outline colour (what p5's <code>stroke()</code> sets), or <code>null</code> for none</td>
+<td>The outline color (what p5's <code>stroke()</code> sets), or <code>null</code> for none</td>
 </tr>
 <tr>
 <td><code>strokeWeight</code></td>
@@ -508,7 +515,7 @@ new GameObject(options)                       // options.x, options.y, options.w
 <tbody>
 <tr>
 <td><code>color</code></td>
-<td>The fill colour, or <code>null</code> for none</td>
+<td>The fill color, or <code>null</code> for none</td>
 </tr>
 <tr>
 <td><code>fill(...)</code></td>
@@ -516,7 +523,7 @@ new GameObject(options)                       // options.x, options.y, options.w
 </tr>
 <tr>
 <td><code>stroke</code>, <code>strokeWeight</code></td>
-<td>The outline colour (or <code>null</code> for none) and its thickness</td>
+<td>The outline color (or <code>null</code> for none) and its thickness</td>
 </tr>
 <tr>
 <td><code>opacity</code></td>
@@ -595,7 +602,7 @@ new GameObject(options)                       // options.x, options.y, options.w
 <tr>
 <td><code>ignore(target)</code></td>
 <td>object</td>
-<td>Pass through <code>target</code> without colliding or reporting touches</td>
+<td>Pass through <code>target</code> without colliding or reporting touches. Up to 30 objects or groups can have <code>ignore()</code> rules at the same time; destroying an object or calling <code>unignore()</code> frees its place. Prefer ignoring a whole group.</td>
 </tr>
 <tr>
 <td><code>unignore(target)</code></td>
@@ -982,7 +989,7 @@ let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, col
 <tr>
 <td><code>background</code></td>
 <td><code>null</code></td>
-<td>If set, the world clears the canvas with this colour before drawing</td>
+<td>If set, the world clears the canvas with this color before drawing</td>
 </tr>
 </tbody>
 </table>
@@ -1028,7 +1035,7 @@ let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, col
 </tr>
 <tr>
 <td><code>background</code></td>
-<td>colour or <code>null</code></td>
+<td>color or <code>null</code></td>
 <td>Clears the canvas before the world draws</td>
 </tr>
 <tr>
@@ -1395,11 +1402,254 @@ ball.onCollide((me, other) =&gt; bumpSound.play());         // anything
 <li><strong>Ignored</strong> pairs never trigger them.</li>
 <li><strong>Changing levels:</strong> do it from <code>draw()</code> (for example after checking <code>isTouching()</code>), not from inside a callback.</li>
 </ul>
+<hr />
+<h2 id="input-mouse-and-keys">Input: mouse and keys</h2>
+<p>GameObjects uses p5.js's own keyboard and mouse tools, and adds a few extras for game objects and the camera. This section lists both. For a walkthrough with demos, see <a href="input-camera.html">Player Input and Camera</a>.</p>
+<h3 id="keyboard">Keyboard</h3>
+<p>These come from p5.js.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>keyIsDown(code)</code></td>
+<td><code>true</code> for <strong>every frame</strong> the key is held. Check it in <code>draw()</code> for walking, steering and thrust.</td>
+</tr>
+<tr>
+<td><code>keyPressed()</code></td>
+<td>Write this function and p5 runs it <strong>once</strong> each time a key goes down. Use it for jumping, shooting and pausing.</td>
+</tr>
+<tr>
+<td><code>keyReleased()</code></td>
+<td>Runs once each time a key comes up</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td>The last key pressed, as a character: <code>'a'</code>, <code>'A'</code>, <code>' '</code></td>
+</tr>
+<tr>
+<td><code>keyCode</code></td>
+<td>The last key pressed, as a number</td>
+</tr>
+<tr>
+<td><code>keyIsPressed</code></td>
+<td><code>true</code> while any key is held</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">function draw() {
+  if (keyIsDown(LEFT_ARROW)) player.velocityX = -5;   // held
+  if (keyIsDown(RIGHT_ARROW)) player.velocityX = 5;
+}
+
+function keyPressed() {
+  if (key === ' ') player.velocityY = -12;            // once per press
+  if (keyCode === ESCAPE) world.paused = !world.paused;
+}
+</code></pre>
+<h3 id="key-codes">Key codes</h3>
+<p><code>keyIsDown()</code> and <code>keyCode</code> use numbers. p5 names the common ones:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arrow keys</td>
+<td><code>LEFT_ARROW</code>, <code>RIGHT_ARROW</code>, <code>UP_ARROW</code>, <code>DOWN_ARROW</code></td>
+</tr>
+<tr>
+<td>Enter, Escape, Backspace, Delete, Tab</td>
+<td><code>ENTER</code>, <code>ESCAPE</code>, <code>BACKSPACE</code>, <code>DELETE</code>, <code>TAB</code></td>
+</tr>
+<tr>
+<td>Shift, Control, Option/Alt</td>
+<td><code>SHIFT</code>, <code>CONTROL</code>, <code>OPTION</code> (<code>ALT</code> in p5 2.x)</td>
+</tr>
+<tr>
+<td>Space bar</td>
+<td><code>32</code></td>
+</tr>
+<tr>
+<td>Letters</td>
+<td>The capital letter's code: <code>65</code> (A) to <code>90</code> (Z), or <code>'W'.charCodeAt(0)</code></td>
+</tr>
+<tr>
+<td>Number keys</td>
+<td><code>48</code> (0) to <code>57</code> (9)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mouse-p5js">Mouse (p5.js)</h3>
+<p>These come from p5.js. <code>mouseX</code> and <code>mouseY</code> are <strong>screen</strong> positions: once the camera moves, use the GameObjects versions below.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mouseX</code>, <code>mouseY</code></td>
+<td>The mouse position on the canvas (screen coordinates)</td>
+</tr>
+<tr>
+<td><code>mouseIsPressed</code></td>
+<td><code>true</code> while a mouse button is held</td>
+</tr>
+<tr>
+<td><code>mouseButton</code></td>
+<td>Which button: <code>LEFT</code>, <code>RIGHT</code> or <code>CENTER</code></td>
+</tr>
+<tr>
+<td><code>mousePressed()</code></td>
+<td>Runs once when a button goes down</td>
+</tr>
+<tr>
+<td><code>mouseReleased()</code></td>
+<td>Runs once when a button comes up</td>
+</tr>
+<tr>
+<td><code>mouseClicked()</code></td>
+<td>Runs once after a full click (down and up)</td>
+</tr>
+<tr>
+<td><code>mouseDragged()</code></td>
+<td>Runs every time the mouse moves with a button held</td>
+</tr>
+<tr>
+<td><code>mouseWheel(event)</code></td>
+<td>Runs when the wheel scrolls. <code>event.delta</code> is positive for scrolling down.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gameobjects-mouse-extras">GameObjects mouse extras</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>world.mouseX</code>, <code>world.mouseY</code></td>
+<td>The mouse position in the <strong>game world</strong>, which takes the camera's position and zoom into account</td>
+</tr>
+<tr>
+<td><code>world.mouse</code></td>
+<td>Both at once, as <code>{ x, y }</code></td>
+</tr>
+<tr>
+<td><code>obj.isMouseOver()</code></td>
+<td><code>true</code> if the mouse is over the object's shape</td>
+</tr>
+<tr>
+<td><code>draggable</code></td>
+<td>An object option: when <code>true</code>, the player can grab the object and throw it</td>
+</tr>
+<tr>
+<td><code>obj.isDragging</code></td>
+<td><code>true</code> while the object is being dragged</td>
+</tr>
+<tr>
+<td><code>world.dragging</code></td>
+<td>The object being dragged, or <code>null</code></td>
+</tr>
+<tr>
+<td><code>world.objectsAt(x, y)</code></td>
+<td>Every object under a point. Use <code>world.mouseX</code>, <code>world.mouseY</code> for the mouse.</td>
+</tr>
+<tr>
+<td><code>world.camera.screenToWorld(x, y)</code></td>
+<td>Convert any screen point, like a touch, to a world point</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">function mousePressed() {
+  for (let enemy of enemies) {
+    if (enemy.isMouseOver()) enemy.destroy();     // click to zap
+  }
+}
+
+function draw() {
+  turret.lookAt(world.mouseX, world.mouseY);      // aim at the mouse, even with the camera moving
+}
+</code></pre>
+<hr />
+<h2 id="color-names">Color names</h2>
+<p>Any color p5 understands works for <code>color</code>, <code>stroke</code>, <code>labelColor</code> and <code>fill()</code>: a name, a hex code like <code>'#ff8800'</code>, or numbers like <code>[255, 136, 0]</code>. These are the <strong>148 color names</strong>. Put the name in quotes:</p>
+<pre><code class="language-js">let player = new GameObject(200, 100, 40, 60, { color: 'tomato', stroke: 'navy' });
+player.fill('seagreen');
+</code></pre>
+<p>Names are all lowercase with no spaces. Every name with <code>gray</code> in it can also be spelled <code>grey</code>, so <code>'darkgrey'</code> works too. On the website, click a color to copy its name.</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Names</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reds</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'indianred'" title="Copy 'indianred'"><span class="chip" style="background:indianred"></span><span class="swatch-name">indianred</span></button><button class="swatch" type="button" data-copy="'lightcoral'" title="Copy 'lightcoral'"><span class="chip" style="background:lightcoral"></span><span class="swatch-name">lightcoral</span></button><button class="swatch" type="button" data-copy="'salmon'" title="Copy 'salmon'"><span class="chip" style="background:salmon"></span><span class="swatch-name">salmon</span></button><button class="swatch" type="button" data-copy="'darksalmon'" title="Copy 'darksalmon'"><span class="chip" style="background:darksalmon"></span><span class="swatch-name">darksalmon</span></button><button class="swatch" type="button" data-copy="'crimson'" title="Copy 'crimson'"><span class="chip" style="background:crimson"></span><span class="swatch-name">crimson</span></button><button class="swatch" type="button" data-copy="'red'" title="Copy 'red'"><span class="chip" style="background:red"></span><span class="swatch-name">red</span></button><button class="swatch" type="button" data-copy="'firebrick'" title="Copy 'firebrick'"><span class="chip" style="background:firebrick"></span><span class="swatch-name">firebrick</span></button><button class="swatch" type="button" data-copy="'darkred'" title="Copy 'darkred'"><span class="chip" style="background:darkred"></span><span class="swatch-name">darkred</span></button></div></td>
+</tr>
+<tr>
+<td>Pinks</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'pink'" title="Copy 'pink'"><span class="chip" style="background:pink"></span><span class="swatch-name">pink</span></button><button class="swatch" type="button" data-copy="'lightpink'" title="Copy 'lightpink'"><span class="chip" style="background:lightpink"></span><span class="swatch-name">lightpink</span></button><button class="swatch" type="button" data-copy="'hotpink'" title="Copy 'hotpink'"><span class="chip" style="background:hotpink"></span><span class="swatch-name">hotpink</span></button><button class="swatch" type="button" data-copy="'deeppink'" title="Copy 'deeppink'"><span class="chip" style="background:deeppink"></span><span class="swatch-name">deeppink</span></button><button class="swatch" type="button" data-copy="'mediumvioletred'" title="Copy 'mediumvioletred'"><span class="chip" style="background:mediumvioletred"></span><span class="swatch-name">mediumvioletred</span></button><button class="swatch" type="button" data-copy="'palevioletred'" title="Copy 'palevioletred'"><span class="chip" style="background:palevioletred"></span><span class="swatch-name">palevioletred</span></button></div></td>
+</tr>
+<tr>
+<td>Oranges</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'lightsalmon'" title="Copy 'lightsalmon'"><span class="chip" style="background:lightsalmon"></span><span class="swatch-name">lightsalmon</span></button><button class="swatch" type="button" data-copy="'coral'" title="Copy 'coral'"><span class="chip" style="background:coral"></span><span class="swatch-name">coral</span></button><button class="swatch" type="button" data-copy="'tomato'" title="Copy 'tomato'"><span class="chip" style="background:tomato"></span><span class="swatch-name">tomato</span></button><button class="swatch" type="button" data-copy="'orangered'" title="Copy 'orangered'"><span class="chip" style="background:orangered"></span><span class="swatch-name">orangered</span></button><button class="swatch" type="button" data-copy="'darkorange'" title="Copy 'darkorange'"><span class="chip" style="background:darkorange"></span><span class="swatch-name">darkorange</span></button><button class="swatch" type="button" data-copy="'orange'" title="Copy 'orange'"><span class="chip" style="background:orange"></span><span class="swatch-name">orange</span></button></div></td>
+</tr>
+<tr>
+<td>Yellows</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'gold'" title="Copy 'gold'"><span class="chip" style="background:gold"></span><span class="swatch-name">gold</span></button><button class="swatch" type="button" data-copy="'yellow'" title="Copy 'yellow'"><span class="chip" style="background:yellow"></span><span class="swatch-name">yellow</span></button><button class="swatch" type="button" data-copy="'lightyellow'" title="Copy 'lightyellow'"><span class="chip" style="background:lightyellow"></span><span class="swatch-name">lightyellow</span></button><button class="swatch" type="button" data-copy="'lemonchiffon'" title="Copy 'lemonchiffon'"><span class="chip" style="background:lemonchiffon"></span><span class="swatch-name">lemonchiffon</span></button><button class="swatch" type="button" data-copy="'lightgoldenrodyellow'" title="Copy 'lightgoldenrodyellow'"><span class="chip" style="background:lightgoldenrodyellow"></span><span class="swatch-name">lightgoldenrodyellow</span></button><button class="swatch" type="button" data-copy="'papayawhip'" title="Copy 'papayawhip'"><span class="chip" style="background:papayawhip"></span><span class="swatch-name">papayawhip</span></button><button class="swatch" type="button" data-copy="'moccasin'" title="Copy 'moccasin'"><span class="chip" style="background:moccasin"></span><span class="swatch-name">moccasin</span></button><button class="swatch" type="button" data-copy="'peachpuff'" title="Copy 'peachpuff'"><span class="chip" style="background:peachpuff"></span><span class="swatch-name">peachpuff</span></button><button class="swatch" type="button" data-copy="'palegoldenrod'" title="Copy 'palegoldenrod'"><span class="chip" style="background:palegoldenrod"></span><span class="swatch-name">palegoldenrod</span></button><button class="swatch" type="button" data-copy="'khaki'" title="Copy 'khaki'"><span class="chip" style="background:khaki"></span><span class="swatch-name">khaki</span></button><button class="swatch" type="button" data-copy="'darkkhaki'" title="Copy 'darkkhaki'"><span class="chip" style="background:darkkhaki"></span><span class="swatch-name">darkkhaki</span></button></div></td>
+</tr>
+<tr>
+<td>Greens</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'greenyellow'" title="Copy 'greenyellow'"><span class="chip" style="background:greenyellow"></span><span class="swatch-name">greenyellow</span></button><button class="swatch" type="button" data-copy="'chartreuse'" title="Copy 'chartreuse'"><span class="chip" style="background:chartreuse"></span><span class="swatch-name">chartreuse</span></button><button class="swatch" type="button" data-copy="'lawngreen'" title="Copy 'lawngreen'"><span class="chip" style="background:lawngreen"></span><span class="swatch-name">lawngreen</span></button><button class="swatch" type="button" data-copy="'lime'" title="Copy 'lime'"><span class="chip" style="background:lime"></span><span class="swatch-name">lime</span></button><button class="swatch" type="button" data-copy="'limegreen'" title="Copy 'limegreen'"><span class="chip" style="background:limegreen"></span><span class="swatch-name">limegreen</span></button><button class="swatch" type="button" data-copy="'palegreen'" title="Copy 'palegreen'"><span class="chip" style="background:palegreen"></span><span class="swatch-name">palegreen</span></button><button class="swatch" type="button" data-copy="'lightgreen'" title="Copy 'lightgreen'"><span class="chip" style="background:lightgreen"></span><span class="swatch-name">lightgreen</span></button><button class="swatch" type="button" data-copy="'mediumspringgreen'" title="Copy 'mediumspringgreen'"><span class="chip" style="background:mediumspringgreen"></span><span class="swatch-name">mediumspringgreen</span></button><button class="swatch" type="button" data-copy="'springgreen'" title="Copy 'springgreen'"><span class="chip" style="background:springgreen"></span><span class="swatch-name">springgreen</span></button><button class="swatch" type="button" data-copy="'mediumseagreen'" title="Copy 'mediumseagreen'"><span class="chip" style="background:mediumseagreen"></span><span class="swatch-name">mediumseagreen</span></button><button class="swatch" type="button" data-copy="'seagreen'" title="Copy 'seagreen'"><span class="chip" style="background:seagreen"></span><span class="swatch-name">seagreen</span></button><button class="swatch" type="button" data-copy="'forestgreen'" title="Copy 'forestgreen'"><span class="chip" style="background:forestgreen"></span><span class="swatch-name">forestgreen</span></button><button class="swatch" type="button" data-copy="'green'" title="Copy 'green'"><span class="chip" style="background:green"></span><span class="swatch-name">green</span></button><button class="swatch" type="button" data-copy="'darkgreen'" title="Copy 'darkgreen'"><span class="chip" style="background:darkgreen"></span><span class="swatch-name">darkgreen</span></button><button class="swatch" type="button" data-copy="'yellowgreen'" title="Copy 'yellowgreen'"><span class="chip" style="background:yellowgreen"></span><span class="swatch-name">yellowgreen</span></button><button class="swatch" type="button" data-copy="'olivedrab'" title="Copy 'olivedrab'"><span class="chip" style="background:olivedrab"></span><span class="swatch-name">olivedrab</span></button><button class="swatch" type="button" data-copy="'olive'" title="Copy 'olive'"><span class="chip" style="background:olive"></span><span class="swatch-name">olive</span></button><button class="swatch" type="button" data-copy="'darkolivegreen'" title="Copy 'darkolivegreen'"><span class="chip" style="background:darkolivegreen"></span><span class="swatch-name">darkolivegreen</span></button><button class="swatch" type="button" data-copy="'mediumaquamarine'" title="Copy 'mediumaquamarine'"><span class="chip" style="background:mediumaquamarine"></span><span class="swatch-name">mediumaquamarine</span></button><button class="swatch" type="button" data-copy="'darkseagreen'" title="Copy 'darkseagreen'"><span class="chip" style="background:darkseagreen"></span><span class="swatch-name">darkseagreen</span></button><button class="swatch" type="button" data-copy="'lightseagreen'" title="Copy 'lightseagreen'"><span class="chip" style="background:lightseagreen"></span><span class="swatch-name">lightseagreen</span></button><button class="swatch" type="button" data-copy="'darkcyan'" title="Copy 'darkcyan'"><span class="chip" style="background:darkcyan"></span><span class="swatch-name">darkcyan</span></button><button class="swatch" type="button" data-copy="'teal'" title="Copy 'teal'"><span class="chip" style="background:teal"></span><span class="swatch-name">teal</span></button></div></td>
+</tr>
+<tr>
+<td>Blues and cyans</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'aqua'" title="Copy 'aqua'"><span class="chip" style="background:aqua"></span><span class="swatch-name">aqua</span></button><button class="swatch" type="button" data-copy="'cyan'" title="Copy 'cyan'"><span class="chip" style="background:cyan"></span><span class="swatch-name">cyan</span></button><button class="swatch" type="button" data-copy="'lightcyan'" title="Copy 'lightcyan'"><span class="chip" style="background:lightcyan"></span><span class="swatch-name">lightcyan</span></button><button class="swatch" type="button" data-copy="'paleturquoise'" title="Copy 'paleturquoise'"><span class="chip" style="background:paleturquoise"></span><span class="swatch-name">paleturquoise</span></button><button class="swatch" type="button" data-copy="'aquamarine'" title="Copy 'aquamarine'"><span class="chip" style="background:aquamarine"></span><span class="swatch-name">aquamarine</span></button><button class="swatch" type="button" data-copy="'turquoise'" title="Copy 'turquoise'"><span class="chip" style="background:turquoise"></span><span class="swatch-name">turquoise</span></button><button class="swatch" type="button" data-copy="'mediumturquoise'" title="Copy 'mediumturquoise'"><span class="chip" style="background:mediumturquoise"></span><span class="swatch-name">mediumturquoise</span></button><button class="swatch" type="button" data-copy="'darkturquoise'" title="Copy 'darkturquoise'"><span class="chip" style="background:darkturquoise"></span><span class="swatch-name">darkturquoise</span></button><button class="swatch" type="button" data-copy="'cadetblue'" title="Copy 'cadetblue'"><span class="chip" style="background:cadetblue"></span><span class="swatch-name">cadetblue</span></button><button class="swatch" type="button" data-copy="'steelblue'" title="Copy 'steelblue'"><span class="chip" style="background:steelblue"></span><span class="swatch-name">steelblue</span></button><button class="swatch" type="button" data-copy="'lightsteelblue'" title="Copy 'lightsteelblue'"><span class="chip" style="background:lightsteelblue"></span><span class="swatch-name">lightsteelblue</span></button><button class="swatch" type="button" data-copy="'powderblue'" title="Copy 'powderblue'"><span class="chip" style="background:powderblue"></span><span class="swatch-name">powderblue</span></button><button class="swatch" type="button" data-copy="'lightblue'" title="Copy 'lightblue'"><span class="chip" style="background:lightblue"></span><span class="swatch-name">lightblue</span></button><button class="swatch" type="button" data-copy="'skyblue'" title="Copy 'skyblue'"><span class="chip" style="background:skyblue"></span><span class="swatch-name">skyblue</span></button><button class="swatch" type="button" data-copy="'lightskyblue'" title="Copy 'lightskyblue'"><span class="chip" style="background:lightskyblue"></span><span class="swatch-name">lightskyblue</span></button><button class="swatch" type="button" data-copy="'deepskyblue'" title="Copy 'deepskyblue'"><span class="chip" style="background:deepskyblue"></span><span class="swatch-name">deepskyblue</span></button><button class="swatch" type="button" data-copy="'dodgerblue'" title="Copy 'dodgerblue'"><span class="chip" style="background:dodgerblue"></span><span class="swatch-name">dodgerblue</span></button><button class="swatch" type="button" data-copy="'cornflowerblue'" title="Copy 'cornflowerblue'"><span class="chip" style="background:cornflowerblue"></span><span class="swatch-name">cornflowerblue</span></button><button class="swatch" type="button" data-copy="'royalblue'" title="Copy 'royalblue'"><span class="chip" style="background:royalblue"></span><span class="swatch-name">royalblue</span></button><button class="swatch" type="button" data-copy="'blue'" title="Copy 'blue'"><span class="chip" style="background:blue"></span><span class="swatch-name">blue</span></button><button class="swatch" type="button" data-copy="'mediumblue'" title="Copy 'mediumblue'"><span class="chip" style="background:mediumblue"></span><span class="swatch-name">mediumblue</span></button><button class="swatch" type="button" data-copy="'darkblue'" title="Copy 'darkblue'"><span class="chip" style="background:darkblue"></span><span class="swatch-name">darkblue</span></button><button class="swatch" type="button" data-copy="'navy'" title="Copy 'navy'"><span class="chip" style="background:navy"></span><span class="swatch-name">navy</span></button><button class="swatch" type="button" data-copy="'midnightblue'" title="Copy 'midnightblue'"><span class="chip" style="background:midnightblue"></span><span class="swatch-name">midnightblue</span></button></div></td>
+</tr>
+<tr>
+<td>Purples</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'lavender'" title="Copy 'lavender'"><span class="chip" style="background:lavender"></span><span class="swatch-name">lavender</span></button><button class="swatch" type="button" data-copy="'thistle'" title="Copy 'thistle'"><span class="chip" style="background:thistle"></span><span class="swatch-name">thistle</span></button><button class="swatch" type="button" data-copy="'plum'" title="Copy 'plum'"><span class="chip" style="background:plum"></span><span class="swatch-name">plum</span></button><button class="swatch" type="button" data-copy="'violet'" title="Copy 'violet'"><span class="chip" style="background:violet"></span><span class="swatch-name">violet</span></button><button class="swatch" type="button" data-copy="'orchid'" title="Copy 'orchid'"><span class="chip" style="background:orchid"></span><span class="swatch-name">orchid</span></button><button class="swatch" type="button" data-copy="'fuchsia'" title="Copy 'fuchsia'"><span class="chip" style="background:fuchsia"></span><span class="swatch-name">fuchsia</span></button><button class="swatch" type="button" data-copy="'magenta'" title="Copy 'magenta'"><span class="chip" style="background:magenta"></span><span class="swatch-name">magenta</span></button><button class="swatch" type="button" data-copy="'mediumorchid'" title="Copy 'mediumorchid'"><span class="chip" style="background:mediumorchid"></span><span class="swatch-name">mediumorchid</span></button><button class="swatch" type="button" data-copy="'mediumpurple'" title="Copy 'mediumpurple'"><span class="chip" style="background:mediumpurple"></span><span class="swatch-name">mediumpurple</span></button><button class="swatch" type="button" data-copy="'rebeccapurple'" title="Copy 'rebeccapurple'"><span class="chip" style="background:rebeccapurple"></span><span class="swatch-name">rebeccapurple</span></button><button class="swatch" type="button" data-copy="'blueviolet'" title="Copy 'blueviolet'"><span class="chip" style="background:blueviolet"></span><span class="swatch-name">blueviolet</span></button><button class="swatch" type="button" data-copy="'darkviolet'" title="Copy 'darkviolet'"><span class="chip" style="background:darkviolet"></span><span class="swatch-name">darkviolet</span></button><button class="swatch" type="button" data-copy="'darkorchid'" title="Copy 'darkorchid'"><span class="chip" style="background:darkorchid"></span><span class="swatch-name">darkorchid</span></button><button class="swatch" type="button" data-copy="'darkmagenta'" title="Copy 'darkmagenta'"><span class="chip" style="background:darkmagenta"></span><span class="swatch-name">darkmagenta</span></button><button class="swatch" type="button" data-copy="'purple'" title="Copy 'purple'"><span class="chip" style="background:purple"></span><span class="swatch-name">purple</span></button><button class="swatch" type="button" data-copy="'indigo'" title="Copy 'indigo'"><span class="chip" style="background:indigo"></span><span class="swatch-name">indigo</span></button><button class="swatch" type="button" data-copy="'slateblue'" title="Copy 'slateblue'"><span class="chip" style="background:slateblue"></span><span class="swatch-name">slateblue</span></button><button class="swatch" type="button" data-copy="'darkslateblue'" title="Copy 'darkslateblue'"><span class="chip" style="background:darkslateblue"></span><span class="swatch-name">darkslateblue</span></button><button class="swatch" type="button" data-copy="'mediumslateblue'" title="Copy 'mediumslateblue'"><span class="chip" style="background:mediumslateblue"></span><span class="swatch-name">mediumslateblue</span></button></div></td>
+</tr>
+<tr>
+<td>Browns</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'cornsilk'" title="Copy 'cornsilk'"><span class="chip" style="background:cornsilk"></span><span class="swatch-name">cornsilk</span></button><button class="swatch" type="button" data-copy="'blanchedalmond'" title="Copy 'blanchedalmond'"><span class="chip" style="background:blanchedalmond"></span><span class="swatch-name">blanchedalmond</span></button><button class="swatch" type="button" data-copy="'bisque'" title="Copy 'bisque'"><span class="chip" style="background:bisque"></span><span class="swatch-name">bisque</span></button><button class="swatch" type="button" data-copy="'navajowhite'" title="Copy 'navajowhite'"><span class="chip" style="background:navajowhite"></span><span class="swatch-name">navajowhite</span></button><button class="swatch" type="button" data-copy="'wheat'" title="Copy 'wheat'"><span class="chip" style="background:wheat"></span><span class="swatch-name">wheat</span></button><button class="swatch" type="button" data-copy="'burlywood'" title="Copy 'burlywood'"><span class="chip" style="background:burlywood"></span><span class="swatch-name">burlywood</span></button><button class="swatch" type="button" data-copy="'tan'" title="Copy 'tan'"><span class="chip" style="background:tan"></span><span class="swatch-name">tan</span></button><button class="swatch" type="button" data-copy="'rosybrown'" title="Copy 'rosybrown'"><span class="chip" style="background:rosybrown"></span><span class="swatch-name">rosybrown</span></button><button class="swatch" type="button" data-copy="'sandybrown'" title="Copy 'sandybrown'"><span class="chip" style="background:sandybrown"></span><span class="swatch-name">sandybrown</span></button><button class="swatch" type="button" data-copy="'goldenrod'" title="Copy 'goldenrod'"><span class="chip" style="background:goldenrod"></span><span class="swatch-name">goldenrod</span></button><button class="swatch" type="button" data-copy="'darkgoldenrod'" title="Copy 'darkgoldenrod'"><span class="chip" style="background:darkgoldenrod"></span><span class="swatch-name">darkgoldenrod</span></button><button class="swatch" type="button" data-copy="'peru'" title="Copy 'peru'"><span class="chip" style="background:peru"></span><span class="swatch-name">peru</span></button><button class="swatch" type="button" data-copy="'chocolate'" title="Copy 'chocolate'"><span class="chip" style="background:chocolate"></span><span class="swatch-name">chocolate</span></button><button class="swatch" type="button" data-copy="'saddlebrown'" title="Copy 'saddlebrown'"><span class="chip" style="background:saddlebrown"></span><span class="swatch-name">saddlebrown</span></button><button class="swatch" type="button" data-copy="'sienna'" title="Copy 'sienna'"><span class="chip" style="background:sienna"></span><span class="swatch-name">sienna</span></button><button class="swatch" type="button" data-copy="'brown'" title="Copy 'brown'"><span class="chip" style="background:brown"></span><span class="swatch-name">brown</span></button><button class="swatch" type="button" data-copy="'maroon'" title="Copy 'maroon'"><span class="chip" style="background:maroon"></span><span class="swatch-name">maroon</span></button></div></td>
+</tr>
+<tr>
+<td>Whites</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'white'" title="Copy 'white'"><span class="chip" style="background:white"></span><span class="swatch-name">white</span></button><button class="swatch" type="button" data-copy="'snow'" title="Copy 'snow'"><span class="chip" style="background:snow"></span><span class="swatch-name">snow</span></button><button class="swatch" type="button" data-copy="'honeydew'" title="Copy 'honeydew'"><span class="chip" style="background:honeydew"></span><span class="swatch-name">honeydew</span></button><button class="swatch" type="button" data-copy="'mintcream'" title="Copy 'mintcream'"><span class="chip" style="background:mintcream"></span><span class="swatch-name">mintcream</span></button><button class="swatch" type="button" data-copy="'azure'" title="Copy 'azure'"><span class="chip" style="background:azure"></span><span class="swatch-name">azure</span></button><button class="swatch" type="button" data-copy="'aliceblue'" title="Copy 'aliceblue'"><span class="chip" style="background:aliceblue"></span><span class="swatch-name">aliceblue</span></button><button class="swatch" type="button" data-copy="'ghostwhite'" title="Copy 'ghostwhite'"><span class="chip" style="background:ghostwhite"></span><span class="swatch-name">ghostwhite</span></button><button class="swatch" type="button" data-copy="'whitesmoke'" title="Copy 'whitesmoke'"><span class="chip" style="background:whitesmoke"></span><span class="swatch-name">whitesmoke</span></button><button class="swatch" type="button" data-copy="'seashell'" title="Copy 'seashell'"><span class="chip" style="background:seashell"></span><span class="swatch-name">seashell</span></button><button class="swatch" type="button" data-copy="'beige'" title="Copy 'beige'"><span class="chip" style="background:beige"></span><span class="swatch-name">beige</span></button><button class="swatch" type="button" data-copy="'oldlace'" title="Copy 'oldlace'"><span class="chip" style="background:oldlace"></span><span class="swatch-name">oldlace</span></button><button class="swatch" type="button" data-copy="'floralwhite'" title="Copy 'floralwhite'"><span class="chip" style="background:floralwhite"></span><span class="swatch-name">floralwhite</span></button><button class="swatch" type="button" data-copy="'ivory'" title="Copy 'ivory'"><span class="chip" style="background:ivory"></span><span class="swatch-name">ivory</span></button><button class="swatch" type="button" data-copy="'antiquewhite'" title="Copy 'antiquewhite'"><span class="chip" style="background:antiquewhite"></span><span class="swatch-name">antiquewhite</span></button><button class="swatch" type="button" data-copy="'linen'" title="Copy 'linen'"><span class="chip" style="background:linen"></span><span class="swatch-name">linen</span></button><button class="swatch" type="button" data-copy="'lavenderblush'" title="Copy 'lavenderblush'"><span class="chip" style="background:lavenderblush"></span><span class="swatch-name">lavenderblush</span></button><button class="swatch" type="button" data-copy="'mistyrose'" title="Copy 'mistyrose'"><span class="chip" style="background:mistyrose"></span><span class="swatch-name">mistyrose</span></button></div></td>
+</tr>
+<tr>
+<td>Greys and black</td>
+<td><div class="swatches"><button class="swatch" type="button" data-copy="'gainsboro'" title="Copy 'gainsboro'"><span class="chip" style="background:gainsboro"></span><span class="swatch-name">gainsboro</span></button><button class="swatch" type="button" data-copy="'lightgray'" title="Copy 'lightgray'"><span class="chip" style="background:lightgray"></span><span class="swatch-name">lightgray</span></button><button class="swatch" type="button" data-copy="'silver'" title="Copy 'silver'"><span class="chip" style="background:silver"></span><span class="swatch-name">silver</span></button><button class="swatch" type="button" data-copy="'darkgray'" title="Copy 'darkgray'"><span class="chip" style="background:darkgray"></span><span class="swatch-name">darkgray</span></button><button class="swatch" type="button" data-copy="'gray'" title="Copy 'gray'"><span class="chip" style="background:gray"></span><span class="swatch-name">gray</span></button><button class="swatch" type="button" data-copy="'dimgray'" title="Copy 'dimgray'"><span class="chip" style="background:dimgray"></span><span class="swatch-name">dimgray</span></button><button class="swatch" type="button" data-copy="'lightslategray'" title="Copy 'lightslategray'"><span class="chip" style="background:lightslategray"></span><span class="swatch-name">lightslategray</span></button><button class="swatch" type="button" data-copy="'slategray'" title="Copy 'slategray'"><span class="chip" style="background:slategray"></span><span class="swatch-name">slategray</span></button><button class="swatch" type="button" data-copy="'darkslategray'" title="Copy 'darkslategray'"><span class="chip" style="background:darkslategray"></span><span class="swatch-name">darkslategray</span></button><button class="swatch" type="button" data-copy="'black'" title="Copy 'black'"><span class="chip" style="background:black"></span><span class="swatch-name">black</span></button></div></td>
+</tr>
+</tbody>
+</table>
     <nav class="pager">
       <span></span>
       <span></span>
     </nav>
+    <footer id="site-footer" class="site-footer">
+      <span class="footer-credit">© <span class="footer-year">2026</span> <a href="https://davidstein.us" target="_blank" rel="noopener">David Stein</a> · MIT License · Physics by <a href="https://brm.io/matter-js/" target="_blank" rel="noopener">Matter.js</a></span>
+      <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
+    </footer>
   </main>
-  <script src="js/docs.js?v=d6305a77"></script>
+  <script src="js/docs.js?v=e027a379"></script>
 </body>
 </html>

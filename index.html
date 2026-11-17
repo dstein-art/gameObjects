@@ -7,7 +7,7 @@
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="stylesheet" href="docs/css/docs.css?v=d6305a77" />
+  <link rel="stylesheet" href="docs/css/docs.css?v=e027a379" />
   <style>
     .home { max-width: 1120px; margin: 0 auto; padding: calc(var(--topbar) + 40px) 28px 80px; }
 
@@ -45,8 +45,6 @@
 
     .setup { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
     .setup ol { padding-left: 20px; }
-    footer { margin-top: 70px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
-    footer a { color: var(--muted); }
 
     @media (max-width: 900px) {
       .hero, .setup { grid-template-columns: 1fr; }
@@ -56,12 +54,13 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
+    <a class="brand" href="index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> <span class="brand-name">GameObjects.js</span></a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="docs/getting-started.html">Learn</a>
       <a href="docs/examples.html">Examples</a>
       <a href="docs/api.html">API</a>
+      <a href="docs/api.html#search" class="search-link" title="Search the API" aria-label="Search the API"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
     </nav>
   </header>
 
@@ -125,7 +124,7 @@ function draw() {
       </a>
       <a class="card" href="docs/game-objects.html">
         <img src="docs/assets/thumbs/sec-game-objects.jpg" alt="" loading="lazy" />
-        <div class="body"><span class="num">2</span><h3>Game Objects</h3><p>Shapes, colours, images and your own kinds of object.</p></div>
+        <div class="body"><span class="num">2</span><h3>Game Objects</h3><p>Shapes, colors, images and your own kinds of object.</p></div>
       </a>
       <a class="card" href="docs/movement.html">
         <img src="docs/assets/thumbs/sec-movement.jpg" alt="" loading="lazy" />
@@ -190,13 +189,11 @@ function draw() {
       </a>
     </div>
 
-    <footer>
-      <span>GameObjects.js by David Stein · MIT License</span>
-      <a href="docs/api.html">API reference</a>
-      <a href="https://brm.io/matter-js/">Physics by Matter.js</a>
-      <a href="https://p5js.org">p5.js</a>
+    <footer id="site-footer" class="site-footer">
+      <span class="footer-credit">© <span class="footer-year">2026</span> <a href="https://davidstein.us" target="_blank" rel="noopener">David Stein</a> · MIT License · Physics by <a href="https://brm.io/matter-js/" target="_blank" rel="noopener">Matter.js</a></span>
+      <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="docs/js/docs.js?v=d6305a77"></script>
+  <script src="docs/js/docs.js?v=e027a379"></script>
 </body>
 </html>

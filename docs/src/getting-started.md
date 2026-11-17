@@ -9,7 +9,7 @@ GameObjects is built on [Matter.js](https://brm.io/matter-js/), a popular physic
 
 Click the demo above to drop more boxes. That whole sketch is about 20 lines of code.
 
-> **Tip:** you can **edit the code under every demo** on this site. Change a number or a colour, then press the **▶** button (or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd>) to see what happens. If something goes wrong, the error and its line are shown in red. The other icons under each demo reset the code to the original (**↺**), hide or show the code, copy it, and open the demo in its own tab.
+> **Tip:** you can **edit the code under every demo** on this site. Change a number or a color, then press the **▶** button (or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd>) to see what happens. If something goes wrong, the error and its line are shown in red. The other icons under each demo reset the code to the original (**↺**), hide or show the code, copy it, and open the demo in its own tab.
 
 ## What you need
 
@@ -110,7 +110,7 @@ Outlines are **green**, turn **red** while touching something, and are **orange*
 
 Work through the sections in order, or jump to what you need:
 
-- **[Game Objects](game-objects.html):** shapes, colours, images and your own kinds of object
+- **[Game Objects](game-objects.html):** shapes, colors, images and your own kinds of object
 - **[Movement](movement.html):** making things move
 - **[Groups](groups.html):** handling lots of objects at once
 - **[Physics](physics.html):** gravity, bounce, friction, weight and joints

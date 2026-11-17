@@ -74,6 +74,39 @@ PAGES = [
 # Built from a file outside docs/src
 API_PAGE = ("api", "API Reference", ROOT.parent / "API.md")
 
+# The footer, like the other David Stein sites. This list is a fallback: when the
+# page loads, docs.js fetches the current list from davidstein.us/shared/footer.json.
+FOOTER_SITES = [
+    ["machine.net", "https://machine.net"],
+    ["newsnix.com", "https://newsnix.com"],
+    ["instructor.cc", "https://instructor.cc"],
+    ["p5code.com", "https://p5code.com"],
+    ["p5sound.com", "https://p5sound.com"],
+    ["midiconductor.com", "https://midiconductor.com"],
+    ["procontrols.org", "https://procontrols.org"],
+    ["supermod3l.com", "https://supermod3l.com"],
+    ["indienewyork.com", "https://indienewyork.com"],
+    ["indieboston.com", "https://indieboston.com"],
+    ["iHearYouCanCode.com", "https://iHearYouCanCode.com"],
+    ["davidstein.us", "http://www.davidstein.us/portfolio/"],
+    ["colonelPanix.com", "https://colonelPanix.com"],
+]
+
+
+def footer_html():
+    links = " · ".join(
+        f'<a href="{url}" target="_blank" rel="noopener">{html.escape(label)}</a>' for label, url in FOOTER_SITES
+    )
+    return (
+        '<footer id="site-footer" class="site-footer">\n'
+        '      <span class="footer-credit">© <span class="footer-year">2026</span> '
+        '<a href="https://davidstein.us" target="_blank" rel="noopener">David Stein</a> · MIT License · '
+        'Physics by <a href="https://brm.io/matter-js/" target="_blank" rel="noopener">Matter.js</a></span>\n'
+        f'      <span class="footer-promo">Another David Stein Production: {links}</span>\n'
+        "    </footer>"
+    )
+
+
 LAYOUT = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,12 +126,13 @@ LAYOUT = """<!DOCTYPE html>
 <body class="page-{slug}">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> <span class="brand-name">GameObjects.js</span></a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html"{top_learn}>Learn</a>
       <a href="examples.html"{top_examples}>Examples</a>
       <a href="api.html"{top_api}>API</a>
+      <a href="api.html#search" class="search-link" title="Search the API" aria-label="Search the API"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
     </nav>
   </header>
   <nav class="sidebar">
@@ -114,6 +148,7 @@ LAYOUT = """<!DOCTYPE html>
       {prev}
       {next}
     </nav>
+    {footer}
   </main>
   <script src="js/docs.js?v={version}"></script>
 </body>
@@ -166,6 +201,31 @@ def learn_sidebar(current):
     </div>"""
 
 
+def color_swatches(body):
+    """On the API page, each color name in the Color names table becomes a
+    swatch you can click to copy. (On GitHub the same table is plain text.)"""
+    start = body.find('<h2 id="color-names">')
+    if start == -1:
+        return body
+    end = body.find("<h2", start + 4)
+    end = len(body) if end == -1 else end
+    section = body[start:end]
+
+    def cell(m):
+        names = re.findall(r"<code>([a-z]+)</code>", m.group(1))
+        if not names:
+            return m.group(0)
+        chips = "".join(
+            f'<button class="swatch" type="button" data-copy="\'{n}\'" title="Copy \'{n}\'">'
+            f'<span class="chip" style="background:{n}"></span><span class="swatch-name">{n}</span></button>'
+            for n in names
+        )
+        return f'<td><div class="swatches">{chips}</div></td>'
+
+    section = re.sub(r"<td>((?:<code>[a-z]+</code>\s*)+)</td>", cell, section)
+    return body[:start] + section + body[end:]
+
+
 def api_sidebar(toc_tokens):
     """The API page's own contents: each ## heading, with its ### headings under it."""
     # toc_tokens is [h1 -> [h2 -> [h3]]]
@@ -179,6 +239,10 @@ def api_sidebar(toc_tokens):
         items.append(f'      <li><a href="#{h2["id"]}">{h2["name"]}</a>{sub_html}</li>')
     return (
         '    <p class="sidebar-title"><span class="ref-icon">{ }</span> API Reference</p>\n'
+        '    <div class="api-search" id="search">\n'
+        '      <input id="api-search" type="search" placeholder="Search the API…" autocomplete="off" spellcheck="false" aria-label="Search the API" />\n'
+        '      <ul class="api-results" hidden></ul>\n'
+        '    </div>\n'
         '    <ul class="api-toc">\n' + "\n".join(items) + "\n    </ul>\n"
         '    <div class="sidebar-ref">\n'
         '      <a href="getting-started.html"><span class="ref-icon learn">?</span> Learn GameObjects</a>\n'
@@ -197,6 +261,10 @@ def render(md, slug, title, text, kicker, area, prev=None, nxt=None):
     text = DEMO_RE.sub(demo_html, text)
     md.reset()
     body = md.convert(text)
+    if area == "api":
+        body = color_swatches(body)
+        # API.md links to the Learn pages with full addresses (for GitHub); on the site, keep them local
+        body = body.replace('href="https://www.gameobjects.org/docs/', 'href="')
     on = ' class="current" aria-current="page"'
     sidebar = api_sidebar(md.toc_tokens) if area == "api" else learn_sidebar(slug)
     page = LAYOUT.format(
@@ -209,6 +277,7 @@ def render(md, slug, title, text, kicker, area, prev=None, nxt=None):
         body=body,
         version=VERSION,
         kicker=kicker,
+        footer=footer_html(),
         prev=pager_link("prev", "Previous", prev),
         next=pager_link("next", "Next", nxt),
     )
@@ -236,7 +305,7 @@ def build():
             kicker = f'<a href="{p_slug}.html">{html.escape(p_title)}</a> › {html.escape(title)}'
         else:
             kicker = f"Section {section_num[slug]} of {len(PAGES)}"
-        area = "examples" if slug == "examples" or slug in parent_of else "learn"
+        area = "examples" if slug == "examples" or parent_of.get(slug, (None,))[0] == "examples" else "learn"
         render(
             md, slug, titles[slug], text, kicker, area,
             prev=order[i - 1] if i > 0 else None,
@@ -256,6 +325,7 @@ def build():
     page = home.read_text(encoding="utf-8")
     page = re.sub(r'docs/css/docs\.css(\?v=\w+)?"', f'docs/css/docs.css?v={VERSION}"', page)
     page = re.sub(r'docs/js/docs\.js(\?v=\w+)?"', f'docs/js/docs.js?v={VERSION}"', page)
+    page = re.sub(r"<footer[^>]*>.*?</footer>", lambda m: footer_html(), page, count=1, flags=re.S)
     home.write_text(page, encoding="utf-8")
     print(f"updated index.html (version {VERSION})")
 

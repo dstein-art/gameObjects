@@ -40,6 +40,12 @@ Every class, property and method in GameObjects.js. For a step-by-step introduct
 - [GameLink](#gamelink)
 - [The GameObjects namespace](#the-gameobjects-namespace)
 - [Collision targets and callbacks](#collision-targets-and-callbacks)
+- [Input: mouse and keys](#input-mouse-and-keys)
+    - [Keyboard](#keyboard)
+    - [Key codes](#key-codes)
+    - [Mouse (p5.js)](#mouse-p5js)
+    - [GameObjects mouse extras](#gameobjects-mouse-extras)
+- [Color names](#color-names)
 
 ---
 
@@ -68,7 +74,7 @@ GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created a
 | `rotation`, `direction`, `rotationSpeed` | degrees (0 = pointing right, positive = clockwise) |
 | `angle` | radians |
 | `lifespan`, `frameDelay` | frames |
-| Colours | anything p5's `fill()` accepts: `'red'`, `'#ff8800'`, `[255, 0, 0]`, `[255, 0, 0, 128]`, a `p5.Color`, or `null` for none |
+| Colors | anything p5's `fill()` accepts: a [color name](#color-names) like `'red'`, `'#ff8800'`, `[255, 0, 0]`, `[255, 0, 0, 128]`, a `p5.Color`, or `null` for none |
 
 Rotation is always in degrees, whatever `angleMode()` is set to. Most methods that change an object return the object, so calls can be chained: `ball.setPosition(100, 50).setVelocity(3, 0)`.
 
@@ -159,8 +165,8 @@ Every option can also be read and changed later as a property, unless it's marke
 | `mass` | from density | Total weight |
 | `rotation` | `0` | Starting angle in degrees |
 | `fixedRotation` | `false` | Never spins |
-| `color` | random pastel | The fill colour (what p5's `fill()` sets), or `null` for none. Can also be set with the [`fill()`](#appearance) method. |
-| `stroke` | `0` (black) | The outline colour (what p5's `stroke()` sets), or `null` for none |
+| `color` | random pastel | The fill color (what p5's `fill()` sets), or `null` for none. Can also be set with the [`fill()`](#appearance) method. Any p5 color works, including the 148 [color names](#color-names). |
+| `stroke` | `0` (black) | The outline color (what p5's `stroke()` sets), or `null` for none |
 | `strokeWeight` | `1` | Outline thickness |
 | `opacity` | `255` | `0` to `255` |
 | `image` | `null` | A `p5.Image` or `p5.Graphics`, stretched to the object's size |
@@ -228,9 +234,9 @@ Every option can also be read and changed later as a property, unless it's marke
 
 | Property | Description |
 |---|---|
-| `color` | The fill colour, or `null` for none |
+| `color` | The fill color, or `null` for none |
 | `fill(...)` | Set `color` using the same arguments as p5's `fill()`: `obj.fill('red')`, `obj.fill(255, 0, 0)`, `obj.fill(0, 128)`, `obj.fill(null)`. Returns the object. |
-| `stroke`, `strokeWeight` | The outline colour (or `null` for none) and its thickness |
+| `stroke`, `strokeWeight` | The outline color (or `null` for none) and its thickness |
 | `opacity` | `0` (invisible) to `255` (solid) |
 | `image` | A picture instead of a shape |
 | `imageOffsetX`, `imageOffsetY` | Move the picture inside the object |
@@ -252,7 +258,7 @@ See [Collision targets and callbacks](#collision-targets-and-callbacks) for what
 | `whileTouching(target, fn)` | object | Run `fn(thisObject, other)` every frame while touching |
 | `isTouching(target)` | boolean | Touching right now? |
 | `getTouching()` | array | Everything touching this object |
-| `ignore(target)` | object | Pass through `target` without colliding or reporting touches |
+| `ignore(target)` | object | Pass through `target` without colliding or reporting touches. Up to 30 objects or groups can have `ignore()` rules at the same time; destroying an object or calling `unignore()` frees its place. Prefer ignoring a whole group. |
 | `unignore(target)` | object | Collide with `target` again |
 
 ### Mouse
@@ -416,7 +422,7 @@ If your sketch declares its own `let world`, your variable is used instead of th
 | `autoUpdate` | `true` | Update automatically before `draw()` |
 | `autoDraw` | `true` | Draw automatically after `draw()`. Turn it off to call `world.draw()` yourself at a different moment. For text on top, use [`drawOnTop()`](#drawontop) instead. |
 | `timeScale` | `1` | Speed of time: `0.5` is slow motion |
-| `background` | `null` | If set, the world clears the canvas with this colour before drawing |
+| `background` | `null` | If set, the world clears the canvas with this color before drawing |
 
 ### World properties
 
@@ -428,7 +434,7 @@ If your sketch declares its own `let world`, your variable is used instead of th
 | `paused` | boolean | `true` freezes physics, animations and lifespans. Objects are still drawn. |
 | `timeScale` | number | `1` is normal, `0.3` slow motion, `2` fast |
 | `debug` | boolean | Draws every physics outline: green normally, red while touching, orange for sensors, with a magenta cross at each centre |
-| `background` | colour or `null` | Clears the canvas before the world draws |
+| `background` | color or `null` | Clears the canvas before the world draws |
 | `autoUpdate`, `autoDraw` | boolean | Automatic update and draw (see [The frame loop](#the-frame-loop)) |
 | `mouseX`, `mouseY` | number | Mouse position in **world** coordinates (read only). Differs from p5's `mouseX` once the camera moves. |
 | `mouse` | `{ x, y }` | Both of the above at once (read only) |
@@ -572,3 +578,113 @@ Callbacks are given `(self, other)`. For groups, `self` is the member involved.
 - **Sensors** (`isSensor: true`) trigger callbacks and `isTouching()` but don't collide.
 - **Ignored** pairs never trigger them.
 - **Changing levels:** do it from `draw()` (for example after checking `isTouching()`), not from inside a callback.
+
+---
+
+## Input: mouse and keys
+
+GameObjects uses p5.js's own keyboard and mouse tools, and adds a few extras for game objects and the camera. This section lists both. For a walkthrough with demos, see [Player Input and Camera](https://www.gameobjects.org/docs/input-camera.html).
+
+### Keyboard
+
+These come from p5.js.
+
+| Name | Description |
+|---|---|
+| `keyIsDown(code)` | `true` for **every frame** the key is held. Check it in `draw()` for walking, steering and thrust. |
+| `keyPressed()` | Write this function and p5 runs it **once** each time a key goes down. Use it for jumping, shooting and pausing. |
+| `keyReleased()` | Runs once each time a key comes up |
+| `key` | The last key pressed, as a character: `'a'`, `'A'`, `' '` |
+| `keyCode` | The last key pressed, as a number |
+| `keyIsPressed` | `true` while any key is held |
+
+```js
+function draw() {
+  if (keyIsDown(LEFT_ARROW)) player.velocityX = -5;   // held
+  if (keyIsDown(RIGHT_ARROW)) player.velocityX = 5;
+}
+
+function keyPressed() {
+  if (key === ' ') player.velocityY = -12;            // once per press
+  if (keyCode === ESCAPE) world.paused = !world.paused;
+}
+```
+
+### Key codes
+
+`keyIsDown()` and `keyCode` use numbers. p5 names the common ones:
+
+| Key | Code |
+|---|---|
+| Arrow keys | `LEFT_ARROW`, `RIGHT_ARROW`, `UP_ARROW`, `DOWN_ARROW` |
+| Enter, Escape, Backspace, Delete, Tab | `ENTER`, `ESCAPE`, `BACKSPACE`, `DELETE`, `TAB` |
+| Shift, Control, Option/Alt | `SHIFT`, `CONTROL`, `OPTION` (`ALT` in p5 2.x) |
+| Space bar | `32` |
+| Letters | The capital letter's code: `65` (A) to `90` (Z), or `'W'.charCodeAt(0)` |
+| Number keys | `48` (0) to `57` (9) |
+
+### Mouse (p5.js)
+
+These come from p5.js. `mouseX` and `mouseY` are **screen** positions: once the camera moves, use the GameObjects versions below.
+
+| Name | Description |
+|---|---|
+| `mouseX`, `mouseY` | The mouse position on the canvas (screen coordinates) |
+| `mouseIsPressed` | `true` while a mouse button is held |
+| `mouseButton` | Which button: `LEFT`, `RIGHT` or `CENTER` |
+| `mousePressed()` | Runs once when a button goes down |
+| `mouseReleased()` | Runs once when a button comes up |
+| `mouseClicked()` | Runs once after a full click (down and up) |
+| `mouseDragged()` | Runs every time the mouse moves with a button held |
+| `mouseWheel(event)` | Runs when the wheel scrolls. `event.delta` is positive for scrolling down. |
+
+### GameObjects mouse extras
+
+| Name | Description |
+|---|---|
+| `world.mouseX`, `world.mouseY` | The mouse position in the **game world**, which takes the camera's position and zoom into account |
+| `world.mouse` | Both at once, as `{ x, y }` |
+| `obj.isMouseOver()` | `true` if the mouse is over the object's shape |
+| `draggable` | An object option: when `true`, the player can grab the object and throw it |
+| `obj.isDragging` | `true` while the object is being dragged |
+| `world.dragging` | The object being dragged, or `null` |
+| `world.objectsAt(x, y)` | Every object under a point. Use `world.mouseX`, `world.mouseY` for the mouse. |
+| `world.camera.screenToWorld(x, y)` | Convert any screen point, like a touch, to a world point |
+
+```js
+function mousePressed() {
+  for (let enemy of enemies) {
+    if (enemy.isMouseOver()) enemy.destroy();     // click to zap
+  }
+}
+
+function draw() {
+  turret.lookAt(world.mouseX, world.mouseY);      // aim at the mouse, even with the camera moving
+}
+```
+
+---
+
+## Color names
+
+Any color p5 understands works for `color`, `stroke`, `labelColor` and `fill()`: a name, a hex code like `'#ff8800'`, or numbers like `[255, 136, 0]`. These are the **148 color names**. Put the name in quotes:
+
+```js
+let player = new GameObject(200, 100, 40, 60, { color: 'tomato', stroke: 'navy' });
+player.fill('seagreen');
+```
+
+Names are all lowercase with no spaces. Every name with `gray` in it can also be spelled `grey`, so `'darkgrey'` works too. On the website, click a color to copy its name.
+
+| Family | Names |
+|---|---|
+| Reds | `indianred` `lightcoral` `salmon` `darksalmon` `crimson` `red` `firebrick` `darkred` |
+| Pinks | `pink` `lightpink` `hotpink` `deeppink` `mediumvioletred` `palevioletred` |
+| Oranges | `lightsalmon` `coral` `tomato` `orangered` `darkorange` `orange` |
+| Yellows | `gold` `yellow` `lightyellow` `lemonchiffon` `lightgoldenrodyellow` `papayawhip` `moccasin` `peachpuff` `palegoldenrod` `khaki` `darkkhaki` |
+| Greens | `greenyellow` `chartreuse` `lawngreen` `lime` `limegreen` `palegreen` `lightgreen` `mediumspringgreen` `springgreen` `mediumseagreen` `seagreen` `forestgreen` `green` `darkgreen` `yellowgreen` `olivedrab` `olive` `darkolivegreen` `mediumaquamarine` `darkseagreen` `lightseagreen` `darkcyan` `teal` |
+| Blues and cyans | `aqua` `cyan` `lightcyan` `paleturquoise` `aquamarine` `turquoise` `mediumturquoise` `darkturquoise` `cadetblue` `steelblue` `lightsteelblue` `powderblue` `lightblue` `skyblue` `lightskyblue` `deepskyblue` `dodgerblue` `cornflowerblue` `royalblue` `blue` `mediumblue` `darkblue` `navy` `midnightblue` |
+| Purples | `lavender` `thistle` `plum` `violet` `orchid` `fuchsia` `magenta` `mediumorchid` `mediumpurple` `rebeccapurple` `blueviolet` `darkviolet` `darkorchid` `darkmagenta` `purple` `indigo` `slateblue` `darkslateblue` `mediumslateblue` |
+| Browns | `cornsilk` `blanchedalmond` `bisque` `navajowhite` `wheat` `burlywood` `tan` `rosybrown` `sandybrown` `goldenrod` `darkgoldenrod` `peru` `chocolate` `saddlebrown` `sienna` `brown` `maroon` |
+| Whites | `white` `snow` `honeydew` `mintcream` `azure` `aliceblue` `ghostwhite` `whitesmoke` `seashell` `beige` `oldlace` `floralwhite` `ivory` `antiquewhite` `linen` `lavenderblush` `mistyrose` |
+| Greys and black | `gainsboro` `lightgray` `silver` `darkgray` `gray` `dimgray` `lightslategray` `slategray` `darkslategray` `black` |

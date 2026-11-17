@@ -12,17 +12,18 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=d6305a77" />
+  <link rel="stylesheet" href="css/docs.css?v=e027a379" />
 </head>
 <body class="page-example-breakout">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> <span class="brand-name">GameObjects.js</span></a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html">Learn</a>
       <a href="examples.html" class="current" aria-current="page">Examples</a>
       <a href="api.html">API</a>
+      <a href="api.html#search" class="search-link" title="Search the API" aria-label="Search the API"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
     </nav>
   </header>
   <nav class="sidebar">
@@ -125,7 +126,7 @@ walls.bottom.destroy();
 <p>A <code>launched</code> variable tracks whether the ball is in play. When the ball falls off the bottom, it goes back to <code>false</code>, and the ball returns to the paddle.</p>
 <div class="demo" data-sketch="examples/breakout-step-3" data-width="600" data-height="600"></div>
 <h2 id="step-4-a-wall-of-bricks">Step 4: A wall of bricks</h2>
-<p>Two nested loops make 5 rows of 10 bricks, with one colour per row. The bricks share their settings through the group's defaults.</p>
+<p>Two nested loops make 5 rows of 10 bricks, with one color per row. The bricks share their settings through the group's defaults.</p>
 <pre><code class="language-js">bricks = new GameGroup({ isStatic: true, bounce: 1, friction: 0, stroke: '#222', strokeWeight: 2 });
 let colors = ['#ff6b6b', '#ffa94d', '#ffd43b', '#69db7c', '#4dabf7'];
 for (let row = 0; row &lt; 5; row++) {
@@ -176,7 +177,7 @@ function drawOnTop() {
 <div class="demo" data-sketch="examples/breakout" data-width="600" data-height="600"></div>
 <h2 id="make-it-your-own">Make it your own</h2>
 <ul>
-<li><strong>Tough bricks:</strong> give the top row <code>data.hits = 2</code>, and only destroy a brick when its hits run out (change its colour each hit).</li>
+<li><strong>Tough bricks:</strong> give the top row <code>data.hits = 2</code>, and only destroy a brick when its hits run out (change its color each hit).</li>
 <li><strong>Power-ups:</strong> sometimes drop a sensor from a destroyed brick. Catching it with the paddle makes the paddle wider with <code>paddle.width = 150</code>.</li>
 <li><strong>Sound:</strong> a blip for the paddle and a crunch for bricks (see <a href="sounds.html">Sounds</a>).</li>
 <li><strong>Restart:</strong> press <strong>R</strong> to rebuild the bricks and reset lives, instead of reloading (see <a href="levels-score.html#starting-again">Levels and Score</a>).</li>
@@ -185,7 +186,11 @@ function drawOnTop() {
       <a class="prev" href="example-joints.html"><small>Previous</small>Joints Playground</a>
       <a class="next" href="example-platformer.html"><small>Next</small>Platformer</a>
     </nav>
+    <footer id="site-footer" class="site-footer">
+      <span class="footer-credit">© <span class="footer-year">2026</span> <a href="https://davidstein.us" target="_blank" rel="noopener">David Stein</a> · MIT License · Physics by <a href="https://brm.io/matter-js/" target="_blank" rel="noopener">Matter.js</a></span>
+      <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
+    </footer>
   </main>
-  <script src="js/docs.js?v=d6305a77"></script>
+  <script src="js/docs.js?v=e027a379"></script>
 </body>
 </html>

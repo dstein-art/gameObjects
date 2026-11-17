@@ -47,7 +47,7 @@ world.pin(planks.last, planks.last.x + plankW / 2, bridgeY, { offset: { x: plank
 
 ## Step 3: A pendulum
 
-A pendulum is a ball pinned to a point above it. The pin keeps the distance the same, so the ball swings in an arc. `pin()` returns a **link**, and links are drawn as lines, so we give this one a grey colour.
+A pendulum is a ball pinned to a point above it. The pin keeps the distance the same, so the ball swings in an arc. `pin()` returns a **link**, and links are drawn as lines, so we give this one a grey color.
 
 ```js
 let bob = new GameObject(650, 260, 50, { shape: 'circle', color: '#f06595', draggable: true });

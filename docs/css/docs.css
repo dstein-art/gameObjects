@@ -33,7 +33,7 @@ body {
 }
 .brand { font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; }
 .logo { color: var(--accent); letter-spacing: 1px; margin-right: 4px; font-size: 15px; }
-/* the same colours as the favicon */
+/* the same colors as the favicon */
 .logo-circle { color: #e2574c; }
 .logo-square { color: #2f7fd8; }
 .logo-triangle { color: #f5c542; }
@@ -54,6 +54,7 @@ body {
 }
 .sidebar ol { list-style: none; counter-reset: sec; margin: 0; padding: 0; }
 .sidebar li { counter-increment: sec; }
+.sidebar .sub li { counter-increment: none; }
 .sidebar li a {
   display: flex; gap: 10px; padding: 8px 10px; border-radius: 8px;
   color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.35;
@@ -120,7 +121,7 @@ pre {
 }
 pre code { background: none; padding: 0; font-size: 14px; color: inherit; }
 
-/* syntax colours */
+/* syntax colors */
 .t-com { color: #7f8aa3; font-style: italic; }
 .t-str { color: #a6e3a1; }
 .t-num { color: #fab387; }
@@ -245,6 +246,12 @@ kbd {
   .menu-btn { display: block; }
   .tagline { display: none; }
   .topnav a { padding: 6px 8px; font-size: 14px; }
+}
+@media (max-width: 560px) {
+  /* phones: keep the colored logo, drop the wordmark so the nav and search fit */
+  .brand-name { display: none; }
+  .topnav { gap: 2px; }
+  .topnav a { padding: 6px 7px; }
   .sidebar { transform: translateX(-100%); transition: transform .2s; z-index: 15; box-shadow: 0 0 30px rgba(0,0,0,.15); }
   body.nav-open .sidebar { transform: none; }
   .content { margin-left: 0; padding: calc(var(--topbar) + 24px) 20px 60px; }
@@ -284,3 +291,45 @@ kbd {
 .sidebar .api-toc li a::before { display: none; }
 .sidebar .api-toc > li > a { display: block; }
 .page-api hr { display: none; }
+
+/* Color names page */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px; margin: 14px 0 28px; }
+.swatch { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 6px; background: #fff; border: 1px solid #e3e5ea; border-radius: 10px; cursor: pointer; font: inherit; text-align: left; transition: transform .1s, box-shadow .1s; }
+.swatch:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.swatch:focus-visible { outline: 2px solid #2f7fd8; outline-offset: 2px; }
+.swatch .chip { display: block; height: 46px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.swatch-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #333; padding: 0 2px 2px; white-space: nowrap; }
+.swatch.copied .swatch-name { color: #2f7fd8; font-weight: 600; }
+
+/* Search: the magnifying glass in the top bar */
+.topnav a.search-link { display: inline-flex; align-items: center; padding-left: 10px; padding-right: 10px; }
+
+/* Search box and results on the API page */
+.api-search { position: sticky; top: -20px; z-index: 2; margin: -4px -4px 12px; padding: 4px; background: var(--soft); }
+.api-search input { width: 100%; box-sizing: border-box; padding: 9px 12px; font: inherit; font-size: 14px; border: 1px solid #d5d8df; border-radius: 8px; background: #fff; outline: none; }
+.api-search input:focus { border-color: #2f7fd8; box-shadow: 0 0 0 3px rgba(47,127,216,.15); }
+.api-results { list-style: none; margin: 8px 0 0; padding: 0; }
+.api-results li { margin: 0; counter-increment: none; }
+.sidebar .api-results li { counter-increment: none; }
+.sidebar .api-results li a::before { display: none; content: none; }
+.sidebar .api-results li a { display: block; padding: 7px 9px; font-size: 14px; border-radius: 7px; color: inherit; text-decoration: none; line-height: 1.35; }
+.sidebar .api-results li a:hover, .sidebar .api-results li a.sel { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.api-results code { font-size: 13px; background: none; padding: 0; color: #1f2330; font-weight: 600; }
+.api-results .where { display: block; font-size: 11.5px; color: #7a8091; margin-top: 1px; }
+.api-results .desc { display: block; font-size: 12px; color: #555b69; margin-top: 2px; }
+.api-results .none { padding: 8px 9px; color: #7a8091; font-size: 13px; }
+.search-hit, .search-hit td { animation: search-flash 2s ease-out; }
+@keyframes search-flash { 0%, 40% { background: #fff4c2; } 100% { background: transparent; } }
+
+/* Color names table on the API page: small swatches in each row */
+.page-api td .swatches { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin: 2px 0; }
+.page-api td .swatch { flex-direction: row; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 7px; }
+.page-api td .swatch .chip { width: 22px; height: 22px; flex: none; border-radius: 5px; }
+.page-api td .swatch-name { padding: 0; }
+.page-api table:has(.swatches) td:first-child { width: 130px; white-space: nowrap; }
+
+/* Footer, like the other David Stein sites */
+.site-footer { margin-top: 64px; border-top: 1px solid var(--line); padding: 26px 0 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--muted); }
+.site-footer a { color: var(--accent); text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+.footer-promo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }

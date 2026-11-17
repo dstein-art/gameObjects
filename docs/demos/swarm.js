@@ -32,7 +32,7 @@ function drawOnTop() {
   fill(0);
   noStroke();
   text('Bugs: ' + bugs.length, 10, 20);
-  text('Move the mouse · click to add a bug · C = new colour · X = destroy one at random', 10, 38);
+  text('Move the mouse · click to add a bug · C = new color · X = destroy one at random', 10, 38);
 }
 
 function mousePressed() {

@@ -109,7 +109,7 @@ A `launched` variable tracks whether the ball is in play. When the ball falls of
 
 ## Step 4: A wall of bricks
 
-Two nested loops make 5 rows of 10 bricks, with one colour per row. The bricks share their settings through the group's defaults.
+Two nested loops make 5 rows of 10 bricks, with one color per row. The bricks share their settings through the group's defaults.
 
 ```js
 bricks = new GameGroup({ isStatic: true, bounce: 1, friction: 0, stroke: '#222', strokeWeight: 2 });
@@ -178,7 +178,7 @@ function drawOnTop() {
 
 ## Make it your own
 
-- **Tough bricks:** give the top row `data.hits = 2`, and only destroy a brick when its hits run out (change its colour each hit).
+- **Tough bricks:** give the top row `data.hits = 2`, and only destroy a brick when its hits run out (change its color each hit).
 - **Power-ups:** sometimes drop a sensor from a destroyed brick. Catching it with the paddle makes the paddle wider with `paddle.width = 150`.
 - **Sound:** a blip for the paddle and a crunch for bricks (see [Sounds](sounds.html)).
 - **Restart:** press **R** to rebuild the bricks and reset lives, instead of reloading (see [Levels and Score](levels-score.html#starting-again)).

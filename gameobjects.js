@@ -59,7 +59,7 @@
     return v !== null && typeof v === 'object' && !Array.isArray(v) && !(v instanceof GameObject);
   }
 
-  // Apply a colour value (string, number, array or p5.Color) with fill()/stroke()
+  // Apply a color value (string, number, array or p5.Color) with fill()/stroke()
   function applyColor(p, fnName, value) {
     if (value === null || value === undefined || value === false) {
       fnName === 'fill' ? p.noFill() : p.noStroke();
@@ -74,13 +74,28 @@
   // Collision-filter bits (used by .ignore())
   // Bit 0 is the default category everyone belongs to. Each group/object that
   // takes part in an ignore() rule gets its own bit, allocated on demand.
+  // When it has no ignore() rules left (unignore(), or the object is destroyed)
+  // the bit goes back on a free list, so only 30 can be in use AT THE SAME TIME.
   // ---------------------------------------------------------------------------
   let nextBit = 1;
+  let freeBits = [];
   function allocBit() {
+    if (freeBits.length) return freeBits.pop();
     if (nextBit > 30) {
-      throw new Error('GameObjects: too many ignore() rules — up to 30 groups/objects can use ignore().');
+      throw new Error(
+        'GameObjects: too many ignore() rules at once. Up to 30 objects or groups can use ignore() ' +
+          'at the same time. Tip: put the objects in a GameGroup and call ignore() on the group, ' +
+          'for example ship.ignore(bullets) instead of bullet.ignore(ship) for every bullet.'
+      );
     }
     return 1 << nextBit++;
+  }
+  function releaseBit(entity) {
+    // free the bit once nothing ignores this object/group and it ignores nothing
+    if (entity._bit && entity._ignores.size === 0) {
+      freeBits.push(entity._bit);
+      entity._bit = 0;
+    }
   }
 
   // ===========================================================================
@@ -177,8 +192,8 @@
 
       // ---- appearance ----
       // (null means "none", so only fall back to a default when the option is missing)
-      this.color = pick(options, 'color', randomPastel()); // the fill colour
-      this.stroke = pick(options, 'stroke', 0); // the outline colour
+      this.color = pick(options, 'color', randomPastel()); // the fill color
+      this.stroke = pick(options, 'stroke', 0); // the outline color
       this.strokeWeight = options.strokeWeight ?? 1;
       this.image = options.image || null;
       this.imageOffsetX = options.imageOffsetX || 0;
@@ -398,7 +413,7 @@
     }
 
     /**
-     * Set the fill colour, with the same arguments as p5's fill():
+     * Set the fill color, with the same arguments as p5's fill():
      *   obj.fill('red')   obj.fill(255, 0, 0)   obj.fill(0, 128)   obj.fill(null)
      * The same as setting obj.color.
      */
@@ -655,6 +670,8 @@
   function unlinkIgnore(a, b) {
     a._ignores.delete(b);
     b._ignores.delete(a);
+    releaseBit(a);
+    releaseBit(b);
     membersOf(a).forEach(refreshFilter);
     membersOf(b).forEach(refreshFilter);
   }

@@ -12,17 +12,18 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=d6305a77" />
+  <link rel="stylesheet" href="css/docs.css?v=e027a379" />
 </head>
 <body class="page-game-objects">
   <header class="topbar">
     <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
-    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> GameObjects.js</a>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> <span class="brand-name">GameObjects.js</span></a>
     <span class="tagline">physics game objects for p5.js</span>
     <nav class="topnav">
       <a href="getting-started.html" class="current" aria-current="page">Learn</a>
       <a href="examples.html">Examples</a>
       <a href="api.html">API</a>
+      <a href="api.html#search" class="search-link" title="Search the API" aria-label="Search the API"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
     </nav>
   </header>
   <nav class="sidebar">
@@ -126,12 +127,12 @@ new GameObject(480, 50, {
 <tbody>
 <tr>
 <td><code>color</code></td>
-<td>The inside colour, like p5's <code>fill()</code>. Any p5 colour: <code>'red'</code>, <code>'#ff8800'</code>, <code>[255, 0, 0]</code>. <code>null</code> for none.</td>
+<td>The inside color, like p5's <code>fill()</code>. Any p5 color: <code>'red'</code>, <code>'#ff8800'</code>, <code>[255, 0, 0]</code>. <code>null</code> for none.</td>
 <td>random pastel</td>
 </tr>
 <tr>
 <td><code>stroke</code></td>
-<td>The outline colour, like p5's <code>stroke()</code>. <code>null</code> for no outline.</td>
+<td>The outline color, like p5's <code>stroke()</code>. <code>null</code> for no outline.</td>
 <td>black</td>
 </tr>
 <tr>
@@ -151,7 +152,7 @@ new GameObject(480, 50, {
 </tr>
 <tr>
 <td><code>labelColor</code>, <code>labelSize</code></td>
-<td>Colour and size of the label</td>
+<td>Color and size of the label</td>
 <td>black, <code>14</code></td>
 </tr>
 <tr>
@@ -176,14 +177,15 @@ new GameObject(480, 50, {
 </tr>
 </tbody>
 </table>
-<p>You can change the colours at any time. <code>fill()</code> works just like p5's <code>fill()</code>, so any colour p5 understands works here too:</p>
-<pre><code class="language-js">player.color = 'gold';       // set the colour directly...
+<p>You can change the colors at any time. <code>fill()</code> works just like p5's <code>fill()</code>, so any color p5 understands works here too:</p>
+<pre><code class="language-js">player.color = 'gold';       // set the color directly...
 player.fill(255, 200, 0);    // ...or the p5 way
 player.fill(0, 0, 255, 128); // with transparency
-player.stroke = 'navy';      // outline colour
+player.stroke = 'navy';      // outline color
 player.stroke = null;        // no outline
 player.strokeWeight = 4;
 </code></pre>
+<p>There are 148 color names to choose from, like <code>'tomato'</code>, <code>'seagreen'</code> and <code>'midnightblue'</code>. See them all in the <a href="api.html#color-names">color names</a> list.</p>
 <div class="demo" data-sketch="appearance" data-width="640" data-height="300"></div>
 <h2 id="images">Images</h2>
 <p>To make an object look like a picture, load an image and pass it as the <code>image</code> option. In p5.js 2.x, load images in an <strong><code>async setup()</code></strong> with <strong><code>await</code></strong>:</p>
@@ -297,7 +299,7 @@ if (rock.isOffscreen(100)) rock.destroy();
 </tr>
 <tr>
 <td><code>color</code>, <code>fill(...)</code>, <code>stroke</code>, <code>strokeWeight</code>, <code>opacity</code></td>
-<td>Colours</td>
+<td>Colors</td>
 </tr>
 <tr>
 <td><code>image</code>, <code>imageOffsetX</code>, <code>imageOffsetY</code></td>
@@ -329,7 +331,11 @@ if (rock.isOffscreen(100)) rock.destroy();
       <a class="prev" href="getting-started.html"><small>Previous</small>Getting Started</a>
       <a class="next" href="movement.html"><small>Next</small>Movement</a>
     </nav>
+    <footer id="site-footer" class="site-footer">
+      <span class="footer-credit">© <span class="footer-year">2026</span> <a href="https://davidstein.us" target="_blank" rel="noopener">David Stein</a> · MIT License · Physics by <a href="https://brm.io/matter-js/" target="_blank" rel="noopener">Matter.js</a></span>
+      <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
+    </footer>
   </main>
-  <script src="js/docs.js?v=d6305a77"></script>
+  <script src="js/docs.js?v=e027a379"></script>
 </body>
 </html>

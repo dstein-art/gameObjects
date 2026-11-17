@@ -300,7 +300,7 @@
       Body.setAngle(this.body, a);
       this._w = w;
       this._h = h;
-      this._inertia = this.body.inertia;
+      if (isFinite(this.body.inertia)) this._inertia = this.body.inertia;
       if (this._fixedRotation) Body.setInertia(this.body, Infinity);
       return this;
     }
@@ -385,9 +385,23 @@
     get airFriction() { return this.body.frictionAir; }
     set airFriction(v) { this.body.frictionAir = v; }
     get density() { return this.body.density; }
-    set density(v) { Body.setDensity(this.body, v); this._inertia = this.body.inertia; }
+    set density(v) { this._changeMass(() => Body.setDensity(this.body, v)); }
     get mass() { return this.body.mass; }
-    set mass(v) { Body.setMass(this.body, v); this._inertia = this.body.inertia; }
+    set mass(v) { this._changeMass(() => Body.setMass(this.body, v)); }
+
+    // Change the mass and keep the saved inertia (how hard it is to spin) right.
+    // While fixedRotation is on the body's inertia is Infinity, so instead of
+    // copying that we scale the saved inertia: for the same shape, inertia
+    // grows in step with mass.
+    _changeMass(change) {
+      let oldMass = this.body.mass;
+      change();
+      if (isFinite(this.body.inertia)) {
+        this._inertia = this.body.inertia;
+      } else if (isFinite(oldMass) && oldMass > 0 && isFinite(this.body.mass)) {
+        this._inertia *= this.body.mass / oldMass;
+      }
+    }
 
     /** Static objects never move (floors, walls, platforms). */
     get isStatic() { return this.body.isStatic; }

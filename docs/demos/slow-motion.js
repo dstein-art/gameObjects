@@ -18,6 +18,9 @@ function build() {
 
 function draw() {
   background(245);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('S = slow motion · P = pause · R = run it again', 10, 20);

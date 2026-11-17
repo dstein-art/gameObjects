@@ -16,6 +16,9 @@ function makeShapes() {
 
 function draw() {
   background(235);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Click to drop another set', 10, 20);

@@ -70,6 +70,14 @@ new GameObject(width / 2, 50, 50);   // a 50 × 50 box, high up
 }
 </code></pre>
 <p>We don't need to keep each box in a variable: the world keeps track of it.</p>
+<p>The instructions go in <strong><code>drawOnTop()</code></strong>, an optional function that GameObjects runs after it has drawn every object. Text drawn there is always on top, so a falling box can never cover it:</p>
+<pre><code class="language-js">function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(14);
+  text('Click to drop a box', 10, 20);
+}
+</code></pre>
 <div class="demo" data-sketch="examples/basics-step-2" data-width="800" data-height="500"></div>
 <h2 id="step-3-random-shapes-and-a-ramp">Step 3: Random shapes and a ramp</h2>
 <p>Let's make it more interesting. <code>random()</code> can pick from an array, so each click picks a different <strong>shape</strong>, <strong>size</strong> and starting <strong>rotation</strong>:</p>

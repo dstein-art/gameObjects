@@ -39,7 +39,10 @@ function draw() {
   if (!hero.isTouching(ground)) hero.playAnimation('jump');
   else if (hero.velocityX !== 0) hero.playAnimation('run');
   else hero.playAnimation('idle');
+}
 
+function drawOnTop() {
+  if (!hero) return; // still loading
   fill(0);
   noStroke();
   text('Left/right to run · up or space to jump', 10, 20);

@@ -56,9 +56,6 @@ function setup() {
 
   // The camera follows the player smoothly
   world.camera.follow(player, 0.1, 0, -60);
-
-  // We'll draw the world ourselves so the score can go on top
-  world.autoDraw = false;
 }
 
 function draw() {
@@ -74,10 +71,11 @@ function draw() {
   // keep the camera inside the level
   world.camera.x = constrain(world.camera.x, width / 2, LEVEL_WIDTH - width / 2);
   world.camera.y = min(world.camera.y, height / 2);
+}
 
-  world.draw();
-
-  // ---- HUD (screen space, drawn after the world) ----
+// drawOnTop() runs after all the game objects are drawn,
+// so the score is never hidden behind them
+function drawOnTop() {
   fill(0);
   noStroke();
   textSize(20);

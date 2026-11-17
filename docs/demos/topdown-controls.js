@@ -30,7 +30,9 @@ function draw() {
   player.setVelocity((vx / len) * speed, (vy / len) * speed);
   if (dashTimer > 0) dashTimer--;
   player.color = dashTimer > 0 ? '#e599f7' : '#7950f2';
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Arrows or WASD to move (held) · SPACE to dash (pressed once)', 10, 20);

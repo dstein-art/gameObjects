@@ -49,6 +49,9 @@ function setup() {
 
 function draw() {
   background(235);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Robots are a class that extends GameObject. Drag them around!', 10, 20);

@@ -23,14 +23,17 @@ async function setup() {
 
 function draw() {
   background(250);
+  if (pads) {
+    for (let pad of pads) pad.setSize(lerp(pad.width, 130, 0.2), lerp(pad.height, 110, 0.2));
+  }
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   textSize(14);
   if (!started) text('Click (or press a key) to turn sound on', 10, 20);
   else text('Click a pad, or press 1 2 3 4 · hold SHIFT for a higher pitch', 10, 20);
-  if (pads) {
-    for (let pad of pads) pad.setSize(lerp(pad.width, 130, 0.2), lerp(pad.height, 110, 0.2));
-  }
 }
 
 function playPad(pad) {

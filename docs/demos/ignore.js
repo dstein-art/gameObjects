@@ -27,7 +27,9 @@ function draw() {
   }
   // tidy up so it doesn't fill forever
   for (let b of world.objects) if (b.y > 280 && !b.isStatic && random() < 0.01) b.destroy();
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Red balls ignore blue shelves. Blue balls ignore red shelves.', 10, 20);

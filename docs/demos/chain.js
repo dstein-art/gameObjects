@@ -35,6 +35,9 @@ function setup() {
 
 function draw() {
   background(248);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('A chain, a pendulum and a spring. Drag and fling them!', 10, 20);

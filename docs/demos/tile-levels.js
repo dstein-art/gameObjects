@@ -107,9 +107,10 @@ function draw() {
     }
     exit.opacity = coins.length === 0 ? 255 : 90; // the exit lights up when it's open
   }
+}
 
-  world.draw();
-
+// the score and messages, drawn on top of the level
+function drawOnTop() {
   fill(0);
   noStroke();
   textSize(15);

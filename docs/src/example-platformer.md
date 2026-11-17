@@ -3,7 +3,7 @@
 Run, jump and collect every coin in a level three screens wide. This is the classic game shape that Mario made famous, and most of it takes surprisingly little code.
 {: .lead }
 
-**You'll learn:** player settings · walking with the keyboard · jumping only on the ground · platforms in a group · a camera that follows the player · coins as sensors · drawing the score on top
+**You'll learn:** player settings · walking with the keyboard · jumping only on the ground · platforms in a group · a camera that follows the player · coins as sensors · `drawOnTop()` for the score
 
 ## Play the finished game
 
@@ -116,25 +116,36 @@ player.onCollide(coins, (me, coin) => {
 });
 ```
 
-[[demo: examples/platformer-step-5 | 800x500 | keys]]
-
-Did you notice the bug? The score is drawn in `draw()`, and GameObjects draws the world **after** `draw()` finishes, so platforms and coins can cover the score.
-
-## Step 6: The score on top (the finished game)
-
-To fix the score, we draw the world ourselves at the right moment. Turning off `world.autoDraw` and calling `world.draw()` in the middle of our `draw()` puts the objects **under** whatever we draw next:
+The score goes in **`drawOnTop()`**. GameObjects calls it every frame **after** all the game objects are drawn, so the score is always on top. It's in screen space too, so it stays in the corner while the camera moves:
 
 ```js
-world.autoDraw = false;  // in setup()
+function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text('Coins: ' + score, 16, 16);
+}
 ```
 
-```js
-world.draw();            // the game objects...
+[[demo: examples/platformer-step-5 | 800x500 | keys]]
 
-fill(0);                 // ...then the score, on top
-text('Coins: ' + score, 16, 16);
-if (coins.length === 0) {
-  text('You got them all!', width / 2, height / 2);
+## Step 6: Collecting every coin (the finished game)
+
+When `coins.length` reaches `0`, every coin has been collected. We add a message for that to `drawOnTop()`:
+
+```js
+function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text('Coins: ' + score, 16, 16);
+  if (coins.length === 0) {
+    textAlign(CENTER, CENTER);
+    textSize(48);
+    text('You got them all!', width / 2, height / 2);
+  }
 }
 ```
 

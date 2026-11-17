@@ -33,7 +33,9 @@ function setup() {
 function draw() {
   background('#1e1e2e');
   paddle.x = constrain(mouseX, paddle.width / 2, width - paddle.width / 2);
+}
 
+function drawOnTop() {
   fill(255);
   noStroke();
   textAlign(CENTER, CENTER);

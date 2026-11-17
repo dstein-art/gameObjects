@@ -11,16 +11,19 @@ function setup() {
 
 function draw() {
   background(240);
-  fill(0);
-  noStroke();
-  text('P = push(0, -12) on both     F = hold to applyForce(0, -5) on both', 10, 20);
-  text('push ignores weight. applyForce moves the heavy box less.', 10, 38);
 
   if (keyIsDown(70)) {
     // 70 = F key: a steady force every frame
     light.applyForce(0, -5);
     heavy.applyForce(0, -5);
   }
+}
+
+function drawOnTop() {
+  fill(0);
+  noStroke();
+  text('P = push(0, -12) on both     F = hold to applyForce(0, -5) on both', 10, 20);
+  text('push ignores weight. applyForce moves the heavy box less.', 10, 38);
 }
 
 function keyPressed() {

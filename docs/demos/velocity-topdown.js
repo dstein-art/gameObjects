@@ -27,7 +27,9 @@ function draw() {
   if (keyIsDown(UP_ARROW)) vy = -4;
   if (keyIsDown(DOWN_ARROW)) vy = 4;
   player.setVelocity(vx, vy);
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Arrow keys to move · push the crates', 10, 20);

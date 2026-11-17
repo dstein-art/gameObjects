@@ -17,6 +17,9 @@ function setup() {
 
 function draw() {
   background(245);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Same size, different density. Drag the boxes around the seesaw.', 10, 20);

@@ -57,7 +57,9 @@ function draw() {
 
   // fell off the bottom? back onto the paddle
   if (ball.y > height + 30) launched = false;
+}
 
+function drawOnTop() {
   if (!launched) {
     fill(255);
     noStroke();

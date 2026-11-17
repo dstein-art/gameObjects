@@ -26,7 +26,9 @@ function draw() {
   for (let bug of bugs) {
     bug.moveToward(mouseX, mouseY, 2.5);
   }
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Bugs: ' + bugs.length, 10, 20);

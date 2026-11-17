@@ -34,7 +34,9 @@ function draw() {
   if (keyIsDown(DOWN_ARROW)) tank.moveForward(-2);
   if (mouseIsPressed) tank.lookAt(mouseX, mouseY);
   tank.rotationSpeed = 0; // don't keep spinning after bumps
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Left/right to turn · up/down to drive · hold the mouse button to face the mouse', 10, 20);

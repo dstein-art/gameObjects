@@ -18,6 +18,9 @@ function setup() {
 
 function draw() {
   background(230);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Press D to turn debug view on and off · drag the shapes', 10, 20);

@@ -82,6 +82,12 @@ function draw() {
     launched = false;
   }
 
+  // game over, or every brick gone? freeze everything
+  if (lives <= 0 || bricks.length === 0) world.paused = true;
+}
+
+// the score and messages, drawn on top of the game objects
+function drawOnTop() {
   fill(255);
   noStroke();
   textSize(16);
@@ -92,10 +98,8 @@ function draw() {
   textSize(32);
   if (lives <= 0) {
     text('Game over — reload to play again', width / 2, height / 2);
-    world.paused = true;
   } else if (bricks.length === 0) {
     text('You win!', width / 2, height / 2);
-    world.paused = true;
   } else if (!launched) {
     textSize(18);
     text('Click to launch', width / 2, height / 2);

@@ -9,6 +9,7 @@ Every class, property and method in GameObjects.js. For a step-by-step introduct
 - [Loading the library](#loading-the-library)
 - [Units and conventions](#units-and-conventions)
 - [The frame loop](#the-frame-loop)
+- [drawOnTop()](#drawontop)
 - [GameWorld](#gameworld)
     - [World options](#world-options)
     - [World properties](#world-properties)
@@ -75,8 +76,33 @@ Each frame, while a world is current:
 1. **Before `draw()`**, the world's `update()` runs: mouse dragging, each object's `update()`, one physics step (collision callbacks run here), then animations, lifespans and the camera.
 2. **Your `draw()`** runs.
 3. **After `draw()`**, the world's `draw()` draws every link and object (sorted by `depth`) through the camera.
+4. **Then your `drawOnTop()`** runs, if the sketch has one (see [drawOnTop()](#drawontop)).
 
 If your sketch calls `world.update()` or `world.draw()` itself, the automatic step is skipped for that frame. Calling `update()` yourself switches `autoUpdate` off. Physics runs at a fixed step of 1/60 s per frame, so the game runs in slow motion if the frame rate drops.
+
+## drawOnTop()
+
+An optional function your sketch can define, like `setup()` and `draw()`. If it exists, GameObjects calls it every frame **after** all the game objects are drawn, so whatever it draws is on top: a score, lives, messages, a title or game-over screen.
+
+```js
+function draw() {
+  background(220);
+  // game logic: input, rules...
+}
+
+function drawOnTop() {
+  fill(0);
+  textSize(20);
+  text('Score: ' + score, 10, 30);
+}
+```
+
+- **Optional.** If it isn't defined, nothing changes.
+- **Screen space.** It's drawn with the transform reset, so the camera doesn't move or zoom it. Use `world.camera.begin()` / `world.camera.end()` inside it to draw something in world coordinates.
+- **Isolated.** Its drawing settings (`fill`, `textAlign`, `translate`, ...) are wrapped in `push()` / `pop()`, so they don't affect the next frame.
+- **Always runs.** It runs even when `world.paused` is `true` or `world.autoDraw` is `false`.
+- **Instance mode:** set `p.drawOnTop = () => { ... }`.
+- **Spelling:** if `drawOnTop` isn't defined but a function with a similar name is (for example `drawontop` or `postdraw`), a hint is printed in the console once.
 
 ---
 
@@ -111,7 +137,7 @@ If your sketch declares its own `let world`, your variable is used instead of th
 | `gravityY` | `1` | Downward gravity. Use `0` for space or top-down games. |
 | `debug` | `false` | Draw physics outlines (see `debug` below) |
 | `autoUpdate` | `true` | Update automatically before `draw()` |
-| `autoDraw` | `true` | Draw automatically after `draw()` |
+| `autoDraw` | `true` | Draw automatically after `draw()`. Turn it off to call `world.draw()` yourself at a different moment. For text on top, use [`drawOnTop()`](#drawontop) instead. |
 | `timeScale` | `1` | Speed of time: `0.5` is slow motion |
 | `background` | `null` | If set, the world clears the canvas with this colour before drawing |
 

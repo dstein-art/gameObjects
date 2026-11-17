@@ -65,8 +65,11 @@ function draw() {
 
   world.camera.x = constrain(world.camera.x, width / 2, LEVEL_WIDTH - width / 2);
   world.camera.y = min(world.camera.y, height / 2);
+}
 
-  // the score (drawn before the objects, so they can cover it up!)
+// drawOnTop() runs after all the game objects are drawn,
+// so the score is never hidden behind them
+function drawOnTop() {
   fill(0);
   noStroke();
   textSize(20);

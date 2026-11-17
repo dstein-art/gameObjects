@@ -35,7 +35,9 @@ function draw() {
   background(250);
   // opacity can change every frame
   ghost.opacity = 128 + sin(frameCount * 3 * PI / 180) * 127;
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Click a shape to give it a random colour with fill()', 10, 20);

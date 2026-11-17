@@ -60,6 +60,18 @@ function mousePressed() {
 }
 ```
 
+The "Missed!" message is drawn in `drawOnTop()`, which GameObjects runs after it draws the ball, paddle and bricks, so messages are always on top:
+
+```js
+function drawOnTop() {
+  fill(255);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(18);
+  if (ball.y > height + 30) text('Missed! Press ▶ above the code (or reload) to try again', width / 2, height / 2);
+}
+```
+
 [[demo: examples/breakout-step-2 | 600x600]]
 
 Two problems: the ball sits in the middle of nowhere before it's launched, and once it's gone, it's gone. Over time it can also speed up or slow down a little, or get stuck bouncing almost flat.
@@ -140,18 +152,25 @@ The finishing touches:
 - **Game over** when lives run out, and **You win!** when `bricks.length` is `0`. Either way, `world.paused = true` freezes everything.
 - Clicking only launches while you still have lives.
 
+The rules go in `draw()`, and the messages go in `drawOnTop()`:
+
 ```js
-if (ball.y > height + 30) {
-  lives--;
-  launched = false;
+function draw() {
+  ...
+  if (ball.y > height + 30) {
+    lives--;
+    launched = false;
+  }
+  if (lives <= 0 || bricks.length === 0) world.paused = true;
 }
-...
-if (lives <= 0) {
-  text('Game over — reload to play again', width / 2, height / 2);
-  world.paused = true;
-} else if (bricks.length === 0) {
-  text('You win!', width / 2, height / 2);
-  world.paused = true;
+
+function drawOnTop() {
+  ...
+  if (lives <= 0) {
+    text('Game over — reload to play again', width / 2, height / 2);
+  } else if (bricks.length === 0) {
+    text('You win!', width / 2, height / 2);
+  }
 }
 ```
 

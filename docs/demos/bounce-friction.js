@@ -35,6 +35,9 @@ function reset() {
 
 function draw() {
   background(245);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('bounce', 120, 20);

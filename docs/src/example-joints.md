@@ -28,6 +28,8 @@ world.connect(previous, plank, {
 
 Nothing holds the chain up yet, so it falls to the floor in a heap. Drag a plank to see how they're linked.
 
+The instructions at the top are drawn in `drawOnTop()`, which runs after the planks are drawn, so they stay readable.
+
 [[demo: examples/joints-step-1 | 800x500]]
 
 ## Step 2: Pin the ends
@@ -84,7 +86,13 @@ for (let i = 0; i < 6; i++) {
 ```
 
 ```js
-if (world.dragging) text('Dragging an object', 10, 40);
+function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(14);
+  text('Drag anything!', 10, 20);
+  if (world.dragging) text('Dragging an object', 10, 40);
+}
 ```
 
 [[demo: examples/joints | 800x500]]

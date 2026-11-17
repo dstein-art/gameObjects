@@ -25,7 +25,9 @@ function draw() {
   strokeWeight(4);
   line(0, 0, world.gravityX * 30, world.gravityY * 30);
   pop();
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Arrow keys change the direction of gravity · space = no gravity', 10, 20);

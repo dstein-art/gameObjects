@@ -108,16 +108,20 @@ function draw() {
 <li><strong><code>x</code> and <code>y</code> are the centre</strong> of the object, not its top-left corner.</li>
 </ul>
 <h2 id="what-happens-every-frame">What happens every frame</h2>
-<p>Each time p5.js runs a frame, GameObjects does three things:</p>
+<p>Each time p5.js runs a frame, this happens:</p>
 <ol>
 <li><strong>Before your <code>draw()</code>:</strong> every object moves one step. Gravity pulls, things bounce, and collision code runs.</li>
 <li><strong>Your <code>draw()</code> runs.</strong> Draw the background, read the keyboard, update the score.</li>
 <li><strong>After your <code>draw()</code>:</strong> GameObjects draws every object on top of what you drew.</li>
+<li><strong>Your <code>drawOnTop()</code> runs</strong>, if you wrote one. It's optional.</li>
 </ol>
 <p>That's why <code>background()</code> in your <code>draw()</code> doesn't wipe out your objects. They're drawn afterwards.</p>
-<blockquote>
-<p><strong>Tip:</strong> Want text (like a score) drawn <em>on top</em> of your objects? Call <code>world.draw()</code> yourself in the middle of <code>draw()</code>, then draw the text. GameObjects notices and won't draw them a second time. There's more on this in <a href="levels-score.html">Levels and Score</a>.</p>
-</blockquote>
+<p>Text drawn in <code>draw()</code> therefore ends up <em>behind</em> your objects. For things that must always be visible, like a score, write a function called <strong><code>drawOnTop()</code></strong>. It runs after all the objects are drawn:</p>
+<pre><code class="language-js">function drawOnTop() {
+  text('Score: ' + score, 10, 20);
+}
+</code></pre>
+<p>There's more on this in <a href="levels-score.html#drawing-the-score-on-top">Levels and Score</a>.</p>
 <h2 id="units">Units</h2>
 <table>
 <thead>

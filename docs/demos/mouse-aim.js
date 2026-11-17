@@ -26,7 +26,9 @@ function draw() {
 
   // hover effect on the targets
   for (let t of targets) t.color = t.isMouseOver() ? '#c92a2a' : '#ff6b6b';
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Click to shoot at the mouse · drag the crate · targets left: ' + targets.length, 10, 20);

@@ -142,7 +142,7 @@ world.camera.reset();     // back to normal
 
 When the camera moves, there are two kinds of drawing:
 
-- **Screen drawing** stays put on the screen: the score, lives and a "Paused" message. This is anything you draw normally in `draw()`.
+- **Screen drawing** stays put on the screen: the score, lives and a "Paused" message. Anything you draw normally is screen drawing. Put it in **`drawOnTop()`** so it also appears over the game objects.
 - **World drawing** scrolls with the world: backgrounds, grids, decorations. Put it between **`world.camera.begin()`** and **`world.camera.end()`**.
 
 ```js
@@ -150,14 +150,16 @@ function draw() {
   background(200);
 
   world.camera.begin();
-  image(mountains, 0, 0);       // scrolls with the world
+  image(mountains, 0, 0);       // scrolls with the world, behind the objects
   world.camera.end();
+}
 
-  world.draw();                 // the game objects
-
-  text('Score: ' + score, 10, 20);   // stays on screen
+function drawOnTop() {
+  text('Score: ' + score, 10, 20);   // stays on screen, on top of the objects
 }
 ```
+
+See [Levels and Score](levels-score.html#drawing-the-score-on-top) for more about `drawOnTop()`.
 
 Converting between the two:
 

@@ -54,7 +54,9 @@ function draw() {
   if (keyIsDown(UP_ARROW)) vy = -speed;
   if (keyIsDown(DOWN_ARROW)) vy = speed;
   player.setVelocity(vx, vy);
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   textSize(14);

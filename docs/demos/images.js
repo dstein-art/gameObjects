@@ -25,6 +25,9 @@ function dropBall(x, y) {
 
 function draw() {
   background('#d0ebff');
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Click empty space: left half drops a crate, right half drops a ball. Drag things around.', 10, 20);

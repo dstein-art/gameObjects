@@ -39,7 +39,10 @@ function draw() {
   for (let p of pops) {
     if (p.animationDone) p.destroy();
   }
+}
 
+function drawOnTop() {
+  if (!coins) return;
   fill(255);
   noStroke();
   text('Click the coins. Coins loop. The pop plays once, then is destroyed.', 10, 20);

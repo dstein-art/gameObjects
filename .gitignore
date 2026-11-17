@@ -8,7 +8,6 @@
 
 # ---- the library ----
 !/gameObjects.js
-!/lib/
 
 # ---- docs and examples (the help site; examples live in docs/examples) ----
 !/index.html

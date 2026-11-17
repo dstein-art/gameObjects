@@ -11,6 +11,9 @@ function setup() {
 
 function draw() {
   background(20, 24, 40);
+}
+
+function drawOnTop() {
   fill(255);
   noStroke();
   text('Click for fireworks · sparks alive: ' + sparks.length, 10, 20);

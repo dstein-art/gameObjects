@@ -127,6 +127,18 @@ bullets.onCollide(rocks, (bullet, rock) => {
 });
 ```
 
+The score is drawn in `drawOnTop()`, which runs after the ship, bullets and rocks are drawn, so a rock flying past never hides it:
+
+```js
+function drawOnTop() {
+  fill(255);
+  noStroke();
+  textSize(18);
+  textAlign(LEFT, TOP);
+  text('Score: ' + score, 12, 12);
+}
+```
+
 [[demo: examples/space-shooter-step-5 | 800x600 | keys]]
 
 ## Step 6: Getting hit

@@ -42,7 +42,7 @@ Load the scripts **in this order** in `index.html`:
 <script src="sketch.js"></script>
 ```
 
-The help site and example games load p5.js and p5.sound from jsDelivr (so they need an internet connection) and Matter.js from the local copy in `lib/` (MIT licensed). p5.sound is optional; GameObjects doesn't need it.
+The help site and example games load p5.js, p5.sound and Matter.js (MIT licensed) from jsDelivr, so they need an internet connection. p5.sound is optional; GameObjects doesn't need it.
 
 **p5.js Web Editor:** upload `gameObjects.js` to your sketch and add the Matter.js line and the `gameObjects.js` line to `index.html`, after p5.
 
@@ -55,8 +55,13 @@ Every frame:
 1. **Before your `draw()`:** each object's `update()` runs, then the physics engine moves everything one step and fires collision callbacks.
 2. **Your `draw()`** runs. Read positions, handle keys, draw backgrounds.
 3. **After your `draw()`:** the world draws every object (sorted by `depth`) through the camera.
+4. **Then your `drawOnTop()`**, if you wrote one. It's optional, and it's the place for the score, messages and anything else that must be drawn *on top* of the objects. It's in screen space, so the camera doesn't move it.
 
-Want the score drawn *on top* of your objects? Call `world.draw()` yourself wherever you want them. GameObjects notices and won't draw a second time. (Or set `world.autoDraw = false`.) The same goes for `world.update()`.
+```js
+function drawOnTop() {
+  text('Score: ' + score, 10, 20);
+}
+```
 
 Units are **pixels**, **pixels per frame** and **degrees**. `rotation` uses degrees whatever `angleMode()` is set to.
 
@@ -85,7 +90,6 @@ Everything to read and play with starts at **[`index.html`](index.html)** in the
 index.html            home page: links to every section and example game
 gameObjects.js        the library
 API.md                the API reference (also built into docs/api.html)
-lib/matter.min.js     Matter.js (MIT), used by the help site
 docs/
   getting-started.html … levels-score.html   the 10 help sections
   examples.html       the example games

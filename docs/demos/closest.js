@@ -26,7 +26,9 @@ function draw() {
     stroke('tomato');
     line(player.x, player.y, nearest.x, nearest.y);
   }
+}
 
+function drawOnTop() {
   noStroke();
   fill(0);
   text('Move the mouse: the closest rock lights up. Click a rock to destroy it.', 10, 20);

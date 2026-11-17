@@ -12,6 +12,9 @@ function setup() {
 
 function draw() {
   background(230);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Click to drop a box', 10, 20);

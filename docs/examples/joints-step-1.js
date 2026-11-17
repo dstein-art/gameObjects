@@ -28,6 +28,9 @@ function setup() {
 
 function draw() {
   background(245);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   textSize(14);

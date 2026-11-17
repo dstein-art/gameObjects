@@ -169,21 +169,22 @@ world.camera.reset();     // back to normal
 <h2 id="drawing-with-the-camera-world-vs-screen">Drawing with the camera: world vs. screen</h2>
 <p>When the camera moves, there are two kinds of drawing:</p>
 <ul>
-<li><strong>Screen drawing</strong> stays put on the screen: the score, lives and a "Paused" message. This is anything you draw normally in <code>draw()</code>.</li>
+<li><strong>Screen drawing</strong> stays put on the screen: the score, lives and a "Paused" message. Anything you draw normally is screen drawing. Put it in <strong><code>drawOnTop()</code></strong> so it also appears over the game objects.</li>
 <li><strong>World drawing</strong> scrolls with the world: backgrounds, grids, decorations. Put it between <strong><code>world.camera.begin()</code></strong> and <strong><code>world.camera.end()</code></strong>.</li>
 </ul>
 <pre><code class="language-js">function draw() {
   background(200);
 
   world.camera.begin();
-  image(mountains, 0, 0);       // scrolls with the world
+  image(mountains, 0, 0);       // scrolls with the world, behind the objects
   world.camera.end();
+}
 
-  world.draw();                 // the game objects
-
-  text('Score: ' + score, 10, 20);   // stays on screen
+function drawOnTop() {
+  text('Score: ' + score, 10, 20);   // stays on screen, on top of the objects
 }
 </code></pre>
+<p>See <a href="levels-score.html#drawing-the-score-on-top">Levels and Score</a> for more about <code>drawOnTop()</code>.</p>
 <p>Converting between the two:</p>
 <pre><code class="language-js">world.camera.screenToWorld(mouseX, mouseY);   // { x, y } in the world
 world.camera.worldToScreen(player.x, player.y);

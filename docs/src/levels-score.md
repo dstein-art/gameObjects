@@ -21,21 +21,26 @@ function setup() {
 
 ### Drawing the score on top
 
-GameObjects normally draws your objects **after** `draw()` finishes, which would put them on top of your score. To draw text over the game, call **`world.draw()`** yourself, then draw your text afterwards:
+GameObjects draws your objects **after** `draw()` finishes. So anything you draw in `draw()`, like the score, ends up **behind** the objects, and a platform or a coin can cover it.
+
+For text that should always be on top, write a function called **`drawOnTop()`**. GameObjects calls it every frame, **after** all the objects are drawn:
 
 ```js
 function draw() {
   background(220);
+  // move things, check the rules...
+}
 
-  world.draw();                   // 1. draw the game objects now
-
-  fill(0);                        // 2. then the score, on top
+function drawOnTop() {
+  fill(0);
   textSize(20);
   text('Score: ' + score, 10, 30);
 }
 ```
 
-GameObjects notices you drew the world yourself and won't draw it again that frame. Anything you draw before `world.draw()`, like a background picture, ends up **behind** the objects.
+`drawOnTop()` is optional: leave it out and nothing changes. It's drawn in **screen space**, so the [camera](input-camera.html#the-camera) doesn't move it, which is just right for a score, lives or a message.
+
+> **Watch out:** spell it exactly `drawOnTop`, with a capital **O** and **T**. If GameObjects finds a function with a similar name, like `drawontop`, it prints a hint in the console.
 
 ## Lives and losing
 
@@ -67,19 +72,24 @@ let state = 'title';
 
 function draw() {
   background(30);
+  if (state === 'playing') {
+    playGame();       // move things, check the rules
+  }
+}
 
+function drawOnTop() {
   if (state === 'title') {
     text('SUPER CATCH — press any key', 200, 180);
   } else if (state === 'playing') {
-    playGame();       // move things, check rules
-    world.draw();
     drawScore();
   } else if (state === 'gameover') {
-    world.draw();
+    drawScore();
     text('GAME OVER — press R', 200, 180);
   }
 }
 ```
+
+The game logic goes in `draw()`, and everything the player reads goes in `drawOnTop()`, so messages always appear over the game.
 
 Freeze the physics while you're not playing with **`world.paused`**:
 

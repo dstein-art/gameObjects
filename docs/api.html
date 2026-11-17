@@ -28,6 +28,7 @@
       <li><a href="#loading-the-library">Loading the library</a></li>
       <li><a href="#units-and-conventions">Units and conventions</a></li>
       <li><a href="#the-frame-loop">The frame loop</a></li>
+      <li><a href="#drawontop">drawOnTop()</a></li>
       <li><a href="#gameworld">GameWorld</a><ul class="sub"><li><a href="#world-options">World options</a></li><li><a href="#world-properties">World properties</a></li><li><a href="#world-methods">World methods</a></li><li><a href="#more-than-one-world">More than one world</a></li><li><a href="#walls">Walls</a></li><li><a href="#joints">Joints</a></li></ul></li>
       <li><a href="#gameobject">GameObject</a><ul class="sub"><li><a href="#creating-a-game-object">Creating a game object</a></li><li><a href="#shapes">Shapes</a></li><li><a href="#object-options">Object options</a></li><li><a href="#position-and-size">Position and size</a></li><li><a href="#movement">Movement</a></li><li><a href="#physical-properties">Physical properties</a></li><li><a href="#appearance">Appearance</a></li><li><a href="#collisions">Collisions</a></li><li><a href="#mouse">Mouse</a></li><li><a href="#animation">Animation</a></li><li><a href="#groups-and-removal">Groups and removal</a></li><li><a href="#extending-gameobject">Extending GameObject</a></li></ul></li>
       <li><a href="#gamegroup">GameGroup</a><ul class="sub"><li><a href="#creating-a-group">Creating a group</a></li><li><a href="#group-members">Group members</a></li><li><a href="#looping-and-searching">Looping and searching</a></li><li><a href="#changing-and-removing">Changing and removing</a></li><li><a href="#group-collisions">Group collisions</a></li></ul></li>
@@ -98,8 +99,30 @@
 <li><strong>Before <code>draw()</code></strong>, the world's <code>update()</code> runs: mouse dragging, each object's <code>update()</code>, one physics step (collision callbacks run here), then animations, lifespans and the camera.</li>
 <li><strong>Your <code>draw()</code></strong> runs.</li>
 <li><strong>After <code>draw()</code></strong>, the world's <code>draw()</code> draws every link and object (sorted by <code>depth</code>) through the camera.</li>
+<li><strong>Then your <code>drawOnTop()</code></strong> runs, if the sketch has one (see <a href="#drawontop">drawOnTop()</a>).</li>
 </ol>
 <p>If your sketch calls <code>world.update()</code> or <code>world.draw()</code> itself, the automatic step is skipped for that frame. Calling <code>update()</code> yourself switches <code>autoUpdate</code> off. Physics runs at a fixed step of 1/60 s per frame, so the game runs in slow motion if the frame rate drops.</p>
+<h2 id="drawontop">drawOnTop()</h2>
+<p>An optional function your sketch can define, like <code>setup()</code> and <code>draw()</code>. If it exists, GameObjects calls it every frame <strong>after</strong> all the game objects are drawn, so whatever it draws is on top: a score, lives, messages, a title or game-over screen.</p>
+<pre><code class="language-js">function draw() {
+  background(220);
+  // game logic: input, rules...
+}
+
+function drawOnTop() {
+  fill(0);
+  textSize(20);
+  text('Score: ' + score, 10, 30);
+}
+</code></pre>
+<ul>
+<li><strong>Optional.</strong> If it isn't defined, nothing changes.</li>
+<li><strong>Screen space.</strong> It's drawn with the transform reset, so the camera doesn't move or zoom it. Use <code>world.camera.begin()</code> / <code>world.camera.end()</code> inside it to draw something in world coordinates.</li>
+<li><strong>Isolated.</strong> Its drawing settings (<code>fill</code>, <code>textAlign</code>, <code>translate</code>, ...) are wrapped in <code>push()</code> / <code>pop()</code>, so they don't affect the next frame.</li>
+<li><strong>Always runs.</strong> It runs even when <code>world.paused</code> is <code>true</code> or <code>world.autoDraw</code> is <code>false</code>.</li>
+<li><strong>Instance mode:</strong> set <code>p.drawOnTop = () =&gt; { ... }</code>.</li>
+<li><strong>Spelling:</strong> if <code>drawOnTop</code> isn't defined but a function with a similar name is (for example <code>drawontop</code> or <code>postdraw</code>), a hint is printed in the console once.</li>
+</ul>
 <hr />
 <h2 id="gameworld">GameWorld</h2>
 <p>The physics world: gravity, every object, the camera, joints and drawing.</p>
@@ -148,7 +171,7 @@
 <tr>
 <td><code>autoDraw</code></td>
 <td><code>true</code></td>
-<td>Draw automatically after <code>draw()</code></td>
+<td>Draw automatically after <code>draw()</code>. Turn it off to call <code>world.draw()</code> yourself at a different moment. For text on top, use <a href="#drawontop"><code>drawOnTop()</code></a> instead.</td>
 </tr>
 <tr>
 <td><code>timeScale</code></td>

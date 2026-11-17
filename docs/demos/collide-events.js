@@ -30,6 +30,9 @@ function setup() {
 
 function draw() {
   background(245);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Drag the ball and drop it on the pad', 10, 20);

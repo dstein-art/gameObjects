@@ -42,6 +42,17 @@ function mousePressed() {
 
 We don't need to keep each box in a variable: the world keeps track of it.
 
+The instructions go in **`drawOnTop()`**, an optional function that GameObjects runs after it has drawn every object. Text drawn there is always on top, so a falling box can never cover it:
+
+```js
+function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(14);
+  text('Click to drop a box', 10, 20);
+}
+```
+
 [[demo: examples/basics-step-2 | 800x500]]
 
 ## Step 3: Random shapes and a ramp

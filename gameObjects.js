@@ -10,6 +10,9 @@
  * A ready-made world called `world` is created when this file loads, so
  * sketches can start making GameObjects straight away.
  *
+ * Optional: if the sketch has a drawOnTop() function, it runs every frame
+ * after all the game objects are drawn (for a score, messages, a HUD).
+ *
  * Core classes:
  *   GameWorld   — the physics world (gravity, camera, walls, joints, drawing)
  *   GameObject  — a single physical thing you can see and move
@@ -1345,15 +1348,64 @@
 
   function onPostDraw() {
     let w = lib.world;
-    if (!w || !w.autoDraw || w._drawnFrame === this.frameCount) return;
-    w._inAutoHook = true;
-    try {
+
+    // 1. draw the game objects (unless the sketch already did, or turned it off)
+    if (w && w.autoDraw && w._drawnFrame !== this.frameCount) {
+      w._inAutoHook = true;
+      try {
+        this.push();
+        this.resetMatrix();
+        w.draw(this);
+        this.pop();
+      } finally {
+        w._inAutoHook = false;
+      }
+    }
+
+    // 2. then the sketch's optional drawOnTop(), on top of everything,
+    //    in screen space (the camera doesn't move it)
+    let onTop = findDrawOnTop(this);
+    if (onTop) {
       this.push();
       this.resetMatrix();
-      w.draw(this);
-      this.pop();
-    } finally {
-      w._inAutoHook = false;
+      try {
+        onTop.call(this);
+      } finally {
+        this.pop();
+      }
+    }
+  }
+
+  // drawOnTop() can be a global function (global mode) or p.drawOnTop (instance mode)
+  let checkedSpelling = false;
+  function findDrawOnTop(p) {
+    let fn = typeof p.drawOnTop === 'function' ? p.drawOnTop : null;
+    if (!fn && typeof global.drawOnTop === 'function') fn = global.drawOnTop;
+    if (!fn && !checkedSpelling) warnAboutSpelling(p);
+    checkedSpelling = true;
+    return fn;
+  }
+
+  // A misspelled drawOnTop would silently never run, so point it out once.
+  function warnAboutSpelling(p) {
+    let near = /^(drawontop|draw_on_top|drawontops|postdraw|drawafter|drawlast)$/;
+    let names = new Set([...Object.keys(global), ...Object.keys(p)]);
+    for (let name of names) {
+      if (name !== 'drawOnTop' && near.test(name.toLowerCase())) {
+        let value;
+        try {
+          value = global[name] !== undefined ? global[name] : p[name];
+        } catch (e) {
+          continue;
+        }
+        if (typeof value === 'function') {
+          console.warn(
+            `GameObjects: found a function called "${name}()". Did you mean drawOnTop()? ` +
+              `Name it drawOnTop() (capital O and T) and it will run after all the objects are drawn.`
+          );
+          return;
+        }
+      }
     }
   }
 

@@ -24,6 +24,9 @@ async function setup() {
 
 function draw() {
   background(245);
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Click to turn on sound. Drag and throw the balls. Big balls sound lower, hard hits are louder.', 10, 20);

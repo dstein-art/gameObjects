@@ -64,14 +64,6 @@ function gameOver() {
 function draw() {
   background('#1b1f3b');
 
-  if (state === 'title') {
-    drawCentered('SUPER CATCH', 44, -40);
-    drawCentered('Catch the stars, dodge the bombs. Move with the mouse or arrow keys.', 16, 10);
-    drawCentered('Click or press any key to start', 18, 50);
-    drawCentered('Best: ' + best, 16, 90);
-    return;
-  }
-
   if (state === 'playing') {
     // move the basket
     let target = basket.x;
@@ -87,10 +79,18 @@ function draw() {
       else bombs.create(random(30, 610), -20, 28);
     }
   }
+}
 
-  world.draw(); // objects first...
+// Runs after the game objects are drawn: the score and messages are always on top
+function drawOnTop() {
+  if (state === 'title') {
+    drawCentered('SUPER CATCH', 44, -40);
+    drawCentered('Catch the stars, dodge the bombs. Move with the mouse or arrow keys.', 16, 10);
+    drawCentered('Click or press any key to start', 18, 50);
+    drawCentered('Best: ' + best, 16, 90);
+    return;
+  }
 
-  // ...then the score on top
   fill(255);
   noStroke();
   textSize(18);

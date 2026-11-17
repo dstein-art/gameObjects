@@ -48,10 +48,11 @@ function draw() {
   strokeWeight(4);
   rect(0, 0, WORLD_W, WORLD_H);
   world.camera.end();
+}
 
-  world.draw(); // draw the objects now, so the HUD goes on top
-
-  // SCREEN drawing: stays put
+// SCREEN drawing: drawOnTop() runs after the objects are drawn,
+// and the camera doesn't move it
+function drawOnTop() {
   fill(0, 150);
   noStroke();
   rect(0, 0, width, 44);

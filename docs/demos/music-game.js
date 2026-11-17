@@ -45,7 +45,10 @@ function draw() {
   player.velocityX = 0;
   if (keyIsDown(LEFT_ARROW)) player.velocityX = -5;
   if (keyIsDown(RIGHT_ARROW)) player.velocityX = 5;
+}
 
+function drawOnTop() {
+  if (!player) return;
   fill(0);
   noStroke();
   textSize(16);
@@ -54,7 +57,6 @@ function draw() {
     textAlign(CENTER, CENTER);
     textSize(28);
     text('Click to start', width / 2, height / 2 - 40);
-    textAlign(LEFT, BASELINE);
   }
 }
 

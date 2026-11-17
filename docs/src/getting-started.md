@@ -77,15 +77,24 @@ Things to notice:
 
 ## What happens every frame
 
-Each time p5.js runs a frame, GameObjects does three things:
+Each time p5.js runs a frame, this happens:
 
 1. **Before your `draw()`:** every object moves one step. Gravity pulls, things bounce, and collision code runs.
 2. **Your `draw()` runs.** Draw the background, read the keyboard, update the score.
 3. **After your `draw()`:** GameObjects draws every object on top of what you drew.
+4. **Your `drawOnTop()` runs**, if you wrote one. It's optional.
 
 That's why `background()` in your `draw()` doesn't wipe out your objects. They're drawn afterwards.
 
-> **Tip:** Want text (like a score) drawn *on top* of your objects? Call `world.draw()` yourself in the middle of `draw()`, then draw the text. GameObjects notices and won't draw them a second time. There's more on this in [Levels and Score](levels-score.html).
+Text drawn in `draw()` therefore ends up *behind* your objects. For things that must always be visible, like a score, write a function called **`drawOnTop()`**. It runs after all the objects are drawn:
+
+```js
+function drawOnTop() {
+  text('Score: ' + score, 10, 20);
+}
+```
+
+There's more on this in [Levels and Score](levels-score.html#drawing-the-score-on-top).
 
 ## Units
 

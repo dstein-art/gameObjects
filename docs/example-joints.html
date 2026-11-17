@@ -62,6 +62,7 @@
 });
 </code></pre>
 <p>Nothing holds the chain up yet, so it falls to the floor in a heap. Drag a plank to see how they're linked.</p>
+<p>The instructions at the top are drawn in <code>drawOnTop()</code>, which runs after the planks are drawn, so they stay readable.</p>
 <div class="demo" data-sketch="examples/joints-step-1" data-width="800" data-height="500"></div>
 <h2 id="step-2-pin-the-ends">Step 2: Pin the ends</h2>
 <p><code>world.pin(obj, x, y, options)</code> nails an object to a fixed point in the world. Pinning the outside end of the first and last plank turns the chain into a bridge. The group's <code>first</code> and <code>last</code> properties give us those planks.</p>
@@ -99,7 +100,13 @@ spring.stroke = '#1c7ed6';
   });
 }
 </code></pre>
-<pre><code class="language-js">if (world.dragging) text('Dragging an object', 10, 40);
+<pre><code class="language-js">function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(14);
+  text('Drag anything!', 10, 20);
+  if (world.dragging) text('Dragging an object', 10, 40);
+}
 </code></pre>
 <div class="demo" data-sketch="examples/joints" data-width="800" data-height="500"></div>
 <h2 id="make-it-your-own">Make it your own</h2>

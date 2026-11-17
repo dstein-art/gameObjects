@@ -20,7 +20,9 @@ function draw() {
   // move the platforms a little every frame
   slider.x = 320 + sin(frameCount * 0.02) * 180;
   lift.y = 190 + sin(frameCount * 0.015) * 90;
+}
 
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Static platforms moved with x and y carry what stands on them. Drag boxes onto them.', 10, 20);

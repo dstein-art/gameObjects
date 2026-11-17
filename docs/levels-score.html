@@ -60,18 +60,23 @@ function setup() {
 }
 </code></pre>
 <h3 id="drawing-the-score-on-top">Drawing the score on top</h3>
-<p>GameObjects normally draws your objects <strong>after</strong> <code>draw()</code> finishes, which would put them on top of your score. To draw text over the game, call <strong><code>world.draw()</code></strong> yourself, then draw your text afterwards:</p>
+<p>GameObjects draws your objects <strong>after</strong> <code>draw()</code> finishes. So anything you draw in <code>draw()</code>, like the score, ends up <strong>behind</strong> the objects, and a platform or a coin can cover it.</p>
+<p>For text that should always be on top, write a function called <strong><code>drawOnTop()</code></strong>. GameObjects calls it every frame, <strong>after</strong> all the objects are drawn:</p>
 <pre><code class="language-js">function draw() {
   background(220);
+  // move things, check the rules...
+}
 
-  world.draw();                   // 1. draw the game objects now
-
-  fill(0);                        // 2. then the score, on top
+function drawOnTop() {
+  fill(0);
   textSize(20);
   text('Score: ' + score, 10, 30);
 }
 </code></pre>
-<p>GameObjects notices you drew the world yourself and won't draw it again that frame. Anything you draw before <code>world.draw()</code>, like a background picture, ends up <strong>behind</strong> the objects.</p>
+<p><code>drawOnTop()</code> is optional: leave it out and nothing changes. It's drawn in <strong>screen space</strong>, so the <a href="input-camera.html#the-camera">camera</a> doesn't move it, which is just right for a score, lives or a message.</p>
+<blockquote>
+<p><strong>Watch out:</strong> spell it exactly <code>drawOnTop</code>, with a capital <strong>O</strong> and <strong>T</strong>. If GameObjects finds a function with a similar name, like <code>drawontop</code>, it prints a hint in the console.</p>
+</blockquote>
 <h2 id="lives-and-losing">Lives and losing</h2>
 <p>Lives work the same way: a variable, and a check for when they run out.</p>
 <pre><code class="language-js">let lives = 3;
@@ -95,19 +100,23 @@ if (player.y &gt; height + 100) loseLife();
 
 function draw() {
   background(30);
+  if (state === 'playing') {
+    playGame();       // move things, check the rules
+  }
+}
 
+function drawOnTop() {
   if (state === 'title') {
     text('SUPER CATCH — press any key', 200, 180);
   } else if (state === 'playing') {
-    playGame();       // move things, check rules
-    world.draw();
     drawScore();
   } else if (state === 'gameover') {
-    world.draw();
+    drawScore();
     text('GAME OVER — press R', 200, 180);
   }
 }
 </code></pre>
+<p>The game logic goes in <code>draw()</code>, and everything the player reads goes in <code>drawOnTop()</code>, so messages always appear over the game.</p>
 <p>Freeze the physics while you're not playing with <strong><code>world.paused</code></strong>:</p>
 <pre><code class="language-js">function gameOver() {
   state = 'gameover';

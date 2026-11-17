@@ -24,6 +24,9 @@ function draw() {
   if (frameCount % 4 === 0) {
     drops.create(random(width), -10, random(6, 12));
   }
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Drops falling: ' + drops.length + '    Splashes: ' + splashes, 10, 20);

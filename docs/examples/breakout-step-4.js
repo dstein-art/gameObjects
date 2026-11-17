@@ -65,7 +65,9 @@ function draw() {
   paddle.x = constrain(mouseX, paddle.width / 2, width - paddle.width / 2);
 
   if (ball.y > height + 30) launched = false;
+}
 
+function drawOnTop() {
   fill(255);
   noStroke();
   textSize(16);

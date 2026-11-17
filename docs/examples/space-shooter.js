@@ -100,7 +100,9 @@ function draw() {
 
   // wrap around the screen edges
   for (let obj of [ship, ...rocks]) wrap(obj);
+}
 
+function drawOnTop() {
   fill(255);
   noStroke();
   textSize(18);

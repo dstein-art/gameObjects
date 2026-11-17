@@ -24,6 +24,9 @@ function draw() {
   for (let c of chasers) {
     c.moveToward(mouseX, mouseY, c.data.speed);
   }
+}
+
+function drawOnTop() {
   fill(0);
   noStroke();
   text('Move the mouse. Each chaser has a different speed.', 10, 20);

@@ -133,6 +133,15 @@ ship.ignore(bullets);
   if (rocks.length === 0) for (let i = 0; i &lt; 6; i++) spawnRock(random(width), 0, 60);
 });
 </code></pre>
+<p>The score is drawn in <code>drawOnTop()</code>, which runs after the ship, bullets and rocks are drawn, so a rock flying past never hides it:</p>
+<pre><code class="language-js">function drawOnTop() {
+  fill(255);
+  noStroke();
+  textSize(18);
+  textAlign(LEFT, TOP);
+  text('Score: ' + score, 12, 12);
+}
+</code></pre>
 <div class="demo" data-sketch="examples/space-shooter-step-5" data-width="800" data-height="600" data-keys="1"></div>
 <h2 id="step-6-getting-hit">Step 6: Getting hit</h2>
 <p>When a rock hits the ship, you lose points and the ship turns red. <code>onCollideEnd</code> turns it back once they stop touching:</p>

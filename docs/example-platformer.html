@@ -47,7 +47,7 @@
     <p class="section-num"><a href="examples.html">Example Games</a> › Platformer</p>
 <h1 id="platformer">Platformer</h1>
 <p class="lead">Run, jump and collect every coin in a level three screens wide. This is the classic game shape that Mario made famous, and most of it takes surprisingly little code.</p>
-<p><strong>You'll learn:</strong> player settings · walking with the keyboard · jumping only on the ground · platforms in a group · a camera that follows the player · coins as sensors · drawing the score on top</p>
+<p><strong>You'll learn:</strong> player settings · walking with the keyboard · jumping only on the ground · platforms in a group · a camera that follows the player · coins as sensors · <code>drawOnTop()</code> for the score</p>
 <h2 id="play-the-finished-game">Play the finished game</h2>
 <p>Arrow keys or <strong>A</strong>/<strong>D</strong> to move, <strong>Space</strong>, <strong>W</strong> or <strong>↑</strong> to jump. Click the game first so it can hear the keyboard.</p>
 <div class="demo" data-sketch="examples/platformer" data-width="800" data-height="500" data-keys="1"></div>
@@ -124,18 +124,29 @@ for (let p of platforms) {
   score++;
 });
 </code></pre>
-<div class="demo" data-sketch="examples/platformer-step-5" data-width="800" data-height="500" data-keys="1"></div>
-<p>Did you notice the bug? The score is drawn in <code>draw()</code>, and GameObjects draws the world <strong>after</strong> <code>draw()</code> finishes, so platforms and coins can cover the score.</p>
-<h2 id="step-6-the-score-on-top-the-finished-game">Step 6: The score on top (the finished game)</h2>
-<p>To fix the score, we draw the world ourselves at the right moment. Turning off <code>world.autoDraw</code> and calling <code>world.draw()</code> in the middle of our <code>draw()</code> puts the objects <strong>under</strong> whatever we draw next:</p>
-<pre><code class="language-js">world.autoDraw = false;  // in setup()
+<p>The score goes in <strong><code>drawOnTop()</code></strong>. GameObjects calls it every frame <strong>after</strong> all the game objects are drawn, so the score is always on top. It's in screen space too, so it stays in the corner while the camera moves:</p>
+<pre><code class="language-js">function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text('Coins: ' + score, 16, 16);
+}
 </code></pre>
-<pre><code class="language-js">world.draw();            // the game objects...
-
-fill(0);                 // ...then the score, on top
-text('Coins: ' + score, 16, 16);
-if (coins.length === 0) {
-  text('You got them all!', width / 2, height / 2);
+<div class="demo" data-sketch="examples/platformer-step-5" data-width="800" data-height="500" data-keys="1"></div>
+<h2 id="step-6-collecting-every-coin-the-finished-game">Step 6: Collecting every coin (the finished game)</h2>
+<p>When <code>coins.length</code> reaches <code>0</code>, every coin has been collected. We add a message for that to <code>drawOnTop()</code>:</p>
+<pre><code class="language-js">function drawOnTop() {
+  fill(0);
+  noStroke();
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text('Coins: ' + score, 16, 16);
+  if (coins.length === 0) {
+    textAlign(CENTER, CENTER);
+    textSize(48);
+    text('You got them all!', width / 2, height / 2);
+  }
 }
 </code></pre>
 <div class="demo" data-sketch="examples/platformer" data-width="800" data-height="500" data-keys="1"></div>

@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=b09d8b46" />
+  <link rel="stylesheet" href="css/docs.css?v=d6305a77" />
 </head>
 <body class="page-getting-started">
   <header class="topbar">
@@ -59,35 +59,23 @@
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A p5.js sketch. GameObjects works with <strong>p5.js 2.x</strong> (recommended) and 1.x.</li>
-<li>Three extra <code>&lt;script&gt;</code> lines in your <code>index.html</code>.</li>
-<li>The file <code>gameobjects.js</code>.</li>
+<li>Four <code>&lt;script&gt;</code> lines in your <code>index.html</code>. There's nothing to download.</li>
 </ul>
-<h2 id="setting-up-in-the-p5js-web-editor">Setting up in the p5.js Web Editor</h2>
-<ol>
-<li><strong>Download <code>gameobjects.js</code></strong> from the GameObjects repository.</li>
-<li>In the Web Editor, open the sketch files panel (the <strong>›</strong> arrow on the left), click <strong>+</strong>, choose <strong>Upload file</strong> and upload <code>gameobjects.js</code>.</li>
-<li>Open <code>index.html</code> and make the <code>&lt;head&gt;</code> load the scripts <strong>in this order</strong>:</li>
-</ol>
+<h2 id="setting-up">Setting up</h2>
+<p>Open <code>index.html</code> and make the <code>&lt;head&gt;</code> load these four scripts <strong>in this order</strong>:</p>
 <pre><code class="language-html">&lt;!-- 1. p5.js and p5.sound --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js&quot;&gt;&lt;/script&gt;
 &lt;!-- 2. the physics engine --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js&quot;&gt;&lt;/script&gt;
 &lt;!-- 3. GameObjects --&gt;
-&lt;script src=&quot;gameobjects.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/dstein-art/gameObjects@v0.1/gameobjects.min.js&quot;&gt;&lt;/script&gt;
 </code></pre>
-<p>Your <code>sketch.js</code> is loaded after these, in the <code>&lt;body&gt;</code>, as usual.</p>
+<p>Your <code>sketch.js</code> is loaded after these, in the <code>&lt;body&gt;</code>, as usual. This works the same in the p5.js Web Editor and on your own computer.</p>
 <blockquote>
-<p><strong>Watch out:</strong> the order matters. p5.js first, then Matter.js, then <code>gameobjects.js</code>. If you see <em>"GameObjects.js needs Matter.js"</em> in the console, the Matter.js line is missing or comes too late.</p>
+<p><strong>Watch out:</strong> the order matters. p5.js first, then Matter.js, then GameObjects. If you see <em>"GameObjects.js needs Matter.js"</em> in the console, the Matter.js line is missing or comes too late.</p>
 </blockquote>
-<h2 id="setting-up-on-your-own-computer">Setting up on your own computer</h2>
-<p>Make a folder like this:</p>
-<pre><code class="language-text">my-game/
-  index.html
-  sketch.js
-  gameobjects.js
-</code></pre>
-<p>Use the same <code>&lt;script&gt;</code> lines as above. Open the folder with a local web server, for example the <strong>Live Server</strong> extension in VS Code. Opening <code>index.html</code> by double-clicking it won't load images or sounds.</p>
+<p>On your own computer, open the sketch folder with a local web server, for example the <strong>Live Server</strong> extension in VS Code. Opening <code>index.html</code> by double-clicking it won't load images or sounds.</p>
 <h2 id="your-first-sketch">Your first sketch</h2>
 <pre><code class="language-js">function setup() {
   createCanvas(640, 320);
@@ -178,6 +166,6 @@ function draw() {
       <a class="next" href="game-objects.html"><small>Next</small>Game Objects</a>
     </nav>
   </main>
-  <script src="js/docs.js?v=b09d8b46"></script>
+  <script src="js/docs.js?v=d6305a77"></script>
 </body>
 </html>

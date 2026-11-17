@@ -7,7 +7,7 @@
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="stylesheet" href="docs/css/docs.css?v=b09d8b46" />
+  <link rel="stylesheet" href="docs/css/docs.css?v=d6305a77" />
   <style>
     .home { max-width: 1120px; margin: 0 auto; padding: calc(var(--topbar) + 40px) 28px 80px; }
 
@@ -103,6 +103,19 @@ function draw() {
 }</code></pre>
     </section>
 
+    <h2 id="setup">Add 4 lines to your <code>index.html</code> to get started</h2>
+    <p>There's nothing to download. GameObjects and the libraries it uses all load from the web.</p>
+    <div class="setup">
+      <ol>
+        <li>Paste these lines into the <code>&lt;head&gt;</code>, in this order: p5.js (and p5.sound), then Matter.js, then GameObjects.</li>
+        <li>Start making <code>GameObject</code>s in <code>setup()</code>.</li>
+      </ol>
+      <pre><code class="language-html">&lt;script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/gh/dstein-art/gameObjects@v0.1/gameobjects.min.js"&gt;&lt;/script&gt;</code></pre>
+    </div>
+
     <h2 id="learn">Learn GameObjects</h2>
     <p>Eleven short sections with live demos, plus a full <a href="docs/api.html">API reference</a>. You can edit and run the code under every demo.</p>
     <div class="grid">
@@ -177,20 +190,6 @@ function draw() {
       </a>
     </div>
 
-    <h2 id="setup">Add it to your sketch</h2>
-    <p>Three extra lines in your <code>index.html</code>, then you're ready.</p>
-    <div class="setup">
-      <ol>
-        <li>Download <a href="gameobjects.js"><code>gameobjects.js</code></a> and put it next to your <code>sketch.js</code>. In the p5.js Web Editor, upload it to your sketch.</li>
-        <li>Load the scripts in this order in your <code>index.html</code>: p5.js, then Matter.js, then GameObjects.</li>
-        <li>Start making <code>GameObject</code>s in <code>setup()</code>.</li>
-      </ol>
-      <pre><code class="language-html">&lt;script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"&gt;&lt;/script&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js"&gt;&lt;/script&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"&gt;&lt;/script&gt;
-&lt;script src="gameobjects.js"&gt;&lt;/script&gt;</code></pre>
-    </div>
-
     <footer>
       <span>GameObjects.js by David Stein · MIT License</span>
       <a href="docs/api.html">API reference</a>
@@ -198,6 +197,6 @@ function draw() {
       <a href="https://p5js.org">p5.js</a>
     </footer>
   </main>
-  <script src="docs/js/docs.js?v=b09d8b46"></script>
+  <script src="docs/js/docs.js?v=d6305a77"></script>
 </body>
 </html>

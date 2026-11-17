@@ -49,10 +49,13 @@ Load the scripts in this order in `index.html`:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
-<script src="gameobjects.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/dstein-art/gameObjects@v0.1/gameobjects.min.js"></script>
 <script src="sketch.js"></script>
 ```
+
+p5.sound is optional: GameObjects doesn't need it.
 
 GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created automatically), `GameWorld`, `GameObject`, `GameGroup` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
 
@@ -78,7 +81,7 @@ Each frame, while a world is current:
 3. **After `draw()`**, the world's `draw()` draws every link and object (sorted by `depth`) through the camera.
 4. **Then your `drawOnTop()`** runs, if the sketch has one (see [drawOnTop()](#drawontop)).
 
-For the first 5 seconds a sketch runs, a small "created with GameObjects.org" note is shown in the top left, over everything, then it fades away.
+For the first 5 seconds a sketch runs, a small "created with GameObjects.org" note is shown in the top right, over everything, then it fades away.
 
 If your sketch calls `world.update()` or `world.draw()` itself, the automatic step is skipped for that frame. Calling `update()` yourself switches `autoUpdate` off. Physics runs at a fixed step of 1/60 s per frame, so the game runs in slow motion if the frame rate drops.
 

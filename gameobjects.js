@@ -1375,11 +1375,11 @@
       }
     }
 
-    // 3. a small credit in the top left for the first few seconds
+    // 3. a small credit in the top right for the first few seconds
     drawCredit(this);
   }
 
-  // "created with GameObjects.org", shown for 5 seconds, fading out in the last one
+  // "created with GameObjects.org" in the top right, shown for 5 seconds, fading out in the last one
   let CREDIT_TEXT = 'created with GameObjects.org';
   let CREDIT_TIME = 5000; // milliseconds
   let CREDIT_FADE = 1000;
@@ -1398,9 +1398,10 @@
     p.noStroke();
     p.rectMode(p.CORNER);
     p.fill(0, 215 * alpha);
-    p.rect(6, 6, w, 22, 6);
+    let x = p.width - w - 6; // the top right corner
+    p.rect(x, 6, w, 22, 6);
     p.fill(255, 255 * alpha);
-    p.text(CREDIT_TEXT, 14, 17);
+    p.text(CREDIT_TEXT, x + 8, 17);
     p.pop();
   }
 

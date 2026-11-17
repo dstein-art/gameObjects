@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=b09d8b46" />
+  <link rel="stylesheet" href="css/docs.css?v=d6305a77" />
 </head>
 <body class="page-api">
   <header class="topbar">
@@ -55,10 +55,12 @@
 <h2 id="loading-the-library">Loading the library</h2>
 <p>Load the scripts in this order in <code>index.html</code>:</p>
 <pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;gameobjects.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/dstein-art/gameObjects@v0.1/gameobjects.min.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;sketch.js&quot;&gt;&lt;/script&gt;
 </code></pre>
+<p>p5.sound is optional: GameObjects doesn't need it.</p>
 <p>GameObjects adds these globals: <strong><code>world</code></strong> (a <a href="#gameworld">GameWorld</a> created automatically), <code>GameWorld</code>, <code>GameObject</code>, <code>GameGroup</code> and the <code>GameObjects</code> namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.</p>
 <h2 id="units-and-conventions">Units and conventions</h2>
 <table>
@@ -104,7 +106,7 @@
 <li><strong>After <code>draw()</code></strong>, the world's <code>draw()</code> draws every link and object (sorted by <code>depth</code>) through the camera.</li>
 <li><strong>Then your <code>drawOnTop()</code></strong> runs, if the sketch has one (see <a href="#drawontop">drawOnTop()</a>).</li>
 </ol>
-<p>For the first 5 seconds a sketch runs, a small "created with GameObjects.org" note is shown in the top left, over everything, then it fades away.</p>
+<p>For the first 5 seconds a sketch runs, a small "created with GameObjects.org" note is shown in the top right, over everything, then it fades away.</p>
 <p>If your sketch calls <code>world.update()</code> or <code>world.draw()</code> itself, the automatic step is skipped for that frame. Calling <code>update()</code> yourself switches <code>autoUpdate</code> off. Physics runs at a fixed step of 1/60 s per frame, so the game runs in slow motion if the frame rate drops.</p>
 <h2 id="drawontop">drawOnTop()</h2>
 <p>An optional function your sketch can define, like <code>setup()</code> and <code>draw()</code>. If it exists, GameObjects calls it every frame <strong>after</strong> all the game objects are drawn, so whatever it draws is on top: a score, lives, messages, a title or game-over screen.</p>
@@ -1398,6 +1400,6 @@ ball.onCollide((me, other) =&gt; bumpSound.play());         // anything
       <span></span>
     </nav>
   </main>
-  <script src="js/docs.js?v=b09d8b46"></script>
+  <script src="js/docs.js?v=d6305a77"></script>
 </body>
 </html>

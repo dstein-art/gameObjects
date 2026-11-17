@@ -14,14 +14,11 @@ Click the demo above to drop more boxes. That whole sketch is about 20 lines of 
 ## What you need
 
 - A p5.js sketch. GameObjects works with **p5.js 2.x** (recommended) and 1.x.
-- Three extra `<script>` lines in your `index.html`.
-- The file `gameobjects.js`.
+- Four `<script>` lines in your `index.html`. There's nothing to download.
 
-## Setting up in the p5.js Web Editor
+## Setting up
 
-1. **Download `gameobjects.js`** from the GameObjects repository.
-2. In the Web Editor, open the sketch files panel (the **›** arrow on the left), click **+**, choose **Upload file** and upload `gameobjects.js`.
-3. Open `index.html` and make the `<head>` load the scripts **in this order**:
+Open `index.html` and make the `<head>` load these four scripts **in this order**:
 
 ```html
 <!-- 1. p5.js and p5.sound -->
@@ -30,25 +27,14 @@ Click the demo above to drop more boxes. That whole sketch is about 20 lines of 
 <!-- 2. the physics engine -->
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <!-- 3. GameObjects -->
-<script src="gameobjects.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/dstein-art/gameObjects@v0.1/gameobjects.min.js"></script>
 ```
 
-Your `sketch.js` is loaded after these, in the `<body>`, as usual.
+Your `sketch.js` is loaded after these, in the `<body>`, as usual. This works the same in the p5.js Web Editor and on your own computer.
 
-> **Watch out:** the order matters. p5.js first, then Matter.js, then `gameobjects.js`. If you see *"GameObjects.js needs Matter.js"* in the console, the Matter.js line is missing or comes too late.
+> **Watch out:** the order matters. p5.js first, then Matter.js, then GameObjects. If you see *"GameObjects.js needs Matter.js"* in the console, the Matter.js line is missing or comes too late.
 
-## Setting up on your own computer
-
-Make a folder like this:
-
-```text
-my-game/
-  index.html
-  sketch.js
-  gameobjects.js
-```
-
-Use the same `<script>` lines as above. Open the folder with a local web server, for example the **Live Server** extension in VS Code. Opening `index.html` by double-clicking it won't load images or sounds.
+On your own computer, open the sketch folder with a local web server, for example the **Live Server** extension in VS Code. Opening `index.html` by double-clicking it won't load images or sounds.
 
 ## Your first sketch
 

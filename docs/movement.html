@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=12c08eef" />
+  <link rel="stylesheet" href="css/docs.css?v=35b4d17c" />
 </head>
 <body class="page-movement">
   <header class="topbar">
@@ -121,6 +121,10 @@ tank.rotationSpeed = 2;      // keep spinning, 2 degrees per frame
 <p>A <strong>static</strong> object (<code>isStatic: true</code>) is never moved by physics, but <strong>you</strong> can move it by setting its position. When you move it a little each frame, GameObjects treats it as sliding, so things standing on it ride along:</p>
 <pre><code class="language-js">platform.x = 320 + sin(frameCount * 0.02) * 150;
 </code></pre>
+<p>Riding along sideways needs <strong>grip</strong>. Friction is <code>0</code> by default, so give both the platform and the things that ride on it some friction, or the platform slides away underneath them:</p>
+<pre><code class="language-js">let platform = new GameObject(320, 140, 160, 16, { isStatic: true, friction: 0.8 });
+let box = new GameObject(320, 100, 40, { friction: 0.8 });
+</code></pre>
 <div class="demo" data-sketch="moving-platform" data-width="640" data-height="320"></div>
 <h2 id="how-far-away">How far away?</h2>
 <pre><code class="language-js">player.distanceTo(enemy);        // distance to another object
@@ -194,6 +198,6 @@ if (enemy.distanceTo(player) &lt; 200) {
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=12c08eef"></script>
+  <script src="js/docs.js?v=35b4d17c"></script>
 </body>
 </html>

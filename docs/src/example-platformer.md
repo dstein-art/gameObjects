@@ -155,6 +155,6 @@ function drawOnTop() {
 
 - **Spikes:** a group of static sensor triangles. Touching one sends the player back to the start (see [Levels and Score](levels-score.html#lives-and-losing)).
 - **An animated hero:** swap the box for the hero spritesheet with idle, run and jump animations (see [Spritesheets and Animations](animation.html#adding-animations-to-an-object)).
-- **Moving platforms:** a static platform whose `x` changes a little every frame carries the player along (see [Movement](movement.html#moving-platforms)).
+- **Moving platforms:** a static platform whose `x` or `y` changes a little every frame. Lifts that go up and down carry the player as they are. For side-to-side platforms the player needs some friction to ride along (see [Movement](movement.html#moving-platforms)).
 - **More levels:** design them as text maps (see [Levels and Score](levels-score.html#levels)).
 - **Sounds:** a jump sound and a coin ding (see [Sounds](sounds.html)).

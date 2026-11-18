@@ -163,8 +163,8 @@ Every option can also be read and changed later as a property, unless it's marke
 | `isStatic` | `false` | Never moved by physics |
 | `isSensor` | `false` | Detects touches but doesn't collide |
 | `bounce` | `0.2` | `0` to `1` |
-| `friction` | `0.1` | `0` (ice) to `1` (sticky) |
-| `airFriction` | `0.01` | Slows the object down all the time |
+| `friction` | `0` | `0` (ice) to `1` (sticky). No grip unless you set it. |
+| `airFriction` | `0` | Slows the object down all the time. Nothing slows down unless you set it. |
 | `density` | `0.001` | Weight per area |
 | `mass` | from density | Total weight |
 | `rotation` | `0` | Starting angle in degrees |
@@ -481,7 +481,7 @@ Most games need only one world. Use `world.clear()` to restart or change levels.
 | `x`, `y`, `width`, `height` | the canvas | The area to wall in |
 | `thickness` | `100` | Wall thickness. The walls sit just outside the area. |
 | `color`, `stroke` | `null` | Invisible by default |
-| `bounce`, `friction` | `0.2`, `0.1` | |
+| `bounce`, `friction` | `0.2`, `0` | |
 | `top` | `true` | `false` leaves the top open |
 
 ```js

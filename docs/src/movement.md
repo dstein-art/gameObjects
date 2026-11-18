@@ -107,6 +107,13 @@ A **static** object (`isStatic: true`) is never moved by physics, but **you** ca
 platform.x = 320 + sin(frameCount * 0.02) * 150;
 ```
 
+Riding along sideways needs **grip**. Friction is `0` by default, so give both the platform and the things that ride on it some friction, or the platform slides away underneath them:
+
+```js
+let platform = new GameObject(320, 140, 160, 16, { isStatic: true, friction: 0.8 });
+let box = new GameObject(320, 100, 40, { friction: 0.8 });
+```
+
 [[demo: moving-platform | 320]]
 
 ## How far away?

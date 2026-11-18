@@ -73,7 +73,7 @@ function keyPressed() {
 }
 ```
 
-> **Tip:** give the player `fixedRotation: true` so it doesn't tip over, and `friction: 0` so it doesn't stick to the sides of walls.
+> **Tip:** give the player `fixedRotation: true` so it doesn't tip over. Friction is `0` by default, so it won't stick to the sides of walls. If you give the player some friction, it will.
 
 ## Mouse
 

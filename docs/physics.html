@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=12c08eef" />
+  <link rel="stylesheet" href="css/docs.css?v=35b4d17c" />
 </head>
 <body class="page-physics">
   <header class="topbar">
@@ -78,9 +78,15 @@ crate.isStatic = false;   // ...and let it fall again
 </code></pre>
 <p>When two objects hit, the bouncier of the two is used.</p>
 <h2 id="friction">Friction</h2>
-<p><strong><code>friction</code></strong> is how much things grip when they slide against each other, from <code>0</code> (ice) to <code>1</code> (sticky). The default is <code>0.1</code>.</p>
-<p>When two objects slide against each other, the <strong>less</strong> grippy of the two is used, so an icy box slides even on a sticky ramp.</p>
-<p><strong><code>airFriction</code></strong> slows an object down all the time, even when it isn't touching anything. Use <code>0</code> in space and higher values (like <code>0.1</code>) for things moving through water or treacle. The default is <code>0.01</code>.</p>
+<p><strong><code>friction</code></strong> is how much things grip when they slide against each other, from <code>0</code> (ice) to <code>1</code> (sticky). The default is <code>0</code>: everything is like ice until you give it some grip.</p>
+<p>When two objects slide against each other, the <strong>less</strong> grippy of the two is used, so an icy box slides even on a sticky ramp. That means <strong>both</strong> need friction for things to grip: a box with <code>friction: 0.5</code> still slides on a floor that has none.</p>
+<pre><code class="language-js">let floor = new GameObject(320, 330, 640, 20, { isStatic: true, friction: 0.5 });
+let box = new GameObject(200, 100, 40, 40, { friction: 0.5 });   // stops sliding on the floor
+</code></pre>
+<p><strong><code>airFriction</code></strong> slows an object down all the time, even when it isn't touching anything. The default is <code>0</code>, so a thrown or pushed object keeps going until something stops it, just like in space. Use small values like <code>0.01</code> for a gentle slow-down, and higher values (like <code>0.1</code>) for things moving through water or treacle.</p>
+<blockquote>
+<p><strong>Tip:</strong> to give every object in a group the same grip, put it in the group's defaults: <code>new GameGroup({ friction: 0.3, airFriction: 0.01 })</code>.</p>
+</blockquote>
 <div class="demo" data-sketch="bounce-friction" data-width="640" data-height="340"></div>
 <h2 id="weight-density-and-mass">Weight: <code>density</code> and <code>mass</code></h2>
 <p>Heavier objects push lighter ones out of the way, and are harder to move with <code>applyForce</code>. Weight comes from <strong>density × size</strong>, so bigger objects are heavier.</p>
@@ -233,6 +239,6 @@ GameObjects.Matter  // the whole Matter.js library
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=12c08eef"></script>
+  <script src="js/docs.js?v=35b4d17c"></script>
 </body>
 </html>

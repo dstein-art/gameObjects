@@ -61,7 +61,7 @@ bullets.onCollide(enemies, (bullet, enemy) => {
 
 ```js
 player.onCollideEnd(water, () => {
-  player.airFriction = 0.01;    // back to normal after leaving the water
+  player.airFriction = 0;       // back to normal after leaving the water
 });
 ```
 
@@ -113,7 +113,7 @@ player.onCollide(coins, (me, coin) => coin.destroy());
 
 function draw() {
   // ...
-  player.airFriction = player.isTouching(water) ? 0.2 : 0.01;   // slow in water
+  player.airFriction = player.isTouching(water) ? 0.2 : 0;   // slow in water
 }
 ```
 

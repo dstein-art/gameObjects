@@ -42,11 +42,18 @@ When two objects hit, the bouncier of the two is used.
 
 ## Friction
 
-**`friction`** is how much things grip when they slide against each other, from `0` (ice) to `1` (sticky). The default is `0.1`.
+**`friction`** is how much things grip when they slide against each other, from `0` (ice) to `1` (sticky). The default is `0`: everything is like ice until you give it some grip.
 
-When two objects slide against each other, the **less** grippy of the two is used, so an icy box slides even on a sticky ramp.
+When two objects slide against each other, the **less** grippy of the two is used, so an icy box slides even on a sticky ramp. That means **both** need friction for things to grip: a box with `friction: 0.5` still slides on a floor that has none.
 
-**`airFriction`** slows an object down all the time, even when it isn't touching anything. Use `0` in space and higher values (like `0.1`) for things moving through water or treacle. The default is `0.01`.
+```js
+let floor = new GameObject(320, 330, 640, 20, { isStatic: true, friction: 0.5 });
+let box = new GameObject(200, 100, 40, 40, { friction: 0.5 });   // stops sliding on the floor
+```
+
+**`airFriction`** slows an object down all the time, even when it isn't touching anything. The default is `0`, so a thrown or pushed object keeps going until something stops it, just like in space. Use small values like `0.01` for a gentle slow-down, and higher values (like `0.1`) for things moving through water or treacle.
+
+> **Tip:** to give every object in a group the same grip, put it in the group's defaults: `new GameGroup({ friction: 0.3, airFriction: 0.01 })`.
 
 [[demo: bounce-friction | 340]]
 

@@ -10,7 +10,8 @@ function setup() {
   new GameObject(220, 200, 140, 14, { isStatic: true, color: '#868e96', rotation: -12 });
   new GameObject(470, 140, 140, 14, { isStatic: true, color: '#868e96', rotation: 15 });
 
-  drops = new GameGroup({ shape: 'circle', color: '#4dabf7', stroke: null, showRotation: false });
+  // a little air friction, so the drops fall at a steady speed like real rain
+  drops = new GameGroup({ shape: 'circle', color: '#4dabf7', stroke: null, showRotation: false, airFriction: 0.02 });
 
   // one rule for the whole group: any drop that hits the ground disappears
   drops.onCollide(ground, (drop) => {

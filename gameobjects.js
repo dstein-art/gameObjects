@@ -192,8 +192,8 @@
       // ---- build the Matter.js body ----
       let bodyOpts = {
         restitution: options.bounce ?? 0.2,
-        friction: options.friction ?? 0.1,
-        frictionAir: options.airFriction ?? 0.01,
+        friction: options.friction ?? 0, // no grip unless you ask for it
+        frictionAir: options.airFriction ?? 0, // nothing slows down unless you ask for it
         isStatic: !!options.isStatic,
         isSensor: !!options.isSensor,
         angle: (options.rotation ?? 0) / DEG,
@@ -1139,7 +1139,7 @@
         color: pick(options, 'color', null),
         stroke: pick(options, 'stroke', null),
         bounce: options.bounce ?? 0.2,
-        friction: options.friction ?? 0.1,
+        friction: options.friction ?? 0,
         world: this,
       };
       let walls = new GameGroup({ name: 'walls' });

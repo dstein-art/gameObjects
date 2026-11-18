@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=12c08eef" />
+  <link rel="stylesheet" href="css/docs.css?v=35b4d17c" />
 </head>
 <body class="page-collisions">
   <header class="topbar">
@@ -94,7 +94,7 @@ let coin = new GameObject(400, 200, 20, { shape: 'circle', isSensor: true });   
 <h2 id="when-touching-stops-oncollideend">When touching stops: <code>onCollideEnd</code></h2>
 <p><strong><code>onCollideEnd(target, callback)</code></strong> runs once, when two things <strong>stop</strong> touching:</p>
 <pre><code class="language-js">player.onCollideEnd(water, () =&gt; {
-  player.airFriction = 0.01;    // back to normal after leaving the water
+  player.airFriction = 0;       // back to normal after leaving the water
 });
 </code></pre>
 <h2 id="every-frame-while-touching-whiletouching">Every frame while touching: <code>whileTouching</code></h2>
@@ -133,7 +133,7 @@ player.onCollide(coins, (me, coin) =&gt; coin.destroy());
 
 function draw() {
   // ...
-  player.airFriction = player.isTouching(water) ? 0.2 : 0.01;   // slow in water
+  player.airFriction = player.isTouching(water) ? 0.2 : 0;   // slow in water
 }
 </code></pre>
 <blockquote>
@@ -227,6 +227,6 @@ function draw() {
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=12c08eef"></script>
+  <script src="js/docs.js?v=35b4d17c"></script>
 </body>
 </html>

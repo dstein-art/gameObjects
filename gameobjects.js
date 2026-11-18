@@ -751,6 +751,37 @@
   // ===========================================================================
   // GameGroup
   // ===========================================================================
+  // Lets group[i] read the i-th member. Everything else goes straight to the group.
+  let isIndex = (prop) => typeof prop === 'string' && /^(0|[1-9][0-9]*)$/.test(prop);
+  let warnedIndexWrite = false;
+  let GROUP_INDEXES = {
+    get(target, prop, receiver) {
+      if (isIndex(prop)) return target._items[+prop];
+      return Reflect.get(target, prop, receiver);
+    },
+    set(target, prop, value, receiver) {
+      if (isIndex(prop)) {
+        if (!warnedIndexWrite) {
+          warnedIndexWrite = true;
+          console.warn(
+            'GameObjects: group[' + prop + '] = ... does nothing. A group is not an array: ' +
+              'use group.add(obj) to add an object, or group.create(x, y, ...) to make one.'
+          );
+        }
+        return true;
+      }
+      return Reflect.set(target, prop, value, receiver);
+    },
+    has(target, prop) {
+      if (isIndex(prop)) return +prop < target._items.length;
+      return Reflect.has(target, prop);
+    },
+    deleteProperty(target, prop) {
+      if (isIndex(prop)) return true; // use group.remove(obj)
+      return Reflect.deleteProperty(target, prop);
+    },
+  };
+
   class GameGroup {
     /**
      * new GameGroup()
@@ -763,6 +794,9 @@
       this._ignores = new Set();
       this.defaults = defaults;
       this.name = defaults.name || '';
+      // A group isn't an array, but group[0], group[1]... read its members,
+      // like an array. They can't be assigned: use add() or create().
+      return new Proxy(this, GROUP_INDEXES);
     }
 
     get length() { return this._items.length; }

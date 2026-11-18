@@ -59,6 +59,16 @@ enemies.forEach((enemy) => enemy.moveToward(player, 2));
 
 It's safe to destroy objects while you loop through a group.
 
+You can also reach a member by its position, like an array: `enemies[0]` is the first, `enemies[enemies.length - 1]` the last.
+
+```js
+for (let i = 0; i < enemies.length; i++) {
+  enemies[i].moveToward(player, 2);
+}
+```
+
+> **Watch out:** a group **isn't really an array**. `enemies[i]` and `enemies.get(i)` read a member, but `enemies[i] = myObject` does **not** put an object in the group: it does nothing, and GameObjects prints a warning. Use `enemies.add(myObject)` or `enemies.create(...)`. Array methods a group doesn't have, like `push()` and `sort()`, don't work either. When you need a real array, use `enemies.toArray()`.
+
 [[demo: swarm | 340]]
 
 ## Counting and picking
@@ -66,12 +76,12 @@ It's safe to destroy objects while you loop through a group.
 | | |
 |---|---|
 | `group.length` | How many objects are in the group |
-| `group.get(i)` | The object at position `i` |
+| `group[i]`, `group.get(i)` | The object at position `i` |
 | `group.first`, `group.last` | The first or last object |
 | `group.random()` | A random object |
 | `group.has(obj)` | Is this object in the group? |
 | `group.closestTo(x, y)`, `group.closestTo(obj)` | The nearest object |
-| `group.filter(fn)`, `group.find(fn)` | Arrays and searching, like normal arrays |
+| `group.filter(fn)`, `group.find(fn)` | Searching, like the array methods |
 | `group.toArray()` | A plain array copy |
 
 ```js

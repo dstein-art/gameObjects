@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=35b4d17c" />
+  <link rel="stylesheet" href="css/docs.css?v=51db08b5" />
 </head>
 <body class="page-api">
   <header class="topbar">
@@ -803,9 +803,9 @@ let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, col
 <td>Number of objects</td>
 </tr>
 <tr>
-<td><code>get(i)</code></td>
+<td><code>[i]</code>, <code>get(i)</code></td>
 <td>GameObject</td>
-<td>Object at position <code>i</code></td>
+<td>Object at position <code>i</code>: <code>group[0]</code> is the first. Reading only: <code>group[i] = obj</code> does nothing (use <code>add()</code>).</td>
 </tr>
 <tr>
 <td><code>first</code>, <code>last</code></td>
@@ -820,7 +820,8 @@ let coins = new GameGroup({ shape: 'circle', isSensor: true, isStatic: true, col
 </tbody>
 </table>
 <h3 id="looping-and-searching">Looping and searching</h3>
-<p>Groups can be looped over with <code>for (let obj of group)</code>. It's safe to destroy objects while looping.</p>
+<p>Groups can be looped over with <code>for (let obj of group)</code>, or with an index and <code>group[i]</code>. It's safe to destroy objects while looping with <code>for...of</code>.</p>
+<p>A group is <strong>not an array</strong>: it reads like one (<code>group[i]</code>, <code>length</code>, <code>for...of</code>), but assigning <code>group[i] = obj</code> does nothing, and array methods it doesn't list below, like <code>push()</code> and <code>sort()</code>, don't exist. <code>toArray()</code> gives you a real array.</p>
 <table>
 <thead>
 <tr>
@@ -1785,6 +1786,6 @@ player.fill('seagreen');
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=35b4d17c"></script>
+  <script src="js/docs.js?v=51db08b5"></script>
 </body>
 </html>

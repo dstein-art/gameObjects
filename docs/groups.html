@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=35b4d17c" />
+  <link rel="stylesheet" href="css/docs.css?v=51db08b5" />
 </head>
 <body class="page-groups">
   <header class="topbar">
@@ -88,6 +88,14 @@ enemies.add(a, b, c);     // several at once
 <pre><code class="language-js">enemies.forEach((enemy) =&gt; enemy.moveToward(player, 2));
 </code></pre>
 <p>It's safe to destroy objects while you loop through a group.</p>
+<p>You can also reach a member by its position, like an array: <code>enemies[0]</code> is the first, <code>enemies[enemies.length - 1]</code> the last.</p>
+<pre><code class="language-js">for (let i = 0; i &lt; enemies.length; i++) {
+  enemies[i].moveToward(player, 2);
+}
+</code></pre>
+<blockquote>
+<p><strong>Watch out:</strong> a group <strong>isn't really an array</strong>. <code>enemies[i]</code> and <code>enemies.get(i)</code> read a member, but <code>enemies[i] = myObject</code> does <strong>not</strong> put an object in the group: it does nothing, and GameObjects prints a warning. Use <code>enemies.add(myObject)</code> or <code>enemies.create(...)</code>. Array methods a group doesn't have, like <code>push()</code> and <code>sort()</code>, don't work either. When you need a real array, use <code>enemies.toArray()</code>.</p>
+</blockquote>
 <div class="demo" data-sketch="swarm" data-width="640" data-height="340"></div>
 <h2 id="counting-and-picking">Counting and picking</h2>
 <table>
@@ -103,7 +111,7 @@ enemies.add(a, b, c);     // several at once
 <td>How many objects are in the group</td>
 </tr>
 <tr>
-<td><code>group.get(i)</code></td>
+<td><code>group[i]</code>, <code>group.get(i)</code></td>
 <td>The object at position <code>i</code></td>
 </tr>
 <tr>
@@ -124,7 +132,7 @@ enemies.add(a, b, c);     // several at once
 </tr>
 <tr>
 <td><code>group.filter(fn)</code>, <code>group.find(fn)</code></td>
-<td>Arrays and searching, like normal arrays</td>
+<td>Searching, like the array methods</td>
 </tr>
 <tr>
 <td><code>group.toArray()</code></td>
@@ -234,6 +242,6 @@ bullets.onCollide(enemies, (bullet, enemy) =&gt; {
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=35b4d17c"></script>
+  <script src="js/docs.js?v=51db08b5"></script>
 </body>
 </html>

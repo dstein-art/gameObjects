@@ -353,13 +353,15 @@ The optional object holds **defaults** for objects made with `create()`. Its `na
 | `remove(obj)` | group | Take an object out of the group. It stays in the world. |
 | `has(obj)` | boolean | Is the object in this group? |
 | `length`, `size` | number | Number of objects |
-| `get(i)` | GameObject | Object at position `i` |
+| `[i]`, `get(i)` | GameObject | Object at position `i`: `group[0]` is the first. Reading only: `group[i] = obj` does nothing (use `add()`). |
 | `first`, `last` | GameObject | First and last object |
 | `random()` | GameObject | A random member |
 
 ### Looping and searching
 
-Groups can be looped over with `for (let obj of group)`. It's safe to destroy objects while looping.
+Groups can be looped over with `for (let obj of group)`, or with an index and `group[i]`. It's safe to destroy objects while looping with `for...of`.
+
+A group is **not an array**: it reads like one (`group[i]`, `length`, `for...of`), but assigning `group[i] = obj` does nothing, and array methods it doesn't list below, like `push()` and `sort()`, don't exist. `toArray()` gives you a real array.
 
 | Method | Returns | Description |
 |---|---|---|

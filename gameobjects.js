@@ -1449,6 +1449,7 @@
   // calls these functions in your sketch, if you write them:
   //   gameStarted()        after gameManager.startGame()
   //   levelStarted(level)  when a level begins (level 1 straight after gameStarted)
+  //   levelStarted(level)  again after gameManager.restartLevel()
   //   levelEnded(level)    after gameManager.endLevel(), before the next level starts
   //   gameEnded(won)       after gameManager.endGame(), or after the last level
   let CALLBACKS = ['gameStarted', 'gameEnded', 'levelStarted', 'levelEnded'];
@@ -1461,6 +1462,7 @@
       this.won = false; // true when the game ended because the last level was finished
       this.highScore = 0; // the best score since the page loaded
       this._score = 0;
+      this._levelStartScore = 0; // the score when the current level began (for restartLevel)
       this._queue = [];
       lib.manager = this;
     }
@@ -1494,7 +1496,7 @@
         this._score = 0;
         this.level = 1;
         callBack('gameStarted');
-        callBack('levelStarted', this.level);
+        this._beginLevel();
       });
     }
 
@@ -1509,9 +1511,27 @@
           this._finish(true);
         } else {
           this.level = finished + 1;
-          callBack('levelStarted', this.level);
+          this._beginLevel();
         }
       });
+    }
+
+    /**
+     * Play the current level again from the start. Calls levelStarted(level) again
+     * (not levelEnded). The score goes back to what it was when the level began,
+     * unless you pass { keepScore: true }.
+     */
+    restartLevel(options = {}) {
+      return this._later('restartLevel', () => {
+        if (this.state !== 'playing') return;
+        if (!options.keepScore) this._score = this._levelStartScore;
+        this._beginLevel();
+      });
+    }
+
+    _beginLevel() {
+      this._levelStartScore = this._score;
+      callBack('levelStarted', this.level);
     }
 
     /** End the game now (the player lost, or quit). Calls gameEnded(false). */

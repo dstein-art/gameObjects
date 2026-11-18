@@ -552,10 +552,11 @@ function draw() {
 |---|---|---|
 | `startGame()` | gameManager | Start, or restart: `score` `0`, `level` `1`, `state` `'playing'`. Calls `gameStarted()`, then `levelStarted(1)`. |
 | `endLevel()` | gameManager | Finish the current level. Calls `levelEnded(level)`, then `levelStarted(level + 1)`. After the last level (see `levels`), it ends the game and calls `gameEnded(true)` instead. Does nothing unless the game is playing. |
+| `restartLevel(options)` | gameManager | Play the current level again from the start: calls `levelStarted(level)` again (not `levelEnded()`), and `level` stays the same. The score goes back to what it was when the level began; pass `{ keepScore: true }` to keep it. Does nothing unless the game is playing. |
 | `endGame()` | gameManager | End the game now. Calls `gameEnded(false)`. Does nothing unless the game is playing. |
 | `addScore(points)` | gameManager | Add to the score (`1` if left out). A negative number takes points away. |
 
-All three of `startGame()`, `endLevel()` and `endGame()` are safe to call from anywhere, including inside collision callbacks: if the physics is in the middle of a step, the game manager waits until the step is over. Calling the same one more than once in a single step counts once, so two coins collected together can't skip a level.
+`startGame()`, `endLevel()`, `restartLevel()` and `endGame()` are all safe to call from anywhere, including inside collision callbacks: if the physics is in the middle of a step, the game manager waits until the step is over. Calling the same one more than once in a single step counts once, so two coins collected together can't skip a level.
 
 ### Game manager callbacks
 
@@ -564,7 +565,7 @@ Write any of these functions in your sketch and the game manager calls them. All
 | Function | Called |
 |---|---|
 | `gameStarted()` | By `startGame()`, before the first level starts |
-| `levelStarted(level)` | When a level begins: `1` straight after `gameStarted()`, then after each `endLevel()` |
+| `levelStarted(level)` | When a level begins: `1` straight after `gameStarted()`, then after each `endLevel()`, and again after `restartLevel()` |
 | `levelEnded(level)` | By `endLevel()`, with the number of the level that was finished |
 | `gameEnded(won)` | By `endGame()` (`won` is `false`), or after the last level (`won` is `true`) |
 

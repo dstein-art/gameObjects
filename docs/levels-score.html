@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=51db08b5" />
+  <link rel="stylesheet" href="css/docs.css?v=8fb7ecf1" />
 </head>
 <body class="page-levels-score">
   <header class="topbar">
@@ -53,10 +53,11 @@
 <p class="lead">You have objects that move, collide, animate and make noise. This section turns them into a <strong>game</strong>: something with a score, a start and an end, and more than one level.</p>
 <h2 id="the-game-manager">The game manager</h2>
 <p>GameObjects gives every sketch a <strong><code>gameManager</code></strong>. It keeps the <strong>score</strong> and the <strong>level</strong>, and it knows whether the game has started, is being played, or is over. There's nothing to set up: just use it.</p>
-<p>You move the game along with three calls:</p>
-<pre><code class="language-js">gameManager.startGame();   // start (or restart): score 0, level 1
-gameManager.endLevel();    // this level is done: go on to the next one
-gameManager.endGame();     // game over
+<p>You move the game along with these calls:</p>
+<pre><code class="language-js">gameManager.startGame();      // start (or restart): score 0, level 1
+gameManager.endLevel();       // this level is done: go on to the next one
+gameManager.restartLevel();   // play this level again from the start
+gameManager.endGame();        // game over
 </code></pre>
 <p>And the game manager calls <strong>your</strong> functions when those things happen, if you write them:</p>
 <pre><code class="language-js">function gameStarted() {
@@ -257,8 +258,16 @@ function levelStarted(level) {
 if (player.isTouching(exit) &amp;&amp; coins.length === 0) gameManager.endLevel();
 </code></pre>
 <p>After the <strong>last</strong> level, <code>endLevel()</code> ends the game instead: <code>gameEnded(true)</code> is called and <code>gameManager.won</code> is <code>true</code>. Use it to show a "You won!" screen.</p>
+<h3 id="restarting-a-level">Restarting a level</h3>
+<p>To play the same level again, for example when the player falls into a pit, call <strong><code>restartLevel()</code></strong>. It calls your <code>levelStarted()</code> again with the same level number, so the level is built fresh:</p>
+<pre><code class="language-js">player.onCollide(spikes, () =&gt; gameManager.restartLevel());
+
+// in draw():
+if (player.y &gt; height + 100) gameManager.restartLevel();   // fell off the bottom
+</code></pre>
+<p>The score goes back to what it was when the level began, so collecting the same coins again doesn't count twice. To keep the score instead, use <code>gameManager.restartLevel({ keepScore: true })</code>. <code>levelEnded()</code> isn't called, because the level wasn't finished.</p>
 <blockquote>
-<p><strong>Tip:</strong> it's safe to call <code>startGame()</code>, <code>endLevel()</code> and <code>endGame()</code> anywhere, even inside an <code>onCollide</code> callback. If the physics is in the middle of a step, the game manager waits until the step is over before building the next level.</p>
+<p><strong>Tip:</strong> it's safe to call <code>startGame()</code>, <code>endLevel()</code>, <code>restartLevel()</code> and <code>endGame()</code> anywhere, even inside an <code>onCollide</code> callback. If the physics is in the middle of a step, the game manager waits until the step is over before building the next level.</p>
 </blockquote>
 <div class="demo" data-sketch="tile-levels" data-width="640" data-height="360" data-keys="1"></div>
 <h2 id="putting-it-all-together">Putting it all together</h2>
@@ -282,6 +291,6 @@ if (player.isTouching(exit) &amp;&amp; coins.length === 0) gameManager.endLevel(
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=51db08b5"></script>
+  <script src="js/docs.js?v=8fb7ecf1"></script>
 </body>
 </html>

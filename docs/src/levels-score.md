@@ -7,12 +7,13 @@ You have objects that move, collide, animate and make noise. This section turns 
 
 GameObjects gives every sketch a **`gameManager`**. It keeps the **score** and the **level**, and it knows whether the game has started, is being played, or is over. There's nothing to set up: just use it.
 
-You move the game along with three calls:
+You move the game along with these calls:
 
 ```js
-gameManager.startGame();   // start (or restart): score 0, level 1
-gameManager.endLevel();    // this level is done: go on to the next one
-gameManager.endGame();     // game over
+gameManager.startGame();      // start (or restart): score 0, level 1
+gameManager.endLevel();       // this level is done: go on to the next one
+gameManager.restartLevel();   // play this level again from the start
+gameManager.endGame();        // game over
 ```
 
 And the game manager calls **your** functions when those things happen, if you write them:
@@ -248,7 +249,20 @@ if (player.isTouching(exit) && coins.length === 0) gameManager.endLevel();
 
 After the **last** level, `endLevel()` ends the game instead: `gameEnded(true)` is called and `gameManager.won` is `true`. Use it to show a "You won!" screen.
 
-> **Tip:** it's safe to call `startGame()`, `endLevel()` and `endGame()` anywhere, even inside an `onCollide` callback. If the physics is in the middle of a step, the game manager waits until the step is over before building the next level.
+### Restarting a level
+
+To play the same level again, for example when the player falls into a pit, call **`restartLevel()`**. It calls your `levelStarted()` again with the same level number, so the level is built fresh:
+
+```js
+player.onCollide(spikes, () => gameManager.restartLevel());
+
+// in draw():
+if (player.y > height + 100) gameManager.restartLevel();   // fell off the bottom
+```
+
+The score goes back to what it was when the level began, so collecting the same coins again doesn't count twice. To keep the score instead, use `gameManager.restartLevel({ keepScore: true })`. `levelEnded()` isn't called, because the level wasn't finished.
+
+> **Tip:** it's safe to call `startGame()`, `endLevel()`, `restartLevel()` and `endGame()` anywhere, even inside an `onCollide` callback. If the physics is in the middle of a step, the game manager waits until the step is over before building the next level.
 
 [[demo: tile-levels | 360 | keys]]
 

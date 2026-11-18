@@ -12,7 +12,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=51db08b5" />
+  <link rel="stylesheet" href="css/docs.css?v=8fb7ecf1" />
 </head>
 <body class="page-api">
   <header class="topbar">
@@ -1328,6 +1328,11 @@ function draw() {
 <td>Finish the current level. Calls <code>levelEnded(level)</code>, then <code>levelStarted(level + 1)</code>. After the last level (see <code>levels</code>), it ends the game and calls <code>gameEnded(true)</code> instead. Does nothing unless the game is playing.</td>
 </tr>
 <tr>
+<td><code>restartLevel(options)</code></td>
+<td>gameManager</td>
+<td>Play the current level again from the start: calls <code>levelStarted(level)</code> again (not <code>levelEnded()</code>), and <code>level</code> stays the same. The score goes back to what it was when the level began; pass <code>{ keepScore: true }</code> to keep it. Does nothing unless the game is playing.</td>
+</tr>
+<tr>
 <td><code>endGame()</code></td>
 <td>gameManager</td>
 <td>End the game now. Calls <code>gameEnded(false)</code>. Does nothing unless the game is playing.</td>
@@ -1339,7 +1344,7 @@ function draw() {
 </tr>
 </tbody>
 </table>
-<p>All three of <code>startGame()</code>, <code>endLevel()</code> and <code>endGame()</code> are safe to call from anywhere, including inside collision callbacks: if the physics is in the middle of a step, the game manager waits until the step is over. Calling the same one more than once in a single step counts once, so two coins collected together can't skip a level.</p>
+<p><code>startGame()</code>, <code>endLevel()</code>, <code>restartLevel()</code> and <code>endGame()</code> are all safe to call from anywhere, including inside collision callbacks: if the physics is in the middle of a step, the game manager waits until the step is over. Calling the same one more than once in a single step counts once, so two coins collected together can't skip a level.</p>
 <h3 id="game-manager-callbacks">Game manager callbacks</h3>
 <p>Write any of these functions in your sketch and the game manager calls them. All are optional. In instance mode, put them on the p5 instance (<code>p.gameStarted = () =&gt; {...}</code>).</p>
 <table>
@@ -1356,7 +1361,7 @@ function draw() {
 </tr>
 <tr>
 <td><code>levelStarted(level)</code></td>
-<td>When a level begins: <code>1</code> straight after <code>gameStarted()</code>, then after each <code>endLevel()</code></td>
+<td>When a level begins: <code>1</code> straight after <code>gameStarted()</code>, then after each <code>endLevel()</code>, and again after <code>restartLevel()</code></td>
 </tr>
 <tr>
 <td><code>levelEnded(level)</code></td>
@@ -1786,6 +1791,6 @@ player.fill('seagreen');
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=51db08b5"></script>
+  <script src="js/docs.js?v=8fb7ecf1"></script>
 </body>
 </html>

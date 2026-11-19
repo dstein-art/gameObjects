@@ -277,6 +277,6 @@ A complete game usually has these parts:
 5. **`drawOnTop()`** draws the score and the title, game-over and "you won" screens.
 6. **`keyPressed()`** handles jumping, and calls `gameManager.startGame()` to start and restart.
 
-The two demos on this page follow this pattern. For more complete games, open the [example games](examples.html), change things and see what happens.
+The two demos on this page follow this pattern, and so does the [Breakout](example-breakout.html) example game, with three levels. Open the [example games](examples.html), change things and see what happens.
 
 **Have fun making games!**

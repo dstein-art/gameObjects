@@ -18,7 +18,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=8fb7ecf1" />
+  <link rel="stylesheet" href="css/docs.css?v=918d0ce0" />
 </head>
 <body class="page-example-breakout">
   <header class="topbar">
@@ -57,9 +57,9 @@
     <p class="section-num"><a href="examples.html">Example Games</a> › Breakout</p>
 <h1 id="breakout">Breakout</h1>
 <p class="lead">The classic: a paddle, a bouncing ball and a wall of bricks. Along the way you'll write your first class that <strong>extends GameObject</strong>.</p>
-<p><strong>You'll learn:</strong> zero gravity · perfectly bouncy objects · controlling a static object with the mouse · making your own class with <code>update()</code> · group collisions · lives and winning</p>
+<p><strong>You'll learn:</strong> zero gravity · perfectly bouncy objects · controlling a static object with the mouse · making your own class with <code>update()</code> · group collisions · the game manager: score, levels, winning and losing</p>
 <h2 id="play-the-finished-game">Play the finished game</h2>
-<p>Move the mouse to steer the paddle and click to launch the ball. Break all the bricks!</p>
+<p>Click to start. Move the mouse to steer the paddle and click to launch the ball. Break all the bricks to reach the next level, and finish all three to win!</p>
 <div class="demo" data-sketch="examples/breakout" data-width="600" data-height="600"></div>
 <h2 id="step-1-no-gravity-walls-and-a-paddle">Step 1: No gravity, walls and a paddle</h2>
 <p>Breakout has no gravity: the ball should fly in straight lines. We turn gravity off with <code>world.gravityY = 0</code>. <code>world</code> is an object that GameObjects creates automatically, holding all the objects and the physics settings.</p>
@@ -154,39 +154,86 @@ for (let row = 0; row &lt; 5; row++) {
 });
 </code></pre>
 <div class="demo" data-sketch="examples/breakout-step-5" data-width="600" data-height="600"></div>
-<h2 id="step-6-lives-winning-and-losing-the-finished-game">Step 6: Lives, winning and losing (the finished game)</h2>
-<p>The finishing touches:</p>
-<ul>
-<li>A <code>lives</code> counter that goes down each time the ball falls off the bottom.</li>
-<li><strong>Game over</strong> when lives run out, and <strong>You win!</strong> when <code>bricks.length</code> is <code>0</code>. Either way, <code>world.paused = true</code> freezes everything.</li>
-<li>Clicking only launches while you still have lives.</li>
-</ul>
-<p>The rules go in <code>draw()</code>, and the messages go in <code>drawOnTop()</code>:</p>
-<pre><code class="language-js">function draw() {
-  ...
-  if (ball.y &gt; height + 30) {
-    lives--;
-    launched = false;
-  }
-  if (lives &lt;= 0 || bricks.length === 0) world.paused = true;
+<h2 id="step-6-score-levels-winning-and-losing-the-finished-game">Step 6: Score, levels, winning and losing (the finished game)</h2>
+<p>The finishing touches use the <a href="levels-score.html#the-game-manager">game manager</a>, the <code>gameManager</code> every sketch gets. It keeps the <strong>score</strong> and the <strong>level</strong>, and calls our functions when the game and each level start and end.</p>
+<p><strong>Levels as maps.</strong> Each level is a small map of bricks: a digit is a brick (and which color it is), and a dot is a gap.</p>
+<pre><code class="language-js">let levels = [
+  [
+    '0000000000',
+    '1111111111',
+    '2222222222',
+  ],
+  // ... two more maps
+];
+</code></pre>
+<p>At the end of <code>setup()</code> we tell the game manager how many levels there are, so finishing the last one wins the game:</p>
+<pre><code class="language-js">gameManager.levels = levels.length;
+</code></pre>
+<p><strong>Starting the game.</strong> Clicking on the title screen calls <code>gameManager.startGame()</code>. The game manager sets the score to <code>0</code>, calls our <code>gameStarted()</code>, then calls <code>levelStarted(1)</code>:</p>
+<pre><code class="language-js">function gameStarted() {
+  lives = 3;
+  world.paused = false;
 }
 
-function drawOnTop() {
+function levelStarted(level) {
+  bricks.destroyAll();
+  let map = levels[level - 1];          // level 1 is levels[0]
+  for (let row = 0; row &lt; map.length; row++) {
+    for (let col = 0; col &lt; map[row].length; col++) {
+      let ch = map[row][col];
+      if (ch === '.') continue;
+      bricks.create(35 + col * 59, 70 + row * 26, 56, 22, { color: colors[int(ch)] });
+    }
+  }
+  ballSpeed = 6 + level;                // a little faster every level
+  launched = false;
+}
+</code></pre>
+<p><strong>Scoring.</strong> Each brick is worth 10 points:</p>
+<pre><code class="language-js">bricks.onCollide(ball, (brick) =&gt; {
+  brick.destroy();
+  gameManager.addScore(10);
+});
+</code></pre>
+<p><strong>Next level, and game over.</strong> In <code>draw()</code>, when the bricks are all gone we call <code>gameManager.endLevel()</code>, which builds the next level by calling <code>levelStarted()</code> again. After level 3 it ends the game instead, with <code>gameManager.won</code> set to <code>true</code>. When the last life is lost, we call <code>gameManager.endGame()</code>:</p>
+<pre><code class="language-js">function draw() {
   ...
-  if (lives &lt;= 0) {
-    text('Game over — reload to play again', width / 2, height / 2);
-  } else if (bricks.length === 0) {
-    text('You win!', width / 2, height / 2);
+  if (gameManager.isPlaying) {
+    if (ball.y &gt; height + 30) {
+      lives--;
+      launched = false;
+      if (lives &lt;= 0) gameManager.endGame();
+    }
+    if (bricks.length === 0) gameManager.endLevel();
+  }
+}
+
+function gameEnded(won) {
+  world.paused = true;
+}
+</code></pre>
+<p><strong>The screens.</strong> <code>drawOnTop()</code> checks <code>gameManager.state</code> to draw the title screen, the score and level while playing, and "You win!" or "Game over" at the end:</p>
+<pre><code class="language-js">function drawOnTop() {
+  if (gameManager.state === 'title') {
+    text('BREAKOUT', width / 2, height / 2 - 40);
+    return;
+  }
+  text('Score: ' + gameManager.score, 12, 12);
+  text('Level ' + gameManager.level + ' of ' + gameManager.levels, 12, 34);
+  if (gameManager.isOver) {
+    text(gameManager.won ? 'You win!' : 'Game over', width / 2, height / 2 - 20);
   }
 }
 </code></pre>
+<p>Clicking after the game ends calls <code>startGame()</code> again, which starts a fresh game from level 1. <code>gameManager.highScore</code> remembers the best score.</p>
 <div class="demo" data-sketch="examples/breakout" data-width="600" data-height="600"></div>
 <h2 id="make-it-your-own">Make it your own</h2>
 <ul>
 <li><strong>Tough bricks:</strong> give the top row <code>data.hits = 2</code>, and only destroy a brick when its hits run out (change its color each hit).</li>
 <li><strong>Power-ups:</strong> sometimes drop a sensor from a destroyed brick. Catching it with the paddle makes the paddle wider with <code>paddle.width = 150</code>.</li>
 <li><strong>Sound:</strong> a blip for the paddle and a crunch for bricks (see <a href="sounds.html">Sounds</a>).</li>
-<li><strong>Restart:</strong> press <strong>R</strong> to rebuild the bricks and reset lives, instead of reloading (see <a href="levels-score.html#starting-again">Levels and Score</a>).</li>
+<li><strong>More levels:</strong> add another map to <code>levels</code>. The game manager counts them for you.</li>
+<li><strong>Save the best score:</strong> remember <code>gameManager.highScore</code> between visits with <code>storeItem()</code> (see <a href="levels-score.html#saving-a-high-score">Levels and Score</a>).</li>
 </ul>
     <nav class="pager">
       <a class="prev" href="example-joints.html"><small>Previous</small>Joints Playground</a>
@@ -197,6 +244,6 @@ function drawOnTop() {
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=8fb7ecf1"></script>
+  <script src="js/docs.js?v=918d0ce0"></script>
 </body>
 </html>

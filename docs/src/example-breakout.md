@@ -3,11 +3,11 @@
 The classic: a paddle, a bouncing ball and a wall of bricks. Along the way you'll write your first class that **extends GameObject**.
 {: .lead }
 
-**You'll learn:** zero gravity · perfectly bouncy objects · controlling a static object with the mouse · making your own class with `update()` · group collisions · lives and winning
+**You'll learn:** zero gravity · perfectly bouncy objects · controlling a static object with the mouse · making your own class with `update()` · group collisions · the game manager: score, levels, winning and losing
 
 ## Play the finished game
 
-Move the mouse to steer the paddle and click to launch the ball. Break all the bricks!
+Click to start. Move the mouse to steer the paddle and click to launch the ball. Break all the bricks to reach the next level, and finish all three to win!
 
 [[demo: examples/breakout | 600x600]]
 
@@ -144,35 +144,98 @@ ball.onCollide(paddle, (b) => {
 
 [[demo: examples/breakout-step-5 | 600x600]]
 
-## Step 6: Lives, winning and losing (the finished game)
+## Step 6: Score, levels, winning and losing (the finished game)
 
-The finishing touches:
+The finishing touches use the [game manager](levels-score.html#the-game-manager), the `gameManager` every sketch gets. It keeps the **score** and the **level**, and calls our functions when the game and each level start and end.
 
-- A `lives` counter that goes down each time the ball falls off the bottom.
-- **Game over** when lives run out, and **You win!** when `bricks.length` is `0`. Either way, `world.paused = true` freezes everything.
-- Clicking only launches while you still have lives.
+**Levels as maps.** Each level is a small map of bricks: a digit is a brick (and which color it is), and a dot is a gap.
 
-The rules go in `draw()`, and the messages go in `drawOnTop()`:
+```js
+let levels = [
+  [
+    '0000000000',
+    '1111111111',
+    '2222222222',
+  ],
+  // ... two more maps
+];
+```
+
+At the end of `setup()` we tell the game manager how many levels there are, so finishing the last one wins the game:
+
+```js
+gameManager.levels = levels.length;
+```
+
+**Starting the game.** Clicking on the title screen calls `gameManager.startGame()`. The game manager sets the score to `0`, calls our `gameStarted()`, then calls `levelStarted(1)`:
+
+```js
+function gameStarted() {
+  lives = 3;
+  world.paused = false;
+}
+
+function levelStarted(level) {
+  bricks.destroyAll();
+  let map = levels[level - 1];          // level 1 is levels[0]
+  for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+      let ch = map[row][col];
+      if (ch === '.') continue;
+      bricks.create(35 + col * 59, 70 + row * 26, 56, 22, { color: colors[int(ch)] });
+    }
+  }
+  ballSpeed = 6 + level;                // a little faster every level
+  launched = false;
+}
+```
+
+**Scoring.** Each brick is worth 10 points:
+
+```js
+bricks.onCollide(ball, (brick) => {
+  brick.destroy();
+  gameManager.addScore(10);
+});
+```
+
+**Next level, and game over.** In `draw()`, when the bricks are all gone we call `gameManager.endLevel()`, which builds the next level by calling `levelStarted()` again. After level 3 it ends the game instead, with `gameManager.won` set to `true`. When the last life is lost, we call `gameManager.endGame()`:
 
 ```js
 function draw() {
   ...
-  if (ball.y > height + 30) {
-    lives--;
-    launched = false;
+  if (gameManager.isPlaying) {
+    if (ball.y > height + 30) {
+      lives--;
+      launched = false;
+      if (lives <= 0) gameManager.endGame();
+    }
+    if (bricks.length === 0) gameManager.endLevel();
   }
-  if (lives <= 0 || bricks.length === 0) world.paused = true;
 }
 
+function gameEnded(won) {
+  world.paused = true;
+}
+```
+
+**The screens.** `drawOnTop()` checks `gameManager.state` to draw the title screen, the score and level while playing, and "You win!" or "Game over" at the end:
+
+```js
 function drawOnTop() {
-  ...
-  if (lives <= 0) {
-    text('Game over — reload to play again', width / 2, height / 2);
-  } else if (bricks.length === 0) {
-    text('You win!', width / 2, height / 2);
+  if (gameManager.state === 'title') {
+    text('BREAKOUT', width / 2, height / 2 - 40);
+    return;
+  }
+  text('Score: ' + gameManager.score, 12, 12);
+  text('Level ' + gameManager.level + ' of ' + gameManager.levels, 12, 34);
+  if (gameManager.isOver) {
+    text(gameManager.won ? 'You win!' : 'Game over', width / 2, height / 2 - 20);
   }
 }
 ```
+
+Clicking after the game ends calls `startGame()` again, which starts a fresh game from level 1. `gameManager.highScore` remembers the best score.
 
 [[demo: examples/breakout | 600x600]]
 
@@ -181,4 +244,5 @@ function drawOnTop() {
 - **Tough bricks:** give the top row `data.hits = 2`, and only destroy a brick when its hits run out (change its color each hit).
 - **Power-ups:** sometimes drop a sensor from a destroyed brick. Catching it with the paddle makes the paddle wider with `paddle.width = 150`.
 - **Sound:** a blip for the paddle and a crunch for bricks (see [Sounds](sounds.html)).
-- **Restart:** press **R** to rebuild the bricks and reset lives, instead of reloading (see [Levels and Score](levels-score.html#starting-again)).
+- **More levels:** add another map to `levels`. The game manager counts them for you.
+- **Save the best score:** remember `gameManager.highScore` between visits with `storeItem()` (see [Levels and Score](levels-score.html#saving-a-high-score)).

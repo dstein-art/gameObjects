@@ -22,7 +22,7 @@ The tutorials go roughly from easiest to hardest. Each one starts from an empty 
     <img src="assets/thumbs/ex-breakout.jpg" alt="Breakout screenshot" loading="lazy">
     <span class="steps">6 steps</span>
     <h3>Breakout</h3>
-    <p>A paddle, a ball and a wall of bricks. Your first class that extends GameObject.</p>
+    <p>A paddle, a ball and three levels of bricks. Your first class that extends GameObject, and the game manager.</p>
   </a>
   <a class="game-card" href="example-platformer.html">
     <img src="assets/thumbs/ex-platformer.jpg" alt="Platformer screenshot" loading="lazy">

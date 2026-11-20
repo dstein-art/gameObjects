@@ -198,6 +198,8 @@ class Robot extends GameObject {
 
 > **Watch out:** don't give your class a property with a built-in name, like `speed = 5` at the top of the class. It hides the real `speed`, so changing it does nothing. Pick another name (`topSpeed`), or set the real one in the constructor after `super()`: `this.speed = 5`. If you forget, GameObjects prints a warning in the console.
 
+GameObjects comes with one ready-made character class: **Mochi**, a soft little blob that blinks, has moods and can walk and jump. Try `new Mochi(200, 100)`, and see the [API reference](api.html#mochi) and [Mochi's Snack Hunt](example-snack-hunt.html).
+
 ## Quick reference
 
 | | |

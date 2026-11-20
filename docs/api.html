@@ -18,7 +18,7 @@
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/docs.css?v=918d0ce0" />
+  <link rel="stylesheet" href="css/docs.css?v=350004db" />
 </head>
 <body class="page-api">
   <header class="topbar">
@@ -49,6 +49,7 @@
       <li><a href="#gamemanager">GameManager</a><ul class="sub"><li><a href="#game-manager-properties">Game manager properties</a></li><li><a href="#game-manager-methods">Game manager methods</a></li><li><a href="#game-manager-callbacks">Game manager callbacks</a></li></ul></li>
       <li><a href="#gamecamera">GameCamera</a></li>
       <li><a href="#gamelink">GameLink</a></li>
+      <li><a href="#mochi">Mochi</a><ul class="sub"><li><a href="#creating-mochi">Creating Mochi</a></li><li><a href="#mochi-properties">Mochi properties</a></li><li><a href="#mochi-methods">Mochi methods</a></li><li><a href="#extending-mochi">Extending Mochi</a></li></ul></li>
       <li><a href="#the-gameobjects-namespace">The GameObjects namespace</a></li>
       <li><a href="#collision-targets-and-callbacks">Collision targets and callbacks</a></li>
       <li><a href="#input-mouse-and-keys">Input: mouse and keys</a><ul class="sub"><li><a href="#keyboard">Keyboard</a></li><li><a href="#key-codes">Key codes</a></li><li><a href="#mouse-p5js">Mouse (p5.js)</a></li><li><a href="#gameobjects-mouse-extras">GameObjects mouse extras</a></li></ul></li>
@@ -75,7 +76,7 @@
 &lt;script src=&quot;sketch.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 <p>p5.sound is optional: GameObjects doesn't need it.</p>
-<p>GameObjects adds these globals: <strong><code>world</code></strong> (a <a href="#gameworld">GameWorld</a> created automatically), <strong><code>gameManager</code></strong> (a <a href="#gamemanager">GameManager</a> created automatically), <code>GameWorld</code>, <code>GameObject</code>, <code>GameGroup</code>, <code>GameManager</code> and the <code>GameObjects</code> namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.</p>
+<p>GameObjects adds these globals: <strong><code>world</code></strong> (a <a href="#gameworld">GameWorld</a> created automatically), <strong><code>gameManager</code></strong> (a <a href="#gamemanager">GameManager</a> created automatically), <code>GameWorld</code>, <code>GameObject</code>, <code>GameGroup</code>, <code>GameManager</code>, <code>Mochi</code> and the <code>GameObjects</code> namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.</p>
 <h2 id="units-and-conventions">Units and conventions</h2>
 <table>
 <thead>
@@ -1475,6 +1476,170 @@ function draw() {
 </tbody>
 </table>
 <hr />
+<h2 id="mochi">Mochi</h2>
+<p>A ready-made character: a <code>GameObject</code> with a face. Its eyes blink and look around, it has moods, and it squishes when it lands. It also knows how to walk and jump. Mochi is a <code>GameObject</code>, so everything in the <a href="#gameobject">GameObject</a> section works on it too: collisions, groups, dragging, <code>destroy()</code> and more.</p>
+<pre><code class="language-js">let mochi = new Mochi(200, 100);                              // 48 pixels, rice-cake white
+let pinky = new Mochi(300, 100, 40, { color: 'pink' });       // any size and color
+
+function draw() {
+  let direction = 0;
+  if (keyIsDown(LEFT_ARROW)) direction = -1;
+  if (keyIsDown(RIGHT_ARROW)) direction = 1;
+  mochi.walk(direction);
+}
+
+function keyPressed() {
+  if (key === ' ') mochi.jump();
+}
+</code></pre>
+<h3 id="creating-mochi">Creating Mochi</h3>
+<pre><code class="language-js">new Mochi(x, y)
+new Mochi(x, y, size)
+new Mochi(x, y, size, options)
+new Mochi(x, y, options)        // size 48
+</code></pre>
+<p><code>size</code> is the width and height in pixels (default <code>48</code>). <code>options</code> takes any <a href="#object-options">GameObject option</a>, plus these:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color</code></td>
+<td><code>'#fbf3e6'</code></td>
+<td>The body color: the creamy white of a rice cake</td>
+</tr>
+<tr>
+<td><code>stroke</code></td>
+<td><code>'#d8c3a8'</code></td>
+<td>The outline color</td>
+</tr>
+<tr>
+<td><code>mood</code></td>
+<td><code>'happy'</code></td>
+<td>The starting mood (see <code>mood</code> below)</td>
+</tr>
+<tr>
+<td><code>walkSpeed</code></td>
+<td><code>4</code></td>
+<td>How fast <code>walk()</code> moves</td>
+</tr>
+<tr>
+<td><code>jumpPower</code></td>
+<td><code>11</code></td>
+<td>How high <code>jump()</code> goes</td>
+</tr>
+<tr>
+<td><code>reactions</code></td>
+<td><code>true</code></td>
+<td>Look surprised after falling from higher than it can jump</td>
+</tr>
+<tr>
+<td><code>naps</code></td>
+<td><code>true</code></td>
+<td>Get sleepy after sitting still for 6 seconds</td>
+</tr>
+<tr>
+<td><code>cheeks</code></td>
+<td><code>true</code></td>
+<td>Draw pink cheeks</td>
+</tr>
+</tbody>
+</table>
+<p>Mochi has <code>fixedRotation: true</code> and rounded corners by default, so it stays upright.</p>
+<h3 id="mochi-properties">Mochi properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mood</code></td>
+<td>string</td>
+<td><code>'happy'</code>, <code>'surprised'</code>, <code>'sleepy'</code>, <code>'hurt'</code> or <code>'angry'</code>. Changes the eyes and the mouth.</td>
+</tr>
+<tr>
+<td><code>expression</code></td>
+<td>string</td>
+<td>The face showing right now: a <code>react()</code>, a nap, or the <code>mood</code> (read only)</td>
+</tr>
+<tr>
+<td><code>isOnGround</code></td>
+<td>boolean</td>
+<td><code>true</code> while standing on something solid: the floor, a platform, another object. Not a wall beside it, and not a sensor. (read only)</td>
+</tr>
+<tr>
+<td><code>facing</code></td>
+<td>number</td>
+<td><code>1</code> facing right, <code>-1</code> facing left. <code>walk()</code> sets it.</td>
+</tr>
+<tr>
+<td><code>walkSpeed</code>, <code>jumpPower</code></td>
+<td>number</td>
+<td>Change them any time</td>
+</tr>
+<tr>
+<td><code>reactions</code>, <code>naps</code>, <code>cheeks</code></td>
+<td>boolean</td>
+<td>See the options above</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mochi-methods">Mochi methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>walk(direction)</code></td>
+<td>mochi</td>
+<td><code>-1</code> walk left, <code>1</code> walk right, <code>0</code> stop. Call it every frame (in <code>draw()</code>).</td>
+</tr>
+<tr>
+<td><code>jump(power)</code></td>
+<td>boolean</td>
+<td>Jump, but only when standing on something. Returns <code>true</code> if it jumped. <code>power</code> defaults to <code>jumpPower</code>.</td>
+</tr>
+<tr>
+<td><code>watch(target)</code></td>
+<td>mochi</td>
+<td>The eyes follow <code>target</code>: a GameObject, a point <code>{ x, y }</code>, or <code>'mouse'</code>. <code>watch(null)</code> goes back to looking where it's walking and glancing around.</td>
+</tr>
+<tr>
+<td><code>react(mood, seconds)</code></td>
+<td>mochi</td>
+<td>Show a mood for a moment (default <code>1</code> second), then go back to <code>mood</code></td>
+</tr>
+<tr>
+<td><code>say(text, seconds)</code></td>
+<td>mochi</td>
+<td>A speech bubble above Mochi for a few seconds (default <code>2.5</code>). <code>say('')</code> removes it.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="extending-mochi">Extending Mochi</h3>
+<p>Mochi does all its animation (blinking, squishing, looking around) while it's drawn. So a class that extends Mochi can write its own <code>update()</code> without calling <code>super.update()</code>:</p>
+<pre><code class="language-js">class Hero extends Mochi {
+  update() {
+    if (this.y &gt; height) this.setPosition(100, 100);   // fell off? back to the start
+  }
+}
+</code></pre>
+<p>To draw something extra, like a hat, override <code>drawShape(p)</code>, call <code>super.drawShape(p)</code> first, then draw on top. The drawing is already moved to Mochi's center.</p>
+<hr />
 <h2 id="the-gameobjects-namespace">The GameObjects namespace</h2>
 <table>
 <thead>
@@ -1797,6 +1962,6 @@ player.fill('seagreen');
       <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
     </footer>
   </main>
-  <script src="js/docs.js?v=918d0ce0"></script>
+  <script src="js/docs.js?v=350004db"></script>
 </body>
 </html>

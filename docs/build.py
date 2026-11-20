@@ -67,6 +67,7 @@ PAGES = [
             ("example-breakout", "Breakout"),
             ("example-platformer", "Platformer"),
             ("example-space-shooter", "Space Shooter"),
+            ("example-snack-hunt", "Mochi's Snack Hunt"),
         ],
     ),
 ]

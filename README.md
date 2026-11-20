@@ -110,6 +110,7 @@ docs/
 | **Breakout** (6 steps) | Zero gravity, `extends GameObject`, group collisions, pausing |
 | **Platformer** (6 steps) | Keyboard control, jumping with `isTouching`, sensor coins, camera follow, HUD on top |
 | **Space Shooter** (7 steps) | `lookAt`, `applyForce`, `lifespan`, `ignore()`, splitting rocks, animation from `p5.Graphics` |
+| **Mochi's Snack Hunt** (5 steps) | The built-in `Mochi` character, levels as text, `gameManager` levels and lives, `restartLevel()`, patrolling enemies |
 
 Each game has its own page with a step-by-step tutorial, and each is a single file in `docs/examples/`. To use one in the p5.js Web Editor, copy it into `sketch.js` (or use the copy icon on its page) and set up `index.html` as shown in [Setup](#setup).
 

@@ -36,6 +36,12 @@ The tutorials go roughly from easiest to hardest. Each one starts from an empty 
     <h3>Space Shooter</h3>
     <p>Thrust, shoot and split asteroids, plus an animated rocket flame.</p>
   </a>
+  <a class="game-card" href="example-snack-hunt.html">
+    <img src="assets/thumbs/ex-snack-hunt.jpg" alt="Mochi's Snack Hunt screenshot" loading="lazy">
+    <span class="steps">5 steps</span>
+    <h3>Mochi's Snack Hunt</h3>
+    <p>Help Mochi eat every snack on three levels. The built-in Mochi character, lives and the game manager.</p>
+  </a>
 </div>
 
 ## How the tutorials work

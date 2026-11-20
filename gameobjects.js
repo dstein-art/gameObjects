@@ -17,6 +17,8 @@
  *   GameWorld   — the physics world (gravity, camera, walls, joints, drawing)
  *   GameObject  — a single physical thing you can see and move
  *   GameGroup   — a collection of GameObjects you can manage together
+ *   GameManager — score, levels, and the start and end of the game (`gameManager`)
+ *   Mochi       — a ready-made character with blinking eyes and moods
  */
 (function (global) {
   'use strict';
@@ -1443,6 +1445,353 @@
   }
 
   // ===========================================================================
+  // Mochi — a ready-made character: blinking eyes, moods, squash and stretch
+  // ===========================================================================
+  //   let mochi = new Mochi(x, y);            // 48 pixels, rice-cake white
+  //   mochi.walk(-1 | 0 | 1);   mochi.jump();   mochi.isOnGround
+  //   mochi.watch(target);      mochi.mood = 'happy' | 'surprised' | 'sleepy' | 'hurt' | 'angry'
+  //   mochi.react(mood, seconds);   mochi.say(text, seconds)
+  // All the animation happens while it's drawn, so a class that extends Mochi
+  // can write its own update() freely.
+  let MOCHI_MOODS = ['happy', 'surprised', 'sleepy', 'hurt', 'angry'];
+  let MOCHI_FPS = 60; // the library steps physics 60 times a second; timings below use the same
+
+  class Mochi extends GameObject {
+    constructor(x, y, size = 48, options = {}) {
+      if (typeof size === 'object') {
+        options = size;
+        size = 48;
+      }
+      super(
+        x,
+        y,
+        size,
+        size,
+        Object.assign(
+          {
+            color: '#fbf3e6', // the creamy white of a rice cake
+            stroke: '#d8c3a8', // a soft, warm outline
+            strokeWeight: 2,
+            cornerRadius: size * 0.42, // a soft, squishy squircle
+            fixedRotation: true, // stays upright
+          },
+          options
+        )
+      );
+
+      // things you can change
+      this.mood = MOCHI_MOODS.includes(options.mood) ? options.mood : 'happy';
+      this.walkSpeed = options.walkSpeed ?? 4;
+      this.jumpPower = options.jumpPower ?? 11;
+      this.reactions = options.reactions ?? true; // surprised by hard landings
+      this.naps = options.naps ?? true; // gets sleepy when left alone
+      this.cheeks = options.cheeks ?? true;
+      this.facing = 1; // 1 right, -1 left
+
+      // inside workings
+      this._watching = null;
+      this._blink = 0; // frames left of the current blink
+      this._glance = { x: 0, y: 0, until: 0 };
+      this._squash = 0; // + is squashed flat, - is stretched tall
+      this._squashSpeed = 0;
+      this._wasOnGround = false;
+      this._fallSpeed = 0;
+      this._still = 0; // frames without moving
+      this._reaction = null; // { mood, until }
+      this._bubble = null; // { text, until }
+      this._frame = -1;
+      this._time = 0;
+    }
+
+    // ---------------------------------------------------------------- moving
+
+    /** Walk left (-1), right (1) or stop (0). Call it every frame while a key is held. */
+    walk(direction = 0) {
+      this.velocityX = direction * this.walkSpeed;
+      if (direction !== 0) this.facing = direction < 0 ? -1 : 1;
+      return this;
+    }
+
+    /** Jump, if standing on something. Returns true if it jumped. */
+    jump(power = this.jumpPower) {
+      if (!this.isOnGround) return false;
+      this.velocityY = -power;
+      this._squash = -0.22; // stretch up
+      this._squashSpeed = 0;
+      return true;
+    }
+
+    /** True while Mochi is standing on something solid (not a sensor, not a wall beside it). */
+    get isOnGround() {
+      let engine = lib.world && lib.world.engine;
+      if (!engine) return false;
+      for (let pair of engine.pairs.list) {
+        if (!pair.isActive || pair.isSensor) continue;
+        let c = pair.collision;
+        let a = c.parentA || c.bodyA;
+        let b = c.parentB || c.bodyB;
+        if (a !== this.body && b !== this.body) continue;
+        // Matter's contact normal points from B toward A. Turn it into the direction
+        // from Mochi toward the other body: standing on something, that points down.
+        let down = a === this.body ? -c.normal.y : c.normal.y;
+        if (down > 0.5) return true;
+      }
+      return false;
+    }
+
+    // ---------------------------------------------------------------- personality
+
+    /** Follow something with the eyes: an object, a point { x, y }, 'mouse', or null to look around. */
+    watch(target = 'mouse') {
+      this._watching = target;
+      return this;
+    }
+
+    /** Show a mood for a moment (in seconds), then go back to the usual one. */
+    react(mood, seconds = 1) {
+      if (MOCHI_MOODS.includes(mood)) this._reaction = { mood, until: this._time + seconds * MOCHI_FPS };
+      return this;
+    }
+
+    /** Show a speech bubble for a few seconds. say('') or say() removes it. */
+    say(text = '', seconds = 2.5) {
+      this._bubble = text === '' ? null : { text: String(text), until: this._time + seconds * MOCHI_FPS };
+      return this;
+    }
+
+    /** The mood showing right now: a reaction, a nap, or the usual mood. */
+    get expression() {
+      if (this._reaction && this._time < this._reaction.until) return this._reaction.mood;
+      if (this.naps && this._still > 6 * MOCHI_FPS && this.mood === 'happy') return 'sleepy';
+      return this.mood;
+    }
+
+    // ---------------------------------------------------------------- drawing
+
+    drawShape(p) {
+      this._tick(p);
+      let w = this.width;
+      let h = this.height;
+      let mood = this.expression;
+
+      // squash and stretch from the bottom, plus a little bob when walking
+      p.push();
+      let bob = 0;
+      if (this._wasOnGround && Math.abs(this.velocityX) > 0.5) bob = -Math.abs(Math.sin(this._time * 0.3)) * h * 0.05;
+      p.translate(0, h / 2 + bob);
+      p.scale(1 + this._squash, 1 - this._squash);
+      p.translate(0, -h / 2);
+
+      // body
+      applyColor(p, 'fill', this.color);
+      applyColor(p, 'stroke', this.stroke);
+      if (this.stroke !== null && this.stroke !== undefined) p.strokeWeight(this.strokeWeight);
+      p.rect(0, 0, w, h, this.cornerRadius);
+
+      // where the eyes look
+      let look = this._lookOffset();
+      let ex = w * 0.2;
+      let ey = -h * 0.06;
+      let lx = look.x * w * 0.07;
+      let ly = look.y * h * 0.06;
+
+      // cheeks
+      if (this.cheeks && mood !== 'angry') {
+        p.noStroke();
+        p.fill(255, 140, 160, mood === 'hurt' ? 70 : 110);
+        p.ellipse(-w * 0.31 + lx * 0.4, h * 0.1, w * 0.17, h * 0.1);
+        p.ellipse(w * 0.31 + lx * 0.4, h * 0.1, w * 0.17, h * 0.1);
+      }
+
+      // eyes
+      let ink = p.color(59, 47, 47);
+      for (let side of [-1, 1]) {
+        let x = side * ex + lx;
+        let y = ey + ly;
+        drawMochiEye(p, mood, x, y, w, h, this._blink > 0, side, ink);
+      }
+
+      // eyebrows, when angry
+      if (mood === 'angry') {
+        p.stroke(ink);
+        p.strokeWeight(Math.max(1.5, w * 0.045));
+        for (let side of [-1, 1]) {
+          let x = side * ex + lx;
+          // outer end high, inner end low: a frown
+          p.line(x + side * w * 0.09, ey + ly - h * 0.17, x - side * w * 0.07, ey + ly - h * 0.1);
+        }
+      }
+
+      // mouth
+      drawMochiMouth(p, mood, lx * 0.5, h * 0.14 + ly * 0.3, w, h, ink);
+
+      p.pop();
+
+      // floating z's while sleepy
+      if (mood === 'sleepy') {
+        p.noStroke();
+        p.fill(120, 110, 140, 200);
+        p.textAlign(p.CENTER, p.CENTER);
+        for (let i = 0; i < 2; i++) {
+          let t = ((this._time / MOCHI_FPS + i * 0.8) % 1.6) / 1.6; // 0 → 1
+          p.textSize(w * (0.18 + i * 0.07));
+          p.text('z', w * (0.4 + t * 0.25), -h * (0.55 + t * 0.4));
+        }
+      }
+
+      // speech bubble
+      if (this._bubble) drawSpeechBubble(p, this._bubble.text, -h / 2 - 10, w);
+    }
+
+    // ---------------------------------------------------------------- inside workings
+
+    // Runs once per frame, from drawShape(), so it keeps working even when a
+    // class that extends Mochi writes its own update().
+    _tick(p) {
+      let frame = p.frameCount;
+      if (frame === this._frame) return;
+      this._frame = frame;
+      this._time++;
+
+      // blinking: now and then, sometimes twice
+      if (this._blink > 0) this._blink--;
+      else if (Math.random() < 0.008) this._blink = Math.random() < 0.2 ? 14 : 7;
+
+      // landing: squish, and maybe look surprised
+      let onGround = this.isOnGround;
+      if (onGround && !this._wasOnGround && this._fallSpeed > 3) {
+        this._squash = Math.min(0.08 + this._fallSpeed * 0.022, 0.38);
+        this._squashSpeed = 0;
+        // landing harder than its own jump would: it fell from higher than it can jump
+        if (this.reactions && this._fallSpeed > this.jumpPower * 1.1) this.react('surprised', 0.8);
+      }
+      this._wasOnGround = onGround;
+      this._fallSpeed = Math.max(0, this.velocityY);
+
+      // the squish springs back
+      this._squashSpeed += -0.22 * this._squash;
+      this._squashSpeed *= 0.72;
+      this._squash += this._squashSpeed;
+
+      // sitting still for a while
+      if (this.speed < 0.15 && !(lib.world && lib.world.dragging)) this._still++;
+      else this._still = 0;
+
+      // finished moments
+      if (this._reaction && this._time >= this._reaction.until) this._reaction = null;
+      if (this._bubble && this._time >= this._bubble.until) this._bubble = null;
+    }
+
+    // Which way the eyes look, from -1 to 1 in x and y
+    _lookOffset() {
+      let target = this._watching;
+      let tx = null;
+      let ty = null;
+      if (target === 'mouse' && lib.world) {
+        tx = lib.world.mouseX;
+        ty = lib.world.mouseY;
+      } else if (target && typeof target.x === 'number' && typeof target.y === 'number' && !target.destroyed) {
+        tx = target.x;
+        ty = target.y;
+      }
+      if (tx !== null) {
+        let dx = tx - this.x;
+        let dy = ty - this.y;
+        let d = Math.hypot(dx, dy);
+        if (d < 1) return { x: 0, y: 0 };
+        let pull = Math.min(1, d / 80); // looks fully across once it's a little way off
+        return { x: (dx / d) * pull, y: (dy / d) * pull };
+      }
+      // nothing to watch: look where it's going, or glance around now and then
+      if (Math.abs(this.velocityX) > 0.5) return { x: this.facing * 0.8, y: 0.1 };
+      if (this._time > this._glance.until) {
+        let quiet = Math.random() < 0.5;
+        this._glance = {
+          x: quiet ? 0 : Math.random() * 1.6 - 0.8,
+          y: quiet ? 0 : Math.random() * 0.8 - 0.4,
+          until: this._time + 60 + Math.random() * 120,
+        };
+      }
+      return this._glance;
+    }
+  }
+
+  // ------------------------------------------------------------------ drawing helpers
+
+  function drawMochiEye(p, mood, x, y, w, h, blinking, side, ink) {
+    let ew = w * 0.13;
+    let eh = h * 0.2;
+    p.noFill();
+    p.stroke(ink);
+    p.strokeWeight(Math.max(1.5, w * 0.045));
+
+    if (mood === 'sleepy' || blinking) {
+      // closed: a soft curve
+      p.bezier(x - ew * 0.6, y, x - ew * 0.3, y + eh * 0.25, x + ew * 0.3, y + eh * 0.25, x + ew * 0.6, y);
+      return;
+    }
+    if (mood === 'hurt') {
+      // > <  (each eye points in, toward the nose)
+      let s = side; // -1 is the left eye ">", 1 is the right eye "<"
+      p.line(x + s * ew * 0.5, y - eh * 0.3, x - s * ew * 0.4, y);
+      p.line(x - s * ew * 0.4, y, x + s * ew * 0.5, y + eh * 0.3);
+      return;
+    }
+
+    let big = mood === 'surprised' ? 1.25 : 1;
+    p.noStroke();
+    p.fill(ink);
+    p.ellipse(x, y, ew * big, eh * big);
+    // the shine that makes it look alive
+    p.fill(255);
+    p.ellipse(x - ew * 0.2 * big, y - eh * 0.22 * big, ew * 0.38 * big, ew * 0.38 * big);
+  }
+
+  function drawMochiMouth(p, mood, x, y, w, h, ink) {
+    let mw = w * 0.13;
+    p.stroke(ink);
+    p.strokeWeight(Math.max(1.2, w * 0.035));
+    p.noFill();
+    if (mood === 'surprised') {
+      p.noStroke();
+      p.fill(ink);
+      p.ellipse(x, y + h * 0.02, w * 0.1, h * 0.12);
+    } else if (mood === 'sleepy') {
+      p.line(x - mw * 0.35, y, x + mw * 0.35, y);
+    } else if (mood === 'hurt') {
+      // a wobbly line
+      p.bezier(x - mw * 0.7, y, x - mw * 0.25, y - h * 0.04, x + mw * 0.25, y + h * 0.04, x + mw * 0.7, y);
+    } else if (mood === 'angry') {
+      p.bezier(x - mw * 0.6, y + h * 0.03, x - mw * 0.2, y - h * 0.03, x + mw * 0.2, y - h * 0.03, x + mw * 0.6, y + h * 0.03);
+    } else {
+      // happy: a little smile
+      p.bezier(x - mw * 0.6, y - h * 0.01, x - mw * 0.3, y + h * 0.06, x + mw * 0.3, y + h * 0.06, x + mw * 0.6, y - h * 0.01);
+    }
+  }
+
+  function drawSpeechBubble(p, text, bottom, w) {
+    p.push();
+    p.textSize(14);
+    p.textAlign(p.CENTER, p.CENTER);
+    let tw = p.textWidth(text);
+    let bw = Math.max(tw + 20, 34);
+    let bh = 28;
+    let cy = bottom - 10 - bh / 2;
+    p.fill(255);
+    p.stroke(60);
+    p.strokeWeight(1.5);
+    p.rectMode(p.CENTER);
+    p.rect(0, cy, bw, bh, 10);
+    // the tail
+    p.triangle(-6, cy + bh / 2 - 1, 6, cy + bh / 2 - 1, 0, cy + bh / 2 + 9);
+    p.noStroke();
+    p.rect(0, cy + bh / 2 - 2, 11, 3); // hide the line where the tail meets the bubble
+    p.fill(40);
+    p.text(text, 0, cy + 1);
+    p.pop();
+  }
+
+  // ===========================================================================
   // GameManager — score, levels, and the start and end of the game
   // ===========================================================================
   // One is made automatically as `gameManager`. It keeps the score and level and
@@ -1749,6 +2098,7 @@
   lib.GameCamera = GameCamera;
   lib.GameLink = GameLink;
   lib.GameManager = GameManager;
+  lib.Mochi = Mochi;
   lib.spriteSheet = spriteSheet;
   lib.Matter = M;
   Object.defineProperty(lib, 'currentWorld', { get: currentWorld });
@@ -1758,6 +2108,7 @@
   global.GameObject = GameObject;
   global.GameGroup = GameGroup;
   global.GameManager = GameManager;
+  global.Mochi = Mochi;
 
   // ---------------------------------------------------------------------------
   // A ready-made world. Sketches can use `world` straight away without making

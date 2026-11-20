@@ -42,6 +42,11 @@ Every class, property and method in GameObjects.js. For a step-by-step introduct
     - [Game manager callbacks](#game-manager-callbacks)
 - [GameCamera](#gamecamera)
 - [GameLink](#gamelink)
+- [Mochi](#mochi)
+    - [Creating Mochi](#creating-mochi)
+    - [Mochi properties](#mochi-properties)
+    - [Mochi methods](#mochi-methods)
+    - [Extending Mochi](#extending-mochi)
 - [The GameObjects namespace](#the-gameobjects-namespace)
 - [Collision targets and callbacks](#collision-targets-and-callbacks)
 - [Input: mouse and keys](#input-mouse-and-keys)
@@ -67,7 +72,7 @@ Load the scripts in this order in `index.html`:
 
 p5.sound is optional: GameObjects doesn't need it.
 
-GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created automatically), **`gameManager`** (a [GameManager](#gamemanager) created automatically), `GameWorld`, `GameObject`, `GameGroup`, `GameManager` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
+GameObjects adds these globals: **`world`** (a [GameWorld](#gameworld) created automatically), **`gameManager`** (a [GameManager](#gamemanager) created automatically), `GameWorld`, `GameObject`, `GameGroup`, `GameManager`, `Mochi` and the `GameObjects` namespace. It works in p5.js global mode and instance mode. If Matter.js isn't loaded first, it throws an error explaining how to fix it.
 
 ## Units and conventions
 
@@ -605,6 +610,87 @@ A joint made by `world.connect()` or `world.pin()`.
 | `destroy()` | Remove the joint. Joints are also removed when either object is destroyed. |
 | `destroyed` | `true` once removed |
 | `constraint` | The Matter.js constraint, for advanced use |
+
+---
+
+## Mochi
+
+A ready-made character: a `GameObject` with a face. Its eyes blink and look around, it has moods, and it squishes when it lands. It also knows how to walk and jump. Mochi is a `GameObject`, so everything in the [GameObject](#gameobject) section works on it too: collisions, groups, dragging, `destroy()` and more.
+
+```js
+let mochi = new Mochi(200, 100);                              // 48 pixels, rice-cake white
+let pinky = new Mochi(300, 100, 40, { color: 'pink' });       // any size and color
+
+function draw() {
+  let direction = 0;
+  if (keyIsDown(LEFT_ARROW)) direction = -1;
+  if (keyIsDown(RIGHT_ARROW)) direction = 1;
+  mochi.walk(direction);
+}
+
+function keyPressed() {
+  if (key === ' ') mochi.jump();
+}
+```
+
+### Creating Mochi
+
+```js
+new Mochi(x, y)
+new Mochi(x, y, size)
+new Mochi(x, y, size, options)
+new Mochi(x, y, options)        // size 48
+```
+
+`size` is the width and height in pixels (default `48`). `options` takes any [GameObject option](#object-options), plus these:
+
+| Option | Default | Description |
+|---|---|---|
+| `color` | `'#fbf3e6'` | The body color: the creamy white of a rice cake |
+| `stroke` | `'#d8c3a8'` | The outline color |
+| `mood` | `'happy'` | The starting mood (see `mood` below) |
+| `walkSpeed` | `4` | How fast `walk()` moves |
+| `jumpPower` | `11` | How high `jump()` goes |
+| `reactions` | `true` | Look surprised after falling from higher than it can jump |
+| `naps` | `true` | Get sleepy after sitting still for 6 seconds |
+| `cheeks` | `true` | Draw pink cheeks |
+
+Mochi has `fixedRotation: true` and rounded corners by default, so it stays upright.
+
+### Mochi properties
+
+| Property | Type | Description |
+|---|---|---|
+| `mood` | string | `'happy'`, `'surprised'`, `'sleepy'`, `'hurt'` or `'angry'`. Changes the eyes and the mouth. |
+| `expression` | string | The face showing right now: a `react()`, a nap, or the `mood` (read only) |
+| `isOnGround` | boolean | `true` while standing on something solid: the floor, a platform, another object. Not a wall beside it, and not a sensor. (read only) |
+| `facing` | number | `1` facing right, `-1` facing left. `walk()` sets it. |
+| `walkSpeed`, `jumpPower` | number | Change them any time |
+| `reactions`, `naps`, `cheeks` | boolean | See the options above |
+
+### Mochi methods
+
+| Method | Returns | Description |
+|---|---|---|
+| `walk(direction)` | mochi | `-1` walk left, `1` walk right, `0` stop. Call it every frame (in `draw()`). |
+| `jump(power)` | boolean | Jump, but only when standing on something. Returns `true` if it jumped. `power` defaults to `jumpPower`. |
+| `watch(target)` | mochi | The eyes follow `target`: a GameObject, a point `{ x, y }`, or `'mouse'`. `watch(null)` goes back to looking where it's walking and glancing around. |
+| `react(mood, seconds)` | mochi | Show a mood for a moment (default `1` second), then go back to `mood` |
+| `say(text, seconds)` | mochi | A speech bubble above Mochi for a few seconds (default `2.5`). `say('')` removes it. |
+
+### Extending Mochi
+
+Mochi does all its animation (blinking, squishing, looking around) while it's drawn. So a class that extends Mochi can write its own `update()` without calling `super.update()`:
+
+```js
+class Hero extends Mochi {
+  update() {
+    if (this.y > height) this.setPosition(100, 100);   // fell off? back to the start
+  }
+}
+```
+
+To draw something extra, like a hat, override `drawShape(p)`, call `super.drawShape(p)` first, then draw on top. The drawing is already moved to Mochi's center.
 
 ---
 

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-TWCP3RR3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mochi&#x27;s Snack Hunt · GameObjects.js</title>
+  <!-- CodeMirror 5 (MIT) makes the demo code editable -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/mode/javascript/javascript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.21/addon/edit/matchbrackets.js"></script>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/docs.css?v=350004db" />
+</head>
+<body class="page-example-snack-hunt">
+  <header class="topbar">
+    <button class="menu-btn" aria-label="Menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <a class="brand" href="../index.html"><span class="logo"><span class="logo-circle">●</span><span class="logo-square">■</span><span class="logo-triangle">▲</span></span> <span class="brand-name">GameObjects.js</span></a>
+    <span class="tagline">physics game objects for p5.js</span>
+    <nav class="topnav">
+      <a href="getting-started.html">Learn</a>
+      <a href="examples.html" class="current" aria-current="page">Examples</a>
+      <a href="api.html">API</a>
+      <a href="api.html#search" class="search-link" title="Search the API" aria-label="Search the API"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
+    </nav>
+  </header>
+  <nav class="sidebar">
+    <ol>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="game-objects.html">Game Objects</a></li>
+      <li><a href="movement.html">Movement</a></li>
+      <li><a href="groups.html">Groups of Game Objects</a></li>
+      <li><a href="physics.html">Physics</a></li>
+      <li><a href="collisions.html">Collisions and Overlaps</a></li>
+      <li><a href="animation.html">Spritesheets and Animations</a></li>
+      <li><a href="sounds.html">Sounds</a></li>
+      <li><a href="input-camera.html">Player Input and Camera</a></li>
+      <li><a href="levels-score.html">Managing your Game with Levels and Score</a></li>
+      <li><a href="examples.html">Example Games</a><ul class="sub"><li><a href="example-basics.html">Physics Sandbox</a></li><li><a href="example-joints.html">Joints Playground</a></li><li><a href="example-breakout.html">Breakout</a></li><li><a href="example-platformer.html">Platformer</a></li><li><a href="example-space-shooter.html">Space Shooter</a></li><li class=current><a href="example-snack-hunt.html">Mochi&#x27;s Snack Hunt</a></li></ul></li>
+    </ol>
+    <div class="sidebar-ref">
+      <a href="api.html"><span class="ref-icon">{ }</span> API Reference</a>
+    </div>
+    <div class="sidebar-foot">
+      <a href="../index.html">← Home</a>
+    </div>
+  </nav>
+  <main class="content">
+    <p class="section-num"><a href="examples.html">Example Games</a> › Mochi&#x27;s Snack Hunt</p>
+<h1 id="mochis-snack-hunt">Mochi's Snack Hunt</h1>
+<p class="lead">Help Mochi eat every snack on three levels, while dodging spikes, gaps and grumpy Mochis. The hero is <strong>Mochi</strong>, a character that comes built into GameObjects, and the <strong>game manager</strong> looks after the levels, the score and the end of the game.</p>
+<p><strong>You'll learn:</strong> the built-in Mochi character · levels drawn as text · snacks as sensors · the game manager: <code>levelStarted()</code>, <code>endLevel()</code>, <code>restartLevel()</code> and <code>endGame()</code> · lives · enemies that patrol, and <code>ignore()</code> · stomping on enemies from above</p>
+<h2 id="play-the-finished-game">Play the finished game</h2>
+<p>Arrow keys or <strong>A</strong>/<strong>D</strong> to walk, <strong>Space</strong>, <strong>W</strong> or <strong>↑</strong> to jump. Click the game first so it can hear the keyboard, then press any key to start.</p>
+<div class="demo" data-sketch="examples/snack-hunt" data-width="800" data-height="480" data-keys="1"></div>
+<h2 id="step-1-mochi-on-a-level">Step 1: Mochi on a level</h2>
+<p><strong>Mochi</strong> is a <code>GameObject</code> with a face. It blinks, looks around, squishes when it lands and has moods. Make one like any other object:</p>
+<pre><code class="language-js">player = new Mochi(x, y, 30);   // 30 pixels across
+</code></pre>
+<p>The level is drawn as text, one character for each 32-pixel tile: <code>#</code> is ground and <code>P</code> is where Mochi starts. We loop through every row and every character, and make the right thing for each one:</p>
+<pre><code class="language-js">for (let row = 0; row &lt; map.length; row++) {
+  for (let col = 0; col &lt; map[row].length; col++) {
+    let ch = map[row][col];
+    let x = col * TILE + TILE / 2;    // the centre of this tile
+    let y = row * TILE + TILE / 2;
+    if (ch === '#') ground.create(x, y, TILE, TILE);
+    if (ch === 'P') player = new Mochi(x, y, 30);
+  }
+}
+</code></pre>
+<p>Mochi already knows how to move. <code>walk()</code> takes <code>-1</code> (left), <code>1</code> (right) or <code>0</code> (stop), and turns Mochi to face the way it's going. <code>jump()</code> only jumps when Mochi is standing on something, so there's no flying:</p>
+<pre><code class="language-js">function draw() {
+  let direction = 0;
+  if (keyIsDown(LEFT_ARROW)) direction = -1;
+  if (keyIsDown(RIGHT_ARROW)) direction = 1;
+  player.walk(direction);
+}
+
+function keyPressed() {
+  if (key === ' ') player.jump();
+}
+</code></pre>
+<p>Stand still for a few seconds and Mochi gets sleepy.</p>
+<div class="demo" data-sketch="examples/snack-hunt-step-1" data-width="800" data-height="480" data-keys="1"></div>
+<h2 id="step-2-snacks-and-a-score">Step 2: Snacks and a score</h2>
+<p>Each <code>o</code> in the map is a snack: a small circle in a group of <strong>sensors</strong>. Sensors don't push anything, so Mochi walks right through them, but the collision is still reported. When Mochi touches a snack, the snack disappears and the <a href="levels-score.html#the-game-manager">game manager</a> adds 10 points:</p>
+<pre><code class="language-js">snacks = new GameGroup({ shape: 'circle', isStatic: true, isSensor: true });
+
+player.onCollide(snacks, (me, snack) =&gt; {
+  snack.destroy();
+  gameManager.addScore(10);
+  if (random() &lt; 0.3) me.say(random(['Yum!', 'Nom!', 'Tasty!']), 0.8);
+});
+</code></pre>
+<p><code>say()</code> shows a speech bubble for a moment. The score goes in <a href="levels-score.html#drawing-the-score-on-top"><code>drawOnTop()</code></a>, so it's always drawn over the level.</p>
+<div class="demo" data-sketch="examples/snack-hunt-step-2" data-width="800" data-height="480" data-keys="1"></div>
+<h2 id="step-3-three-levels-with-the-game-manager">Step 3: Three levels with the game manager</h2>
+<p>Now <code>levels</code> holds three maps. The game manager builds them one at a time: tell it how many there are, and start the game:</p>
+<pre><code class="language-js">gameManager.levels = levels.length;
+gameManager.startGame();          // calls levelStarted(1)
+</code></pre>
+<p>It calls our <code>levelStarted()</code> with the level number. That function clears the world and builds that level's map. Level 1 is <code>levels[0]</code>, because arrays start at 0:</p>
+<pre><code class="language-js">function levelStarted(level) {
+  world.clear();
+  world.addWalls();
+  let map = levels[level - 1];
+  // ... build it, like in step 1
+}
+</code></pre>
+<p>When every snack is eaten, Mochi celebrates for a second and we call <code>gameManager.endLevel()</code>, which builds the next level. After level 3 it ends the game instead, and <code>gameManager.won</code> is <code>true</code>.</p>
+<p>For the pause, a small <code>wait()</code> function remembers what to do and when. <code>draw()</code> does it once the time comes, and ignores the keys until then:</p>
+<pre><code class="language-js">function wait(frames, action) {
+  waitUntil = frameCount + frames;
+  afterWait = action;
+}
+
+// in draw():
+if (snacks.length === 0) {
+  player.walk(0);
+  player.say('All done!', 1);
+  wait(60, () =&gt; gameManager.endLevel());
+}
+</code></pre>
+<p>The maps already have some other characters in them: <code>^</code>, <code>g</code> and <code>|</code>. For now they're ignored.</p>
+<div class="demo" data-sketch="examples/snack-hunt-step-3" data-width="800" data-height="480" data-keys="1"></div>
+<h2 id="step-4-spikes-gaps-and-grumpy-mochis">Step 4: Spikes, gaps and grumpy Mochis</h2>
+<p>Time for some danger:</p>
+<ul>
+<li><strong><code>^</code> spikes</strong> are triangles in a group of sensors.</li>
+<li><strong>Gaps</strong> in the ground: the bottom wall is removed with <code>walls.bottom.destroy()</code>, so Mochi can fall out of the level.</li>
+<li><strong><code>g</code> grumpy Mochis</strong> are Mochis too, with an angry mood and different colors. Their eyes <code>watch()</code> the player.</li>
+</ul>
+<pre><code class="language-js">let grumpy = new Mochi(x, y, 30, { mood: 'angry', color: '#d6cdea', stroke: '#a99cc9', walkSpeed: 1.3 });
+grumpy.watch(player);
+</code></pre>
+<p><strong>Patrolling.</strong> Each grumpy walks in its own <code>data.direction</code> and turns around when it touches a <strong>stopper</strong>, an invisible <code>|</code> in the map. The player shouldn't bump into stoppers, so it <a href="collisions.html#not-colliding-at-all-ignore"><code>ignore()</code>s</a> them:</p>
+<pre><code class="language-js">stoppers = new GameGroup({ isStatic: true, visible: false });
+grumpies.onCollide(stoppers, (grumpy) =&gt; {
+  grumpy.data.direction *= -1;
+});
+
+player.ignore(stoppers);
+</code></pre>
+<p><strong>Getting hurt.</strong> Touching spikes or a grumpy, or falling off the bottom, costs a life. Mochi makes a hurt face and says "Ouch!". Then, after a short <code>wait()</code>, the game manager either <strong>restarts the level</strong> or ends the game:</p>
+<pre><code class="language-js">function hurt() {
+  if (afterWait) return;      // already hurt
+  lives--;
+  player.react('hurt', 2);
+  player.say('Ouch!', 2);
+  wait(50, () =&gt; {
+    if (lives &gt; 0) gameManager.restartLevel();
+    else gameManager.endGame();
+  });
+}
+</code></pre>
+<p><code>restartLevel()</code> calls <code>levelStarted()</code> again with the same level, so the snacks come back. The score goes back to what it was when the level began, so they can't be eaten twice.</p>
+<p><strong>Stomping.</strong> If the player is above the grumpy when they touch, it's a stomp: the grumpy is gone, Mochi bounces, and that's 25 points:</p>
+<pre><code class="language-js">player.onCollide(grumpies, (me, grumpy) =&gt; {
+  if (me.y &lt; grumpy.y - grumpy.height * 0.35) {
+    grumpy.destroy();
+    me.velocityY = -8;
+    gameManager.addScore(25);
+  } else {
+    hurt();
+  }
+});
+</code></pre>
+<div class="demo" data-sketch="examples/snack-hunt-step-4" data-width="800" data-height="480" data-keys="1"></div>
+<h2 id="step-5-title-and-ending-screens-the-finished-game">Step 5: Title and ending screens (the finished game)</h2>
+<p>Before the game starts, <code>gameManager.state</code> is <code>'title'</code>. In <code>setup()</code>, instead of starting straight away, we show a big Mochi waiting on a floor. Any key calls <code>gameManager.startGame()</code>, and after the game ends, any key starts it again:</p>
+<pre><code class="language-js">function showTitle() {
+  world.clear();
+  new GameObject(400, 400, 800, 40, { isStatic: true });
+  let mochi = new Mochi(400, 340, 72);
+  mochi.say('Press any key to start!', 9999);
+}
+
+function keyPressed() {
+  if (!gameManager.isPlaying) {
+    gameManager.startGame();
+    return;
+  }
+  // ... jumping
+}
+</code></pre>
+<p>When the game ends, <code>gameEnded(won)</code> builds the ending scene, a happy Mochi or a hurt one:</p>
+<pre><code class="language-js">function gameEnded(won) {
+  world.clear();
+  new GameObject(400, 400, 800, 40, { isStatic: true });
+  let mochi = new Mochi(400, 340, 72, { mood: won ? 'happy' : 'hurt' });
+  mochi.say(won ? &quot;I'm so full! Thank you!&quot; : 'Oh no...', 9999);
+}
+</code></pre>
+<p><code>drawOnTop()</code> adds the words for each screen: the title, "You win!" or "Game over", and the score with <code>gameManager.highScore</code>.</p>
+<div class="demo" data-sketch="examples/snack-hunt" data-width="800" data-height="480" data-keys="1"></div>
+<h2 id="make-it-your-own">Make it your own</h2>
+<ul>
+<li><strong>More levels:</strong> add a map to <code>levels</code>. The game manager counts them for you.</li>
+<li><strong>Your own Mochi:</strong> change the player's <code>color</code> and <code>stroke</code>, or its <code>walkSpeed</code> and <code>jumpPower</code>. For a pink one, try <code>new Mochi(x, y, 30, { color: '#f7c6d0', stroke: '#e39aac' })</code>.</li>
+<li><strong>A friend at the exit:</strong> put a friendly Mochi in each level that <code>watch()</code>es the player and <code>say()</code>s something when every snack is gone.</li>
+<li><strong>Moods:</strong> make the player look <code>'surprised'</code> with <code>react()</code> when a grumpy gets close.</li>
+<li><strong>A camera:</strong> make the maps wider than the screen and follow Mochi with <a href="input-camera.html#the-camera"><code>world.camera.follow(player)</code></a>.</li>
+<li><strong>Save the best score:</strong> remember <code>gameManager.highScore</code> with <code>storeItem()</code> (see <a href="levels-score.html#saving-a-high-score">Levels and Score</a>).</li>
+</ul>
+<p>See the <a href="api.html#mochi">API reference</a> for everything Mochi can do.</p>
+    <nav class="pager">
+      <a class="prev" href="example-space-shooter.html"><small>Previous</small>Space Shooter</a>
+      <span></span>
+    </nav>
+    <footer id="site-footer" class="site-footer">
+      <span class="footer-credit">© <span class="footer-year">2026</span> <a href="https://davidstein.us" target="_blank" rel="noopener">David Stein</a> · MIT License · Physics by <a href="https://brm.io/matter-js/" target="_blank" rel="noopener">Matter.js</a></span>
+      <span class="footer-promo">Another David Stein Production: <a href="https://machine.net" target="_blank" rel="noopener">machine.net</a> · <a href="https://newsnix.com" target="_blank" rel="noopener">newsnix.com</a> · <a href="https://instructor.cc" target="_blank" rel="noopener">instructor.cc</a> · <a href="https://p5code.com" target="_blank" rel="noopener">p5code.com</a> · <a href="https://p5sound.com" target="_blank" rel="noopener">p5sound.com</a> · <a href="https://midiconductor.com" target="_blank" rel="noopener">midiconductor.com</a> · <a href="https://procontrols.org" target="_blank" rel="noopener">procontrols.org</a> · <a href="https://supermod3l.com" target="_blank" rel="noopener">supermod3l.com</a> · <a href="https://indienewyork.com" target="_blank" rel="noopener">indienewyork.com</a> · <a href="https://indieboston.com" target="_blank" rel="noopener">indieboston.com</a> · <a href="https://iHearYouCanCode.com" target="_blank" rel="noopener">iHearYouCanCode.com</a> · <a href="http://www.davidstein.us/portfolio/" target="_blank" rel="noopener">davidstein.us</a> · <a href="https://colonelPanix.com" target="_blank" rel="noopener">colonelPanix.com</a></span>
+    </footer>
+  </main>
+  <script src="js/docs.js?v=350004db"></script>
+</body>
+</html>

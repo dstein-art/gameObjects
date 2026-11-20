@@ -333,3 +333,8 @@ kbd {
 .site-footer a { color: var(--accent); text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
 .footer-promo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+
+/* Mochi on the home page: a see-through layer under the top bar, and a show / hide button */
+.mochi-layer { position: fixed; top: 0; left: 0; z-index: 15; pointer-events: none; }
+.mochi-toggle { position: fixed; right: 14px; bottom: 14px; z-index: 21; padding: 7px 12px; font: inherit; font-size: 13px; color: #555b69; background: #fff; border: 1px solid #e3e5ea; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,.08); cursor: pointer; }
+.mochi-toggle:hover { color: #1f2330; border-color: #c9ccd4; }

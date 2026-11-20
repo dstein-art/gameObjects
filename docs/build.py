@@ -35,7 +35,7 @@ def site_version():
     It's added to the end of addresses (?v=...), so when any of these files
     change, browsers fetch the new copies instead of using old ones they saved.
     """
-    files = [ROOT.parent / "gameobjects.js", ROOT / "js" / "docs.js", ROOT / "css" / "docs.css",
+    files = [ROOT.parent / "gameobjects.js", ROOT / "js" / "docs.js", ROOT / "js" / "mochi-home.js", ROOT / "css" / "docs.css",
              ROOT / "demos" / "run.html"]
     files += sorted((ROOT / "demos").glob("*.js")) + sorted((ROOT / "examples").glob("*.js"))
     h = hashlib.md5()
@@ -332,6 +332,7 @@ def build():
     page = home.read_text(encoding="utf-8")
     page = re.sub(r'docs/css/docs\.css(\?v=\w+)?"', f'docs/css/docs.css?v={VERSION}"', page)
     page = re.sub(r'docs/js/docs\.js(\?v=\w+)?"', f'docs/js/docs.js?v={VERSION}"', page)
+    page = re.sub(r'docs/js/mochi-home\.js(\?v=\w+)?"', f'docs/js/mochi-home.js?v={VERSION}"', page)
     page = re.sub(r"<footer[^>]*>.*?</footer>", lambda m: footer_html(), page, count=1, flags=re.S)
     home.write_text(page, encoding="utf-8")
     print(f"updated index.html (version {VERSION})")
